@@ -24,5 +24,9 @@ public class EconomicModel {
         this.timePeriod = timePeriod;
     }
 
+    private void run(){
+        for(int i = 0; i < timePeriod; i++){
 
+        }
+    }
 }
