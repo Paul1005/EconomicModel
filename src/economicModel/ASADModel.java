@@ -1,54 +1,59 @@
 package economicModel;
 
 public class ASADModel {
-    public static float longRungAggregateSupply = 400;
+    public static float longRungAggregateSupply;
     public static float taxes;
-    public static float spendiing;
-    public static float taxMultiplier;
-    public static float spendingMultiplier;
     public static float mpc;
     public static float mps;
     public static float reserveRequirement;
     public static float moneySupply;
+    public static float CConstant;
+    public static float IConstant;
+    public static float G;
+    public static float gap;
+    public static float C;
+    public static float aggregateDemand;
+
+    private static float investmentEquation(float interestRate) {
+        return (float) (Math.pow((Math.sqrt(3) * Math.sqrt(27 * Math.pow(IConstant, 2) + 4 * Math.pow(interestRate, 3)) + 9 * IConstant), 1f / 3f) / (Math.pow(2, 1f / 3f) * Math.pow(3, 2f / 3f)) - (Math.pow(2f / 3f, 1f / 3f) * interestRate) / Math.pow((Math.sqrt(3) * Math.sqrt(27 * Math.pow(IConstant, 2) + 4 * Math.pow(interestRate, 3)) + 9 * IConstant), 1f / 3f));
+    }
+
+    private static float consumptionEquation(float priceLevel) {
+        return CConstant / priceLevel;
+    }
 
     public static void runCycle() {
-        float ADm = -1;
-        float ADb = 2000;
+        //float priceLevel;
 
-        float SRASm = 1;
-        float SRASb = 0;
+        C = CConstant + taxes * (-mpc / mps);//consumptionEquation(priceLevel);
+        //double I = -(interestRate - Math.sqrt(Math.pow(interestRate, 2) - 4 * IConstant)) / 2;
+        //interestRate = Math.pow(I, 2) + 1/-I;
+        float interestRate = longRungAggregateSupply/moneySupply;
+        float I = investmentEquation(interestRate);
 
-        float C = 100;
-        float I = 100;
-        float G = 100;
-        float output = C + I + G;
-        float output = (ADb * SRASm - SRASb * ADm) / (SRASm - ADm);
-        //float priceLevel = (SRASb - ADb) / (ADm - SRASm);
+        aggregateDemand = C + I + G;
 
-        float gap = longRungAggregateSupply - output;
+        //float SRAS = priceLevel;
 
-        spendingMultiplier = 1 / (1 - mpc);
-        taxMultiplier = -mpc/mps;
+        gap = longRungAggregateSupply - aggregateDemand;
+    }
 
-        float taxChange = gap/taxMultiplier;
+    public static void changeMoneySupply() {
+        float interestRate;
+        float investmentRequired = longRungAggregateSupply - C - G;
+        interestRate = (float) (Math.pow(investmentRequired, 2) + 1/-investmentRequired);
+        moneySupply = interestRate/longRungAggregateSupply;
+    }
 
-        float spendingChange = gap/spendingMultiplier;
+    public static void changeSpending() {
+        float spendingMultiplier = 1 / (1 - mpc);
+        float spendingChange = gap / spendingMultiplier;
+        G += spendingChange;
+    }
 
-
-
-        float MDm = -1;
-        float MDb = 2000;
-        moneySupply = 1000;
-        float interestRate = MDm * moneySupply + MDb;
-        reserveRequirement = 0.125f;
-
-        float LMm = ;
-        float LMb = ;
-        float ISm = ;
-        float ISb = ;
-
-        float targetInterestRate = ;
-
-        float supplyChange = gap;
+    public static void changeTaxes() {
+        float taxMultiplier = -mpc / mps;
+        float taxChange = gap / taxMultiplier;
+        taxes += taxChange;
     }
 }

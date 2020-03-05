@@ -37,7 +37,7 @@ public class Main {
     */
 
    //Testing
-        float savingsGrowth = 0.5f;
+   /*     float savingsGrowth = 0.5f;
         float populationGrowth = 0.0f;
         float technology = 1.5f;
         float deprecation = 0.005f;
@@ -57,6 +57,43 @@ public class Main {
             //System.out.println("Steady state capital: " + SolowSwanGrowthModel.steadyStateCapital);
             System.out.println("Steady state output per person: " + SolowSwanGrowthModel.steadyStateOutputPerPerson);
             //System.out.println("Steady state output: " + SolowSwanGrowthModel.steadyStateOutput);
+        }*/
+        ASADModel.longRungAggregateSupply = 200;
+        ASADModel.CConstant = 100;
+        ASADModel.G = 100;
+        ASADModel.IConstant = 100;
+        ASADModel.moneySupply = 1000;
+        ASADModel.reserveRequirement = 0.125f;
+        ASADModel.taxes = 10;
+        ASADModel.mpc = 0.7f;
+        ASADModel.mps = 0.3f;
+        while(true) {
+            System.out.println("Press enter to run cycle");
+            scanner.nextLine();
+            ASADModel.runCycle();
+            System.out.println("Current output: " + ASADModel.aggregateDemand);
+            System.out.println("Gap: " + ASADModel.gap);
+            System.out.println("Select option for policy adjustment");
+            String option = scanner.nextLine();
+            switch (option) {
+                case "t":
+                    //if we want to change taxes
+                    ASADModel.changeTaxes();
+                    System.out.println("Taxes: " +  ASADModel.taxes);
+                    break;
+                case "s":
+                    //if we want to change spending
+                    ASADModel.changeSpending();
+                    System.out.println("Government Spending: " +  ASADModel.G);
+                    break;
+                case "m":
+                    //if we want to change money supply
+                    ASADModel.changeMoneySupply();
+                    System.out.println("Money supply: " +  ASADModel.moneySupply);
+                    break;
+            }
+            ASADModel.runCycle();
+            System.out.println("Current output: " + ASADModel.aggregateDemand);
         }
     }
 }
