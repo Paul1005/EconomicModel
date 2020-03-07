@@ -17,62 +17,75 @@ public class ASADModel {
     public static float C;
     public static float aggregateDemand;
 
+    private static float taxMultiplier;
+    private static float spendingMultiplier;
+
+    /**
+     * Find investment based on interest rate, IConstant, and mpi. Is the inverse(swap x and y) of the equation below.
+     * @param interestRate
+     * @return
+     */
     private static float investmentEquation(float interestRate) {
         return (float) (Math.sqrt(Math.pow(IConstant * mpi, 2) * (Math.sqrt(Math.pow(interestRate, 2) + 4) - interestRate)) / Math.sqrt(2));
     }
 
-    /*private static float consumptionEquation(float priceLevel) {
-        return CConstant / priceLevel;
-    }*/
-
-    public static void runCycle() {
-        //float priceLevel;
-        C = CConstant + taxes * (-mpc / mps);//consumptionEquation(priceLevel);
-        //double I = -(interestRate - Math.sqrt(Math.pow(interestRate, 2) - 4 * IConstant)) / 2;
-        //interestRate = Math.pow(I, 2) + 1/-I;
-        moneySupply = ownedBonds / reserveRequirement;
-        System.out.println("Money supply: " + ASADModel.moneySupply);
-        float interestRate = (longRungAggregateSupply - moneySupply) / longRungAggregateSupply;
-        System.out.println("Current Interest Rate: " + interestRate);
-        float I = investmentEquation(interestRate);
-        System.out.println("Current Investment: " + I);
-        G = GConstant * (1 / (mps));
-        aggregateDemand = C + I + G;
-
-        //float SRAS = priceLevel;
-
-        gap = longRungAggregateSupply - aggregateDemand;
+    /**
+     * Find interest rate based on investment, IConstant, and mpi. Is the inverse(swap x and y) of the equation above.
+     * @param investmentRequired
+     * @return
+     */
+    private static float interestRateEquation(float investmentRequired){
+        return (float) ((Math.pow(IConstant, 4) * Math.pow(mpi, 4) - Math.pow(investmentRequired, 4)) / (Math.pow(IConstant, 2) * Math.pow(mpi, 2) * Math.pow(investmentRequired, 2)));
     }
 
-    public static void changeReserveRequirements() {
-        float investmentRequired = longRungAggregateSupply - C - G;
-        float interestRate = (float) ((Math.pow(IConstant, 4) * Math.pow(mpi, 4) - Math.pow(investmentRequired, 4)) / (Math.pow(IConstant, 2) * Math.pow(mpi, 2) * Math.pow(investmentRequired, 2)));
-        float newMoneySupply = -interestRate * longRungAggregateSupply + longRungAggregateSupply;
-        reserveRequirement *= (moneySupply / newMoneySupply);
+    /**
+     * Find money supply based on interest rate and long run aggregate supply.
+     * @param interestRate
+     * @return
+     */
+    private static float moneySupplyEquation(float interestRate){
+       return -interestRate * longRungAggregateSupply + longRungAggregateSupply;
     }
 
-    public static void changeMoneySupply() {
-        float investmentRequired = longRungAggregateSupply - C - G;
-        System.out.println("Investment required: " + investmentRequired);
-        float interestRate = (float) ((Math.pow(IConstant, 4) * Math.pow(mpi, 4) - Math.pow(investmentRequired, 4)) / (Math.pow(IConstant, 2) * Math.pow(mpi, 2) * Math.pow(investmentRequired, 2)));
-        System.out.println("New Interest Rate: " + interestRate);
-        float newMoneySupply = -interestRate * longRungAggregateSupply + longRungAggregateSupply;
-        System.out.println("New Money supply: " + newMoneySupply);
-        float gap = newMoneySupply - moneySupply;
-        float bondChange = gap * reserveRequirement;
-        ownedBonds += bondChange;
-        System.out.println("New owned bonds: " + ownedBonds);
+    static void runCycle() {
+        taxMultiplier = -mpc / mps;
+        spendingMultiplier = 1 / mps;
+
+        C = CConstant + taxes * taxMultiplier; // overall consumption
+
+        moneySupply = ownedBonds / reserveRequirement; // find money supply based on bonds and reserve requirement
+        float interestRate = (longRungAggregateSupply - moneySupply) / longRungAggregateSupply; // find interest rate based on current money supply
+        float I = investmentEquation(interestRate); // overall investment
+
+        G = GConstant * spendingMultiplier; // overall government spending
+
+        aggregateDemand = C + I + G; // total gdp
+        gap = longRungAggregateSupply - aggregateDemand; // find the output gap
     }
 
-    public static void changeSpending() {
-        float spendingMultiplier = 1 / (mps);
-        float spendingChange = gap / spendingMultiplier;
-        G += spendingChange;
+    static void changeReserveRequirements() {
+        float investmentRequired = longRungAggregateSupply - C - G; // find how much investment we need
+        float interestRate = interestRateEquation(investmentRequired); // find the new interest rate based on the investment we need.
+        float newMoneySupply = moneySupplyEquation(interestRate); // find the money supply we need based on the new interest rate
+        reserveRequirement *= (moneySupply / newMoneySupply); // determine the new reserve requirement based on the new and old money supply
     }
 
-    public static void changeTaxes() {
-        float taxMultiplier = -mpc / mps;
-        float taxChange = gap / taxMultiplier;
-        taxes += taxChange;
+    static void changeMoneySupply() {
+        float investmentRequired = longRungAggregateSupply - C - G; // find how much investment we need
+        float interestRate = interestRateEquation(investmentRequired); // find the new interest rate based on the investment we need.
+        float newMoneySupply = moneySupplyEquation(interestRate); // find the money supply we need based on the new interest rate
+        float gap = newMoneySupply - moneySupply; // determine how much more money we need
+        float bondChange = gap * reserveRequirement; // determine how many more bonds we need to buy or sell
+        ownedBonds += bondChange; // add the change in bonds
+    }
+
+    static void changeSpending() {
+        float spendingChange = gap / spendingMultiplier; // find the change in spending required
+        G += spendingChange; // add spending change to government spending
+    }
+
+    static void changeTaxes() {
+        float taxChange = gap / taxMultiplier; // find the change in taxes required
+        taxes += taxChange; // add tax change to total taxes
     }
 }
