@@ -3,7 +3,7 @@ package economicModel;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String args[]){
+    public static void main(String args[]) {
         Scanner scanner = new Scanner(System.in);  // Create a Scanner object
         // preset gdp values
    /*     float consumption = 100;
@@ -36,7 +36,7 @@ public class Main {
         }
     */
 
-   //Testing
+        //Testing
    /*     float savingsGrowth = 0.5f;
         float populationGrowth = 0.0f;
         float technology = 1.5f;
@@ -58,42 +58,51 @@ public class Main {
             System.out.println("Steady state output per person: " + SolowSwanGrowthModel.steadyStateOutputPerPerson);
             //System.out.println("Steady state output: " + SolowSwanGrowthModel.steadyStateOutput);
         }*/
-        ASADModel.longRungAggregateSupply = 200;
-        ASADModel.CConstant = 100;
-        ASADModel.G = 100;
-        ASADModel.IConstant = 100;
-        ASADModel.moneySupply = 1000;
+        ASADModel.longRungAggregateSupply = 500;
+        ASADModel.CConstant = 500;
+        ASADModel.GConstant = 50;
+        ASADModel.IConstant = 50;
+        ASADModel.ownedBonds = 10;
         ASADModel.reserveRequirement = 0.125f;
-        ASADModel.taxes = 10;
-        ASADModel.mpc = 0.7f;
-        ASADModel.mps = 0.3f;
-        while(true) {
+        ASADModel.taxes = 100;
+        ASADModel.mpc = 0.6f;
+        ASADModel.mpi = 0.1f;
+        ASADModel.mps = 1 - ASADModel.mpc - ASADModel.mpi;
+        while (true) {
             System.out.println("Press enter to run cycle");
             scanner.nextLine();
             ASADModel.runCycle();
             System.out.println("Current output: " + ASADModel.aggregateDemand);
             System.out.println("Gap: " + ASADModel.gap);
+            System.out.println("Taxes: " + ASADModel.taxes);
+            System.out.println("Government Spending: " + ASADModel.G);
+            System.out.println("Consumption: " + ASADModel.C);
+            System.out.println("Reserve Requirement: " + ASADModel.reserveRequirement);
             System.out.println("Select option for policy adjustment");
             String option = scanner.nextLine();
             switch (option) {
                 case "t":
-                    //if we want to change taxes
+                    // if we want to change taxes
                     ASADModel.changeTaxes();
-                    System.out.println("Taxes: " +  ASADModel.taxes);
+                    System.out.println("Taxes: " + ASADModel.taxes);
                     break;
                 case "s":
-                    //if we want to change spending
+                    // if we want to change spending
                     ASADModel.changeSpending();
-                    System.out.println("Government Spending: " +  ASADModel.G);
                     break;
                 case "m":
-                    //if we want to change money supply
+                    // if we want to change money supply
                     ASADModel.changeMoneySupply();
-                    System.out.println("Money supply: " +  ASADModel.moneySupply);
                     break;
+                case "r":
+                    // if we want to change reserve requirement
+                    ASADModel.changeReserveRequirements();
+                    System.out.println("Reserve Requirement: " + ASADModel.reserveRequirement);
             }
             ASADModel.runCycle();
+            System.out.println("Money supply: " + ASADModel.moneySupply);
             System.out.println("Current output: " + ASADModel.aggregateDemand);
+            System.out.println("Government Spending: " + ASADModel.G);
         }
     }
 }
