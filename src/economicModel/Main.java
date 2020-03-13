@@ -58,7 +58,7 @@ public class Main {
             System.out.println("Steady state output per person: " + SolowSwanGrowthModel.steadyStateOutputPerPerson);
             //System.out.println("Steady state output: " + SolowSwanGrowthModel.steadyStateOutput);
         }*/
-        ASADModel.longRungAggregateSupply = 500;
+        ASADModel.longRunAggregateSupply = 500;
         ASADModel.CConstant = 500;
         ASADModel.GConstant = 50;
         ASADModel.IConstant = 50;
@@ -68,12 +68,16 @@ public class Main {
         ASADModel.mpc = 0.6f;
         ASADModel.mpi = 0.1f;
         ASADModel.mps = 1 - ASADModel.mpc - ASADModel.mpi;
+        ASADModel.overallGovtBalance = 0;
+        //inflation = quantity * velocity;
+        //money supply * velocity of money = price level * real gdp
+        //price level * real gdp = nominal gdp
         while (true) {
             System.out.println("Press enter to run cycle");
             scanner.nextLine();
             ASADModel.runCycle();
             System.out.println("Current output: " + ASADModel.aggregateDemand);
-            System.out.println("Gap: " + ASADModel.gap);
+            System.out.println("Gap: " + ASADModel.govtSpendingGap);
             System.out.println("Taxes: " + ASADModel.taxes);
             System.out.println("Government Spending: " + ASADModel.G);
             System.out.println("Consumption: " + ASADModel.C);
