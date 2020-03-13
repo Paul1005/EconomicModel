@@ -18,7 +18,7 @@ public class ASADModel {
     public static float govtSpendingGap;
     public static float C;
     public static float aggregateDemand;
-//    public static float priceLevel;
+    public static float priceLevel;
 
     private static float taxMultiplier;
     private static float spendingMultiplier;
@@ -82,8 +82,9 @@ public class ASADModel {
         overallPublicBalance += publicBalance;
         G = GConstant * spendingMultiplier; // overall government spending
 
-        aggregateDemand = (C + I + G);// / priceLevel; // total gdp
-        shortRunAggregateSupply = longRunAggregateSupply;// * priceLevel;
+        priceLevel = (float) Math.sqrt((C + I + G) / longRunAggregateSupply);
+        aggregateDemand = (C + I + G) / priceLevel; // total gdp
+        shortRunAggregateSupply = longRunAggregateSupply * priceLevel;
         govtSpendingGap = longRunAggregateSupply - aggregateDemand; // find the output govtSpendingGap
 
         govtBalance = taxes - GConstant;
