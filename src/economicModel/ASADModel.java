@@ -3,7 +3,7 @@ package economicModel;
 //TODO: incorporate inflation somehow
 public class ASADModel {
     public static float longRunAggregateSupply;
-    public static float shortRunAggregateSupply;
+    public static float shortRunAggregateSupplyOutput;
     public static float taxes;
     public static float mpc;
     public static float mpi;
@@ -11,24 +11,25 @@ public class ASADModel {
     public static float reserveRequirement;
     public static float ownedBonds;
     public static float moneySupply;
-    public static float CConstant;
     public static float GConstant;
     public static float IConstant;
     public static float G;
     public static float govtSpendingGap;
     public static float C;
-    public static float aggregateDemand;
+    public static float aggregateDemandOutput;
     public static float priceLevel;
 
     private static float taxMultiplier;
     private static float spendingMultiplier;
 
+    //TODO: these should somehow be affected by inflation
     public static float govtBalance;
     public static float overallGovtBalance;
-    public static float govtDebtInterest;
     public static float publicBalance;
-    public static float publicDebtInterest;
     public static float overallPublicBalance;
+
+    public static float publicDebtInterest;
+    public static float govtDebtInterest;
 
     /**
      * Find investment based on interest rate, IConstant, and mpi. Is the inverse(swap x and y) of the equation below.
@@ -68,8 +69,6 @@ public class ASADModel {
         taxMultiplier = -mpc / mps;
         spendingMultiplier = 1 / mps;
 
-        C = CConstant + taxes * taxMultiplier; // overall consumption
-
         moneySupply = ownedBonds / reserveRequirement; // find money supply based on bonds and reserve requirement
         float interestRate = (longRunAggregateSupply - moneySupply) / longRunAggregateSupply; // find interest rate based on current money supply
         float I = investmentEquation(interestRate); // overall investment
@@ -82,10 +81,11 @@ public class ASADModel {
         overallPublicBalance += publicBalance;
         G = GConstant * spendingMultiplier; // overall government spending
 
-        priceLevel = (float) Math.sqrt((C + I + G) / longRunAggregateSupply);
-        aggregateDemand = (C + I + G) / priceLevel; // total gdp
-        shortRunAggregateSupply = longRunAggregateSupply * priceLevel;
-        govtSpendingGap = longRunAggregateSupply - aggregateDemand; // find the output govtSpendingGap
+        priceLevel = (C + taxes * taxMultiplier + G  + I) / longRunAggregateSupply;
+        aggregateDemandOutput = (C + I) / priceLevel + G + taxes * taxMultiplier;
+        shortRunAggregateSupplyOutput = longRunAggregateSupply * priceLevel;
+
+        govtSpendingGap = longRunAggregateSupply - (C + taxes * taxMultiplier + G  + I); // find the output govtSpendingGap
 
         govtBalance = taxes - GConstant;
         if (govtBalance < 0) {
@@ -96,14 +96,14 @@ public class ASADModel {
     }
 
     static void changeReserveRequirements() {
-        float investmentRequired = longRunAggregateSupply - C - G; // find how much investment we need
+        float investmentRequired = longRunAggregateSupply - C - G - taxes * taxMultiplier; // find how much investment we need
         float interestRate = interestRateEquation(investmentRequired); // find the new interest rate based on the investment we need.
         float newMoneySupply = moneySupplyEquation(interestRate); // find the money supply we need based on the new interest rate
         reserveRequirement *= (moneySupply / newMoneySupply); // determine the new reserve requirement based on the new and old money supply
     }
 
     static void changeMoneySupply() {
-        float investmentRequired = longRunAggregateSupply - C - G; // find how much investment we need
+        float investmentRequired = longRunAggregateSupply - C - G - taxes * taxMultiplier; // find how much investment we need
         float interestRate = interestRateEquation(investmentRequired); // find the new interest rate based on the investment we need.
         float newMoneySupply = moneySupplyEquation(interestRate); // find the money supply we need based on the new interest rate
         float gap = newMoneySupply - moneySupply; // determine how much more money we need
@@ -113,7 +113,7 @@ public class ASADModel {
 
     static void changeSpending() {
         float spendingChange = govtSpendingGap / spendingMultiplier; // find the change in spending required
-        G += spendingChange; // add spending change to government spending
+        GConstant += spendingChange; // add spending change to government spending
     }
 
     static void changeTaxes() {

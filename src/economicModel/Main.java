@@ -59,7 +59,7 @@ public class Main {
             //System.out.println("Steady state output: " + SolowSwanGrowthModel.steadyStateOutput);
         }*/
         ASADModel.longRunAggregateSupply = 500;
-        ASADModel.CConstant = 500;
+        ASADModel.C = 500;
         ASADModel.GConstant = 50;
         ASADModel.IConstant = 50;
         ASADModel.ownedBonds = 10;
@@ -76,12 +76,13 @@ public class Main {
             System.out.println("Press enter to run cycle");
             scanner.nextLine();
             ASADModel.runCycle();
-            System.out.println("Current output: " + ASADModel.aggregateDemand);
+            System.out.println("Current output: " + ASADModel.aggregateDemandOutput);
             System.out.println("Gap: " + ASADModel.govtSpendingGap);
             System.out.println("Taxes: " + ASADModel.taxes);
             System.out.println("Government Spending: " + ASADModel.G);
             System.out.println("Consumption: " + ASADModel.C);
             System.out.println("Reserve Requirement: " + ASADModel.reserveRequirement);
+            System.out.println("Price Level: " + ASADModel.priceLevel);
             System.out.println("Select option for policy adjustment");
             String option = scanner.nextLine();
             switch (option) {
@@ -104,8 +105,9 @@ public class Main {
                     System.out.println("Reserve Requirement: " + ASADModel.reserveRequirement);
             }
             ASADModel.runCycle();
+            System.out.println("Price Level: " + ASADModel.priceLevel);
             System.out.println("Money supply: " + ASADModel.moneySupply);
-            System.out.println("Current output: " + ASADModel.aggregateDemand);
+            System.out.println("Current output: " + ASADModel.aggregateDemandOutput);
             System.out.println("Government Spending: " + ASADModel.G);
         }
     }
