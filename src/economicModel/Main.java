@@ -63,12 +63,12 @@ public class Main {
         ASADModel.GConstant = 50;
         ASADModel.IConstant = 50;
         ASADModel.ownedBonds = 10;
-        ASADModel.reserveRequirement = 0.125f;
+        ASADModel.reserveRequirement = 0.125;
         ASADModel.taxes = 100;
-        ASADModel.mpc = 0.6f;
-        ASADModel.mpi = 0.1f;
+        ASADModel.mpc = 0.6;
+        ASADModel.mpi = 0.1;
         ASADModel.mps = 1 - ASADModel.mpc - ASADModel.mpi;
-        ASADModel.overallGovtBalance = 0;
+        ASADModel.debtRepaymentAmount = 1;
         //inflation = quantity * velocity;
         //money supply * velocity of money = price level * real gdp
         //price level * real gdp = nominal gdp
@@ -76,8 +76,10 @@ public class Main {
             System.out.println("Press enter to run cycle");
             scanner.nextLine();
             ASADModel.runCycle();
-            System.out.println("Current output: " + ASADModel.aggregateDemandOutput);
-            System.out.println("Gap: " + ASADModel.govtSpendingGap);
+            System.out.println("Aggregate Demand: " + ASADModel.aggregateDemandOutputCurve);
+            System.out.println("Short Run aggregate supply: " + ASADModel.shortRunAggregateSupplyCurve);
+            System.out.println("Equilibrium output: " + ASADModel.equilibriumOutput);
+            System.out.println("Gap: " + ASADModel.outputGap);
             System.out.println("Taxes: " + ASADModel.taxes);
             System.out.println("Government Spending: " + ASADModel.G);
             System.out.println("Consumption: " + ASADModel.C);
@@ -107,8 +109,12 @@ public class Main {
             ASADModel.runCycle();
             System.out.println("Price Level: " + ASADModel.priceLevel);
             System.out.println("Money supply: " + ASADModel.moneySupply);
-            System.out.println("Current output: " + ASADModel.aggregateDemandOutput);
+            System.out.println("Aggregate Demand: " + ASADModel.aggregateDemandOutputCurve);
+            System.out.println("Short Run aggregate supply: " + ASADModel.shortRunAggregateSupplyCurve);
+            System.out.println("Equilibrium output: " + ASADModel.equilibriumOutput);
             System.out.println("Government Spending: " + ASADModel.G);
+            System.out.println("Total Government Debt: " + ASADModel.overallGovtBalanceWInterest);
+            System.out.println("Total Public Debt: " + ASADModel.overallPublicBalanceWInterest);
         }
     }
 }
