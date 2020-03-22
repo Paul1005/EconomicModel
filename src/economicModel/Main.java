@@ -36,44 +36,41 @@ public class Main {
         }
     */
 
-        //Testing
-   /*     float savingsGrowth = 0.5f;
-        float populationGrowth = 0.0f;
-        float technology = 1.5f;
-        float deprecation = 0.005f;
-        int startingPopulation = 100;
-        int startingCapital = 183712;
+        //starting variables
+        ASADModel.debtRepaymentAmount = 1;
+        double populationGrowth = 0.0;
+        double technology = 1;
+        double deprecation = 0.005;
+        SolowSwanGrowthModel.capital = 18000;
+        SolowSwanGrowthModel.Labour = 100;
+        ASADModel.ownedBonds = 10;
+        ASADModel.reserveRequirement = 0.125;
+        ASADModel.taxes = 100;
+        ASADModel.GConstant = 100;
+        ASADModel.mpc = 0.6;
+        ASADModel.mpi = 0.1;
+        ASADModel.mps = 1 - ASADModel.mpc - ASADModel.mpi;
+        double savingsGrowth = ASADModel.mps + ASADModel.mpi;
 
-        SolowSwanGrowthModel.capital = startingCapital;
-        SolowSwanGrowthModel.Labour = startingPopulation;
-        while(true) {
-            System.out.println("Press enter to run cycle");
+        while (true) {
+            System.out.println("Press enter to run Solow Model cycle");
             scanner.nextLine();
             SolowSwanGrowthModel.runCycle(savingsGrowth, populationGrowth, technology, deprecation);
             System.out.println("Capital per person: " + SolowSwanGrowthModel.capitalPerPerson);
             System.out.println("Output/GDP per person: " + SolowSwanGrowthModel.outputPerPerson);
             System.out.println("Gain per person: " + SolowSwanGrowthModel.netGainPerPerson);
             System.out.println("Steady state capital per person: " + SolowSwanGrowthModel.steadyStateCapitalPerPerson);
-            //System.out.println("Steady state capital: " + SolowSwanGrowthModel.steadyStateCapital);
+            System.out.println("Steady state capital: " + SolowSwanGrowthModel.steadyStateCapital);
             System.out.println("Steady state output per person: " + SolowSwanGrowthModel.steadyStateOutputPerPerson);
-            //System.out.println("Steady state output: " + SolowSwanGrowthModel.steadyStateOutput);
-        }*/
-        ASADModel.longRunAggregateSupply = 500;
-        ASADModel.C = 500;
-        ASADModel.GConstant = 50;
-        ASADModel.IConstant = 50;
-        ASADModel.ownedBonds = 10;
-        ASADModel.reserveRequirement = 0.125;
-        ASADModel.taxes = 100;
-        ASADModel.mpc = 0.6;
-        ASADModel.mpi = 0.1;
-        ASADModel.mps = 1 - ASADModel.mpc - ASADModel.mpi;
-        ASADModel.debtRepaymentAmount = 1;
-        //inflation = quantity * velocity;
-        //money supply * velocity of money = price level * real gdp
-        //price level * real gdp = nominal gdp
-        while (true) {
-            System.out.println("Press enter to run cycle");
+            System.out.println("Steady state output: " + SolowSwanGrowthModel.steadyStateOutput);
+
+            ASADModel.longRunAggregateSupply = SolowSwanGrowthModel.steadyStateOutput;
+            ASADModel.C = ASADModel.longRunAggregateSupply * ASADModel.mpc;
+            ASADModel.IConstant = ASADModel.longRunAggregateSupply * ASADModel.mpi;
+            //inflation = quantity * velocity;
+            //money supply * velocity of money = price level * real gdp
+            //price level * real gdp = nominal gdp
+            System.out.println("Press enter to run ASAD cycle");
             scanner.nextLine();
             ASADModel.runCycle();
             System.out.println("Aggregate Demand: " + ASADModel.aggregateDemandOutputCurve);
@@ -85,7 +82,8 @@ public class Main {
             System.out.println("Consumption: " + ASADModel.C);
             System.out.println("Reserve Requirement: " + ASADModel.reserveRequirement);
             System.out.println("Price Level: " + ASADModel.priceLevel);
-            System.out.println("Select option for policy adjustment");
+            System.out.println("Long Run aggregate supply: " + ASADModel.longRunAggregateSupply);
+            System.out.println("Select option for policy adjustment:" + '\n' + "t for taxes" + '\n' + "s for government spending" + '\n' + "m for money supply" + '\n' + "r for reserve requirement");
             String option = scanner.nextLine();
             switch (option) {
                 case "t":
@@ -96,10 +94,12 @@ public class Main {
                 case "s":
                     // if we want to change spending
                     ASADModel.changeSpending();
+                    System.out.println("Government Spending: " + ASADModel.G);
                     break;
                 case "m":
                     // if we want to change money supply
                     ASADModel.changeMoneySupply();
+                    System.out.println("Money supply: " + ASADModel.moneySupply);
                     break;
                 case "r":
                     // if we want to change reserve requirement
@@ -108,13 +108,15 @@ public class Main {
             }
             ASADModel.runCycle();
             System.out.println("Price Level: " + ASADModel.priceLevel);
-            System.out.println("Money supply: " + ASADModel.moneySupply);
             System.out.println("Aggregate Demand: " + ASADModel.aggregateDemandOutputCurve);
             System.out.println("Short Run aggregate supply: " + ASADModel.shortRunAggregateSupplyCurve);
             System.out.println("Equilibrium output: " + ASADModel.equilibriumOutput);
-            System.out.println("Government Spending: " + ASADModel.G);
             System.out.println("Total Government Debt: " + ASADModel.overallGovtBalanceWInterest);
             System.out.println("Total Public Debt: " + ASADModel.overallPublicBalanceWInterest);
+            System.out.println("Long Run aggregate supply: " + ASADModel.longRunAggregateSupply);
+
+            technology += (ASADModel.I / 1000);
+            System.out.println("Technology Level: " + technology);
         }
     }
 }

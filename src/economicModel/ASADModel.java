@@ -145,7 +145,7 @@ public class ASADModel {
 
     static void changeTaxes() {
         double taxChange = outputGap / taxMultiplier; // find the change in taxes required
-        if (taxes - taxChange <= 0) {
+        if (taxes + taxChange <= 0) {
             System.out.println("can't cut taxes enough");
         } else {
             taxes += taxChange; // add tax change to total taxes
