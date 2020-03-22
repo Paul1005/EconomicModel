@@ -21,6 +21,7 @@ public class ASADModel {
     public static double aggregateDemandOutputCurve;
     public static double equilibriumOutput;
     public static double priceLevel;
+    public static double I;
 
     private static double taxMultiplier;
     private static double spendingMultiplier;
@@ -81,15 +82,15 @@ public class ASADModel {
 
         moneySupply = ownedBonds / reserveRequirement; // find money supply based on bonds and reserve requirement
         double interestRate = (longRunAggregateSupply - moneySupply) / longRunAggregateSupply; // find interest rate based on current money supply
-        double I = investmentEquation(interestRate); // overall investment
+        I = investmentEquation(interestRate); // overall investment
 
         publicBalance = IConstant - I;
         if (publicBalance < 0) {
-            publicDebtInterest = debtInterestMultiplierEquation(IConstant, publicBalance) * interestRate;
+            publicDebtInterest = (debtInterestMultiplierEquation(IConstant, publicBalance) + interestRate) / 2; // might need a better equation for this
             takeOutLoan(publicDebts, publicBalance);
             overallPublicBalance += publicBalance;
             overallPublicBalanceWInterest = overallPublicBalance + overallPublicBalance * publicDebtInterest;
-            //servicePublicDebt();
+            servicePublicDebt();
         } else if (govtBalance > 0) {
             repayPublicLoan(publicBalance);
         }
@@ -98,8 +99,6 @@ public class ASADModel {
 
         equilibriumOutput = C + taxes * taxMultiplier + G + I; // should equal LRAS when price is set to one
 
-       // priceLevel = equilibriumOutput / longRunAggregateSupply; // current shortRun aggregate supply price level, should always be one at this point
-       // priceLevel = (C + I) / (equilibriumOutput - G - taxes * taxMultiplier); // current aggregate demand price level, should always be one at this point
         priceLevel = (Math.sqrt(4 * C * longRunAggregateSupply + Math.pow(G, 2) + 2 * G * taxes * taxMultiplier + 4 * longRunAggregateSupply * I + Math.pow(taxes, 2) * Math.pow(taxMultiplier, 2)) + G + taxes * taxMultiplier) / (2 * longRunAggregateSupply); // find our equilibrium price level
         aggregateDemandOutputCurve = (C + I) / priceLevel + G + taxes * taxMultiplier; // this is the aggregate demand curve
         shortRunAggregateSupplyCurve = longRunAggregateSupply * priceLevel; // this is the short run aggregate supply curve
@@ -109,11 +108,11 @@ public class ASADModel {
         govtBalance = taxes - GConstant;
 
         if (govtBalance < 0) {
-            govtDebtInterest = debtInterestMultiplierEquation(longRunAggregateSupply, govtBalance) * interestRate;
+            govtDebtInterest = (debtInterestMultiplierEquation(longRunAggregateSupply, govtBalance) + interestRate) / 2; // might need a better equation for this
             takeOutLoan(govtDebts, govtBalance);
             overallGovtBalance += govtBalance;
             overallGovtBalanceWInterest = overallGovtBalance + overallGovtBalance * govtDebtInterest;
-           //serviceGovtDebt();
+            serviceGovtDebt();
         } else if (govtBalance > 0) {
             repayGovtLoan(govtBalance);
         }

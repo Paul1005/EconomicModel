@@ -1,14 +1,14 @@
 package economicModel;
 
 public class SolowSwanGrowthModel {
-    public static float capital;
+    public static double capital;
     public static double output;
-    public static float a;
-    public static float productivityPerWorker;
-    public static float Labour;
-    public static float eL;
+    public static double a;
+    public static double productivityPerWorker;
+    public static double Labour;
+    public static double eL;
     public static double depreciationPerWorker;
-    public static float capitalPerPerson;
+    public static double capitalPerPerson;
     public static double netGainPerPerson;
     public static double netGain;
     public static double steadyStateCapitalPerPerson;
@@ -17,9 +17,9 @@ public class SolowSwanGrowthModel {
     public static double steadyStateOutput;
     public static double outputPerPerson;
 
-    public static void runCycle(float savingsGrowth, float populationGrowth, float technology, float depreciation) {
-        a = 1f / 3f;
-        productivityPerWorker = 1;
+    public static void runCycle(double savingsGrowth, double populationGrowth, double technology, double depreciation) {
+        a = 1.0 / 3.0;
+        productivityPerWorker = 1.0;
         eL = productivityPerWorker * Labour;
 
         capitalPerPerson = capital / Labour;
