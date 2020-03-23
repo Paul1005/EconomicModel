@@ -5,7 +5,7 @@ public class SolowSwanGrowthModel {
     public static double output;
     public static double a;
     public static double productivityPerWorker;
-    public static double Labour;
+    public static int Labour;
     public static double eL;
     public static double depreciationPerWorker;
     public static double capitalPerPerson;

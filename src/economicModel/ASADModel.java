@@ -42,6 +42,11 @@ public class ASADModel {
     private static ArrayList<Double> govtDebts = new ArrayList<>();
     private static ArrayList<Double> publicDebts = new ArrayList<>();
 
+    static double growthRate = 0;
+    static double averageGrowthRate = 0;
+    static int cyclesRun;
+    private static double originalOutput = 0;
+    private static double previousOutput = 0;
     /**
      * Find investment based on interest rate, IConstant, and mpi. Is the inverse(swap x and y) of the equation below.
      *
@@ -72,8 +77,8 @@ public class ASADModel {
         return -interestRate * longRunAggregateSupply + longRunAggregateSupply;
     }
 
-    private static double debtInterestMultiplierEquation(double total, double balance) {
-        return (1 / (2 * total) * (Math.sqrt(Math.pow(balance, 2) + 4) - balance)); // TODO: incorporate overall growth
+    private static double baseDebtInterestEquation(double totalAssets, double currentBalance) {
+        return 1 / (2 * totalAssets + totalAssets * averageGrowthRate) * (Math.sqrt(Math.pow(currentBalance, 2) + 4) - currentBalance); // may not work in cases of negative assets or very negative growth
     }
 
     static void runCycle() {
@@ -86,7 +91,7 @@ public class ASADModel {
 
         publicBalance = IConstant - I;
         if (publicBalance < 0) {
-            publicDebtInterest = (debtInterestMultiplierEquation(IConstant, publicBalance) + interestRate) / 2; // might need a better equation for this
+            publicDebtInterest = (baseDebtInterestEquation(IConstant, publicBalance) + interestRate) / 2; // might need a better equation for this
             takeOutLoan(publicDebts, publicBalance);
             overallPublicBalance += publicBalance;
             overallPublicBalanceWInterest = overallPublicBalance + overallPublicBalance * publicDebtInterest;
@@ -108,7 +113,7 @@ public class ASADModel {
         govtBalance = taxes - GConstant;
 
         if (govtBalance < 0) {
-            govtDebtInterest = (debtInterestMultiplierEquation(longRunAggregateSupply, govtBalance) + interestRate) / 2; // might need a better equation for this
+            govtDebtInterest = (baseDebtInterestEquation(longRunAggregateSupply, govtBalance) + interestRate) / 2; // might need a better equation for this
             takeOutLoan(govtDebts, govtBalance);
             overallGovtBalance += govtBalance;
             overallGovtBalanceWInterest = overallGovtBalance + overallGovtBalance * govtDebtInterest;
@@ -116,6 +121,15 @@ public class ASADModel {
         } else if (govtBalance > 0) {
             repayGovtLoan(govtBalance);
         }
+
+        if (cyclesRun == 1) {
+            originalOutput = equilibriumOutput;
+        } else {
+            growthRate = equilibriumOutput / previousOutput;
+            averageGrowthRate = equilibriumOutput / originalOutput;
+            previousOutput = equilibriumOutput;
+        }
+        cyclesRun++;
     }
 
     private static void takeOutLoan(ArrayList<Double> debts, double balance) {
@@ -163,12 +177,12 @@ public class ASADModel {
     private static void serviceGovtDebt() {
         overallGovtBalanceWInterest = overallGovtBalance + overallGovtBalance * govtDebtInterest;
         GConstant -= (debtRepaymentAmount * govtDebtInterest);
-        overallGovtBalanceWInterest -= (debtRepaymentAmount * govtDebtInterest);
+        overallGovtBalanceWInterest -= (debtRepaymentAmount + debtRepaymentAmount * govtDebtInterest);
     }
 
     private static void servicePublicDebt() {
         overallPublicBalanceWInterest = overallPublicBalance + overallPublicBalance * publicDebtInterest;
         C -= (debtRepaymentAmount * publicDebtInterest);
-        overallPublicBalanceWInterest -= (debtRepaymentAmount * publicDebtInterest);
+        overallPublicBalanceWInterest -= (debtRepaymentAmount + debtRepaymentAmount * publicDebtInterest);
     }
 }
