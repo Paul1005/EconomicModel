@@ -1,7 +1,7 @@
 package economicModel;
 
 public class SolowSwanGrowthModel {
-    public static double capital;
+    public static double capital; // might want inflation to affect this
     public static double output;
     public static double a;
     public static double productivityPerWorker;

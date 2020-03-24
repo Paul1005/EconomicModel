@@ -2,13 +2,16 @@ package economicModel;
 
 import java.util.Scanner;
 
+//TODO: still need to incorporate inflation somehow, maybe price should affect capital?
 public class Main {
-    public static void main(String args[]) {
+    public static void main(String args[]) throws Exception {
         Scanner scanner = new Scanner(System.in);  // Create a Scanner object
 
         //starting variables
         ASADModel.debtRepaymentAmount = 1;
         ASADModel.cyclesRun = 0;
+        ASADModel.growthRate = 0;
+        ASADModel.averageGrowthRate = 0;
         double technology = 1;
         double deprecation = 0.005;
         SolowSwanGrowthModel.capital = 18000;
@@ -33,17 +36,18 @@ public class Main {
                 double populationGrowth = 0;
 
                 if (ASADModel.cyclesRun != 0) {
-                    double intrinsicGrowth = 1 / (SolowSwanGrowthModel.outputPerPerson / 100);
-                    int carryingCapacity = (int) SolowSwanGrowthModel.outputPerPerson / 100;
+                    double intrinsicGrowth = 1 / (SolowSwanGrowthModel.outputPerPerson * 100);
+                    double carryingCapacity = (int) SolowSwanGrowthModel.outputPerPerson * 100;
                     populationGrowth = calculatePopulationGrowth(intrinsicGrowth, SolowSwanGrowthModel.Labour, carryingCapacity);
                 }
-                System.out.println("-*Solow Model Information*-");
-                System.out.println("Population Growth rate: " + populationGrowth);
+
                 SolowSwanGrowthModel.runCycle(savingsGrowth, populationGrowth, technology, deprecation);
 
-                System.out.println("Capital per person: " + SolowSwanGrowthModel.capitalPerPerson);
-                System.out.println("Output/GDP per person: " + SolowSwanGrowthModel.outputPerPerson);
-                System.out.println("Gain per person: " + SolowSwanGrowthModel.netGainPerPerson);
+                System.out.println("-*Solow Model Information*-");
+                System.out.println("Population Growth rate: " + populationGrowth);
+                //System.out.println("Capital per person: " + SolowSwanGrowthModel.capitalPerPerson);
+                //System.out.println("Output/GDP per person: " + SolowSwanGrowthModel.outputPerPerson);
+                //System.out.println("Gain per person: " + SolowSwanGrowthModel.netGainPerPerson);
                 System.out.println("Total Output: " + SolowSwanGrowthModel.output);
                 //System.out.println("Steady state capital per person: " + SolowSwanGrowthModel.steadyStateCapitalPerPerson);
                 //System.out.println("Steady state capital: " + SolowSwanGrowthModel.steadyStateCapital);
@@ -66,7 +70,7 @@ public class Main {
 
                 System.out.println('\n' + "Select option for policy adjustment:" +
                         '\n' + "t for taxes" +
-                        '\n' + "s for government spending" +
+                        '\n' + "g for government spending" +
                         '\n' + "m for money supply" +
                         '\n' + "r for reserve requirement");
                 String option = scanner.nextLine();
@@ -76,7 +80,7 @@ public class Main {
                         ASADModel.changeTaxes();
                         System.out.println("Taxes: " + ASADModel.taxes);
                         break;
-                    case "s":
+                    case "g":
                         // if we want to change spending
                         ASADModel.changeSpending();
                         System.out.println("Government Spending: " + ASADModel.G);
@@ -90,6 +94,9 @@ public class Main {
                         // if we want to change reserve requirement
                         ASADModel.changeReserveRequirements();
                         System.out.println("Reserve Requirement: " + ASADModel.reserveRequirement);
+                    default:
+                        System.out.println("invalid option");
+                        throw new Exception();
                 }
                 ASADModel.runCycle();
 
@@ -100,8 +107,8 @@ public class Main {
                 System.out.println('\n' + "-*Economic growth information*-");
                 System.out.println("Technology Level: " + technology);
                 System.out.println("Growth Rate for last cycle: " + ((ASADModel.growthRate - 1) * 100) + '%');
-                System.out.println("Average growth Rate: " + ((ASADModel.averageGrowthRate - 1) * 100) + '%');
-                System.out.println('\n' + "Type e and press enter to end program");
+                System.out.println("Average growth Rate: " + (((ASADModel.averageGrowthRate - 1) * 100) / ASADModel.cyclesRun) + '%');
+                System.out.println('\n' + "Press enter to continue to next cycle, or type e and press enter to end program");
                 if (scanner.nextLine().equals("e")) {
                     isPlaying = false;
                 }
@@ -135,7 +142,7 @@ public class Main {
         System.out.println("Total Public Debt: " + ASADModel.overallPublicBalanceWInterest);
     }
 
-    private static double calculatePopulationGrowth(double intrinsicGrowthRate, int currentPopulation, int carryingCapacity) {
-        return intrinsicGrowthRate * currentPopulation * (1 - (float) currentPopulation / (float) carryingCapacity);
+    private static double calculatePopulationGrowth(double intrinsicGrowthRate, int currentPopulation, double carryingCapacity) {
+        return intrinsicGrowthRate * currentPopulation * (1 - (double) currentPopulation /  carryingCapacity);
     }
 }

@@ -42,11 +42,12 @@ public class ASADModel {
     private static ArrayList<Double> govtDebts = new ArrayList<>();
     private static ArrayList<Double> publicDebts = new ArrayList<>();
 
-    static double growthRate = 0;
-    static double averageGrowthRate = 0;
+    static double growthRate;
+    static double averageGrowthRate;
     static int cyclesRun;
     private static double originalOutput = 0;
     private static double previousOutput = 0;
+
     /**
      * Find investment based on interest rate, IConstant, and mpi. Is the inverse(swap x and y) of the equation below.
      *
@@ -127,8 +128,8 @@ public class ASADModel {
         } else {
             growthRate = equilibriumOutput / previousOutput;
             averageGrowthRate = equilibriumOutput / originalOutput;
-            previousOutput = equilibriumOutput;
         }
+        previousOutput = equilibriumOutput;
         cyclesRun++;
     }
 
@@ -174,6 +175,7 @@ public class ASADModel {
         overallPublicBalanceWInterest -= publicBalance;
     }
 
+    // might need to make these harsher
     private static void serviceGovtDebt() {
         overallGovtBalanceWInterest = overallGovtBalance + overallGovtBalance * govtDebtInterest;
         GConstant -= (debtRepaymentAmount * govtDebtInterest);
