@@ -122,7 +122,7 @@ public class ASADModel {
             repayGovtLoan(govtBalance);
         }
 
-        if (cyclesRun == 1) {
+        if (cyclesRun == 0) {
             originalOutput = equilibriumOutput;
         } else {
             growthRate = equilibriumOutput / previousOutput;

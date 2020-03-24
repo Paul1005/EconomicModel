@@ -8,7 +8,7 @@ public class Main {
 
         //starting variables
         ASADModel.debtRepaymentAmount = 1;
-        ASADModel.cyclesRun = 1;
+        ASADModel.cyclesRun = 0;
         double technology = 1;
         double deprecation = 0.005;
         SolowSwanGrowthModel.capital = 18000;
@@ -29,28 +29,34 @@ public class Main {
             if (mode.equals("m")) {
                 System.out.println("Press enter to run Solow Model cycle");
                 scanner.nextLine();
+                double populationGrowth = 0;
 
-                double intrinsicGrowth = 1 / (SolowSwanGrowthModel.outputPerPerson / 100);
-                int carryingCapacity = (int) SolowSwanGrowthModel.outputPerPerson / 100;
-                double populationGrowth = calculatePopulationGrowth(intrinsicGrowth, SolowSwanGrowthModel.Labour, carryingCapacity);
+                if(ASADModel.cyclesRun != 0){
+                    double intrinsicGrowth = 1 / (SolowSwanGrowthModel.outputPerPerson / 100);
+                    int carryingCapacity = (int) SolowSwanGrowthModel.outputPerPerson / 100;
+                    populationGrowth = calculatePopulationGrowth(intrinsicGrowth, SolowSwanGrowthModel.Labour, carryingCapacity);
+                }
+
+                System.out.println("Population Growth rate: " + populationGrowth);
                 SolowSwanGrowthModel.runCycle(savingsGrowth, populationGrowth, technology, deprecation);
 
                 System.out.println("Capital per person: " + SolowSwanGrowthModel.capitalPerPerson);
                 System.out.println("Output/GDP per person: " + SolowSwanGrowthModel.outputPerPerson);
                 System.out.println("Gain per person: " + SolowSwanGrowthModel.netGainPerPerson);
+                System.out.println("Total Output: " + SolowSwanGrowthModel.output);
                 System.out.println("Steady state capital per person: " + SolowSwanGrowthModel.steadyStateCapitalPerPerson);
                 System.out.println("Steady state capital: " + SolowSwanGrowthModel.steadyStateCapital);
                 System.out.println("Steady state output per person: " + SolowSwanGrowthModel.steadyStateOutputPerPerson);
                 System.out.println("Steady state output: " + SolowSwanGrowthModel.steadyStateOutput);
 
-                ASADModel.longRunAggregateSupply = SolowSwanGrowthModel.steadyStateOutput;
+                ASADModel.longRunAggregateSupply = SolowSwanGrowthModel.output;
 
                 ASADModel.C = ASADModel.longRunAggregateSupply * ASADModel.mpc;
                 ASADModel.IConstant = ASADModel.longRunAggregateSupply * ASADModel.mpi;
                 //inflation = quantity * velocity;
                 //money supply * velocity of money = price level * real gdp
                 //price level * real gdp = nominal gdp
-                System.out.println("Press enter to run ASAD cycle");
+                System.out.println("Press enter to run ASAD Model cycle");
                 scanner.nextLine();
                 ASADModel.runCycle();
                 System.out.println("Aggregate Demand: " + ASADModel.aggregateDemandOutputCurve);
