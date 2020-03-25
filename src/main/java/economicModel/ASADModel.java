@@ -4,56 +4,56 @@ import java.util.ArrayList;
 
 //TODO: incorporate inflation somehow, right now incentive is to keep price level at 1
 public class ASADModel {
-    public static double longRunAggregateSupply;
-    public static double shortRunAggregateSupplyCurve;
-    public static double taxes;
-    public static double mpc;
-    public static double mpi;
-    public static double mps;
-    public static double reserveRequirement;
-    public static double ownedBonds;
-    public static double moneySupply;
-    public static double GConstant;
-    public static double IConstant;
-    public static double G;
-    public static double outputGap;
-    public static double C; // Should maybe be affected by inflation
-    public static double aggregateDemandOutputCurve;
-    public static double equilibriumOutput;
-    public static double I;
+    public double longRunAggregateSupply;
+    public double shortRunAggregateSupplyCurve;
+    public double taxes;
+    public double mpc;
+    public double mpi;
+    public double mps;
+    public double reserveRequirement;
+    public double ownedBonds;
+    public double moneySupply;
+    public double GConstant;
+    public double IConstant;
+    public double G;
+    public double outputGap;
+    public double C; // Should maybe be affected by inflation
+    public double aggregateDemandOutputCurve;
+    public double equilibriumOutput;
+    public double I;
 
-    private static double taxMultiplier;
-    private static double spendingMultiplier;
+    private double taxMultiplier;
+    private double spendingMultiplier;
 
     //TODO: these should somehow be affected by inflation
-    public static double govtBalance;
-    private static double overallGovtBalance;
-    private static double overallGovtBalanceWInterest;
-    public static double publicBalance;
-    private static double overallPublicBalance;
-    private static double overallPublicBalanceWInterest;
-    public static double overallGovtBalanceInflationAdjusted;
-    public static double overallPublicBalanceInflationAdjusted;
+    public double govtBalance;
+    private double overallGovtBalance;
+    private double overallGovtBalanceWInterest;
+    public double publicBalance;
+    private double overallPublicBalance;
+    private double overallPublicBalanceWInterest;
+    public double overallGovtBalanceInflationAdjusted;
+    public double overallPublicBalanceInflationAdjusted;
 
-    public static double publicDebtInterest;
-    public static double govtDebtInterest;
+    public double publicDebtInterest;
+    public double govtDebtInterest;
 
-    //public static int debtCycles; // number of cycles we use to pay of debt
-    public static int debtRepaymentAmount; // min debt repayment required
-    private static ArrayList<Double> govtDebts = new ArrayList<>();
-    private static ArrayList<Double> publicDebts = new ArrayList<>();
+    //public  int debtCycles; // number of cycles we use to pay of debt
+    public int debtRepaymentAmount; // min debt repayment required
+    private ArrayList<Double> govtDebts = new ArrayList<>();
+    private ArrayList<Double> publicDebts = new ArrayList<>();
 
-    static double growth;
-    static double overallGrowth;
-    static int cyclesRun;
-    private static double originalOutput = 0;
-    private static double previousOutput = 0;
+    double growth;
+    double overallGrowth;
+    int cyclesRun;
+    private double originalOutput = 0;
+    private double previousOutput = 0;
 
-    public static double priceLevel;
-    private static double previousPriceLevel;
-    private static double originalPriceLevel;
-    public static double overallInflation;
-    public static double inflation;
+    public double priceLevel;
+    private double previousPriceLevel;
+    private double originalPriceLevel;
+    public double overallInflation;
+    public double inflation;
 
 
     /**
@@ -62,7 +62,7 @@ public class ASADModel {
      * @param interestRate
      * @return
      */
-    private static double investmentEquation(double interestRate) {
+    private double investmentEquation(double interestRate) {
         return IConstant * Math.sqrt(Math.sqrt(Math.pow(interestRate, 2) + 4) - interestRate) / (Math.sqrt(2) * overallInflation);
     }
 
@@ -72,8 +72,8 @@ public class ASADModel {
      * @param investmentRequired
      * @return
      */
-    private static double interestRateEquation(double investmentRequired) {
-        return (Math.pow(IConstant, 4) - Math.pow(overallInflation, 4) * Math.pow(investmentRequired, 4)) / (Math.pow(IConstant, 2)* Math.pow(overallInflation, 2) * Math.pow(investmentRequired, 2));
+    private double interestRateEquation(double investmentRequired) {
+        return (Math.pow(IConstant, 4) - Math.pow(overallInflation, 4) * Math.pow(investmentRequired, 4)) / (Math.pow(IConstant, 2) * Math.pow(overallInflation, 2) * Math.pow(investmentRequired, 2));
     }
 
     /**
@@ -82,21 +82,22 @@ public class ASADModel {
      * @param interestRate
      * @return
      */
-    private static double moneySupplyEquation(double interestRate) {
+    private double moneySupplyEquation(double interestRate) {
         return -interestRate * longRunAggregateSupply + longRunAggregateSupply;
     }
 
     /**
      * Find the interest rate multiplier based on how fast your economy is growing, how large your debt is, and how large your economy is. \frac{\sqrt{x^{2}+4}-x}{\left(2\cdot a+a\cdot b\right)}
+     *
      * @param totalAssets
      * @param currentBalance
      * @return
      */
-    private static double baseDebtInterestEquation(double totalAssets, double currentBalance) {
+    private double baseDebtInterestEquation(double totalAssets, double currentBalance) {
         return 1 / (2 * totalAssets + totalAssets * overallGrowth) * (Math.sqrt(Math.pow(currentBalance, 2) + 4) - currentBalance); // may not work in cases of negative assets or very negative growth
     }
 
-    static void runCycle() {
+    void runCycle() {
         taxMultiplier = -mpc / mps;
         spendingMultiplier = 1 / mps;
 
@@ -152,18 +153,18 @@ public class ASADModel {
         cyclesRun++;
     }
 
-    private static void takeOutLoan(ArrayList<Double> debts, double balance) {
+    private void takeOutLoan(ArrayList<Double> debts, double balance) {
         debts.add(Math.abs(balance));
     }
 
-    static void changeReserveRequirements() {
+    void changeReserveRequirements() {
         double investmentRequired = longRunAggregateSupply - C - G - taxes * taxMultiplier; // find how much investment we need
         double interestRate = interestRateEquation(investmentRequired); // find the new interest rate based on the investment we need.
         double newMoneySupply = moneySupplyEquation(interestRate); // find the money supply we need based on the new interest rate
         reserveRequirement *= (moneySupply / newMoneySupply); // determine the new reserve requirement based on the new and old money supply
     }
 
-    static void changeMoneySupply() {
+    void changeMoneySupply() {
         double investmentRequired = longRunAggregateSupply - C - G - taxes * taxMultiplier; // find how much investment we need
         double interestRate = interestRateEquation(investmentRequired); // find the new interest rate based on the investment we need.
         double newMoneySupply = moneySupplyEquation(interestRate); // find the money supply we need based on the new interest rate
@@ -172,12 +173,12 @@ public class ASADModel {
         ownedBonds += bondChange; // add the change in bonds
     }
 
-    static void changeSpending() {
+    void changeSpending() {
         double spendingChange = outputGap / spendingMultiplier; // find the change in spending required
         GConstant += spendingChange; // add spending change to government spending
     }
 
-    static void changeTaxes() {
+    void changeTaxes() {
         double taxChange = outputGap / taxMultiplier; // find the change in taxes required
         if (taxes + taxChange <= 0) {
             System.out.println("can't cut taxes enough");
@@ -187,23 +188,23 @@ public class ASADModel {
     }
 
     // repay loans using surplus
-    private static void repayGovtLoan(double govtBalance) {
+    private void repayGovtLoan(double govtBalance) {
         overallGovtBalance -= govtBalance;
     }
 
-    private static void repayPublicLoan(double publicBalance) {
+    private void repayPublicLoan(double publicBalance) {
         overallPublicBalance -= publicBalance;
     }
 
     // overall debt servicing, might need to make these harsher
-    private static void serviceGovtDebt() {
+    private void serviceGovtDebt() {
         overallGovtBalanceWInterest = overallGovtBalance + overallGovtBalance * govtDebtInterest;
         GConstant -= (debtRepaymentAmount * govtDebtInterest);
         overallGovtBalanceWInterest -= (debtRepaymentAmount + debtRepaymentAmount * govtDebtInterest);
         overallGovtBalanceInflationAdjusted = overallGovtBalanceWInterest / priceLevel;
     }
 
-    private static void servicePublicDebt() {
+    private void servicePublicDebt() {
         overallPublicBalanceWInterest = overallPublicBalance + overallPublicBalance * publicDebtInterest;
         C -= (debtRepaymentAmount * publicDebtInterest);
         overallPublicBalanceWInterest -= (debtRepaymentAmount + debtRepaymentAmount * publicDebtInterest);

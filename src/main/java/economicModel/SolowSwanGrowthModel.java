@@ -1,23 +1,23 @@
 package economicModel;
 
 public class SolowSwanGrowthModel {
-    public static double capital; // might want inflation to affect this
-    public static double output;
-    public static double a;
-    public static double productivityPerWorker;
-    public static int Labour;
-    public static double eL;
-    public static double depreciationPerWorker;
-    public static double capitalPerPerson;
-    public static double netGainPerPerson;
-    public static double netGain;
-    public static double steadyStateCapitalPerPerson;
-    public static double steadyStateCapital;
-    public static double steadyStateOutputPerPerson;
-    public static double steadyStateOutput;
-    public static double outputPerPerson;
+    public double capital; // might want inflation to affect this
+    public double output;
+    public double a;
+    public double productivityPerWorker;
+    public int Labour;
+    public double eL;
+    public double depreciationPerWorker;
+    public double capitalPerPerson;
+    public double netGainPerPerson;
+    public double netGain;
+    public double steadyStateCapitalPerPerson;
+    public double steadyStateCapital;
+    public double steadyStateOutputPerPerson;
+    public double steadyStateOutput;
+    public double outputPerPerson;
 
-    public static void runCycle(double savingsGrowth, double populationGrowth, double technology, double depreciation) {
+    public void runCycle(double savingsGrowth, double populationGrowth, double technology, double depreciation) {
         a = 1.0 / 3.0;
         productivityPerWorker = 1.0;
         eL = productivityPerWorker * Labour;
