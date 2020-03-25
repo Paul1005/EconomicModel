@@ -86,6 +86,12 @@ public class ASADModel {
         return -interestRate * longRunAggregateSupply + longRunAggregateSupply;
     }
 
+    /**
+     * Find the interest rate multiplier based on how fast your economy is growing, how large your debt is, and how large your economy is. \frac{\sqrt{x^{2}+4}-x}{\left(2\cdot a+a\cdot b\right)}
+     * @param totalAssets
+     * @param currentBalance
+     * @return
+     */
     private static double baseDebtInterestEquation(double totalAssets, double currentBalance) {
         return 1 / (2 * totalAssets + totalAssets * overallGrowth) * (Math.sqrt(Math.pow(currentBalance, 2) + 4) - currentBalance); // may not work in cases of negative assets or very negative growth
     }
@@ -180,15 +186,16 @@ public class ASADModel {
         }
     }
 
+    // repay loans using surplus
     private static void repayGovtLoan(double govtBalance) {
-        overallGovtBalanceWInterest -= govtBalance;
+        overallGovtBalance -= govtBalance;
     }
 
     private static void repayPublicLoan(double publicBalance) {
-        overallPublicBalanceWInterest -= publicBalance;
+        overallPublicBalance -= publicBalance;
     }
 
-    // might need to make these harsher
+    // overall debt servicing, might need to make these harsher
     private static void serviceGovtDebt() {
         overallGovtBalanceWInterest = overallGovtBalance + overallGovtBalance * govtDebtInterest;
         GConstant -= (debtRepaymentAmount * govtDebtInterest);
