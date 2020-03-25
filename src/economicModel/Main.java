@@ -10,8 +10,10 @@ public class Main {
         //starting variables
         ASADModel.debtRepaymentAmount = 1;
         ASADModel.cyclesRun = 0;
-        ASADModel.growthRate = 0;
-        ASADModel.averageGrowthRate = 0;
+        ASADModel.growth = 1;
+        ASADModel.overallGrowth = 1;
+        ASADModel.inflation = 1;
+        ASADModel.overallInflation = 1;
         double technology = 1;
         double deprecation = 0.005;
         SolowSwanGrowthModel.capital = 18000;
@@ -36,8 +38,8 @@ public class Main {
                 double populationGrowth = 0;
 
                 if (ASADModel.cyclesRun != 0) {
-                    double intrinsicGrowth = 1 / (SolowSwanGrowthModel.outputPerPerson * 100);
-                    double carryingCapacity = (int) SolowSwanGrowthModel.outputPerPerson * 100;
+                    double intrinsicGrowth = 1 / (SolowSwanGrowthModel.outputPerPerson * 1000);
+                    double carryingCapacity = (int) SolowSwanGrowthModel.outputPerPerson * 1000;
                     populationGrowth = calculatePopulationGrowth(intrinsicGrowth, SolowSwanGrowthModel.Labour, carryingCapacity);
                 }
 
@@ -103,11 +105,8 @@ public class Main {
                 System.out.println('\n' + "-*ASAD Model Information Post-adjustment*-");
                 printData();
 
-                technology += (ASADModel.I / 100);
-                System.out.println('\n' + "-*Economic growth information*-");
+                technology += (ASADModel.I / 1000);
                 System.out.println("Technology Level: " + technology);
-                System.out.println("Growth Rate for last cycle: " + ((ASADModel.growthRate - 1) * 100) + '%');
-                System.out.println("Average growth Rate: " + (((ASADModel.averageGrowthRate - 1) * 100) / ASADModel.cyclesRun) + '%');
                 System.out.println('\n' + "Press enter to continue to next cycle, or type e and press enter to end program");
                 if (scanner.nextLine().equals("e")) {
                     isPlaying = false;
@@ -133,13 +132,21 @@ public class Main {
         System.out.println("Consumption: " + ASADModel.C);
         System.out.println("Investment: " + ASADModel.I);
         System.out.println("Reserve Requirement: " + ASADModel.reserveRequirement);
+
+        System.out.println('\n' + "-*Inflation Data*-");
         System.out.println("Price Level: " + ASADModel.priceLevel);
+        System.out.println("Inflation Rate for last cycle: "  + ((ASADModel.inflation - 1) * 100) + '%');
+        System.out.println("Average Inflation Rate: " + (((ASADModel.overallInflation - 1) * 100) / ASADModel.cyclesRun) + '%');
 
         System.out.println('\n' + "-*Debt and deficit Data*-");
         System.out.println("Government Balance: " + ASADModel.govtBalance);
         System.out.println("Public Balance: " + ASADModel.publicBalance);
-        System.out.println("Total Government Debt: " + ASADModel.overallGovtBalanceWInterest);
-        System.out.println("Total Public Debt: " + ASADModel.overallPublicBalanceWInterest);
+        System.out.println("Total Government Debt: " + ASADModel.overallGovtBalanceInflationAdjusted);
+        System.out.println("Total Public Debt: " + ASADModel.overallPublicBalanceInflationAdjusted);
+
+        System.out.println('\n' + "-*Economic growth information*-");
+        System.out.println("Growth Rate for last cycle: " + ((ASADModel.growth - 1) * 100) + '%');
+        System.out.println("Average growth Rate: " + (((ASADModel.overallGrowth - 1) * 100) / ASADModel.cyclesRun) + '%');
     }
 
     private static double calculatePopulationGrowth(double intrinsicGrowthRate, int currentPopulation, double carryingCapacity) {

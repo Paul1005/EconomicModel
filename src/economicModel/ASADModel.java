@@ -17,10 +17,9 @@ public class ASADModel {
     public static double IConstant;
     public static double G;
     public static double outputGap;
-    public static double C;
+    public static double C; // Should maybe be affected by inflation
     public static double aggregateDemandOutputCurve;
     public static double equilibriumOutput;
-    public static double priceLevel;
     public static double I;
 
     private static double taxMultiplier;
@@ -28,11 +27,13 @@ public class ASADModel {
 
     //TODO: these should somehow be affected by inflation
     public static double govtBalance;
-    public static double overallGovtBalance;
-    public static double overallGovtBalanceWInterest;
+    private static double overallGovtBalance;
+    private static double overallGovtBalanceWInterest;
     public static double publicBalance;
-    public static double overallPublicBalance;
-    public static double overallPublicBalanceWInterest;
+    private static double overallPublicBalance;
+    private static double overallPublicBalanceWInterest;
+    public static double overallGovtBalanceInflationAdjusted;
+    public static double overallPublicBalanceInflationAdjusted;
 
     public static double publicDebtInterest;
     public static double govtDebtInterest;
@@ -42,30 +43,37 @@ public class ASADModel {
     private static ArrayList<Double> govtDebts = new ArrayList<>();
     private static ArrayList<Double> publicDebts = new ArrayList<>();
 
-    static double growthRate;
-    static double averageGrowthRate;
+    static double growth;
+    static double overallGrowth;
     static int cyclesRun;
     private static double originalOutput = 0;
     private static double previousOutput = 0;
 
+    public static double priceLevel;
+    private static double previousPriceLevel;
+    private static double originalPriceLevel;
+    public static double overallInflation;
+    public static double inflation;
+
+
     /**
-     * Find investment based on interest rate, IConstant, and mpi. Is the inverse(swap x and y) of the equation below.
+     * Find investment based on interest rate, IConstant, and mpi. Is the inverse(swap x and y) of the equation below. \frac{a\sqrt{\sqrt{x^{2}+4}-x}}{\sqrt{2}\cdot b}
      *
      * @param interestRate
      * @return
      */
     private static double investmentEquation(double interestRate) {
-        return (Math.sqrt(Math.pow(IConstant * mpi, 2) * (Math.sqrt(Math.pow(interestRate, 2) + 4) - interestRate)) / Math.sqrt(2));
+        return IConstant * Math.sqrt(Math.sqrt(Math.pow(interestRate, 2) + 4) - interestRate) / (Math.sqrt(2) * overallInflation);
     }
 
     /**
-     * Find interest rate based on investment, IConstant, and mpi. Is the inverse(swap x and y) of the equation above.
+     * Find interest rate based on investment, IConstant, and mpi. Is the inverse(swap x and y) of the equation above. \frac{a^{4}-b^{4}\cdot x^{4}}{a^{2}\cdot b^{2}\cdot x^{2}}
      *
      * @param investmentRequired
      * @return
      */
     private static double interestRateEquation(double investmentRequired) {
-        return ((Math.pow(IConstant, 4) * Math.pow(mpi, 4) - Math.pow(investmentRequired, 4)) / (Math.pow(IConstant, 2) * Math.pow(mpi, 2) * Math.pow(investmentRequired, 2)));
+        return (Math.pow(IConstant, 4) - Math.pow(overallInflation, 4) * Math.pow(investmentRequired, 4)) / (Math.pow(IConstant, 2)* Math.pow(overallInflation, 2) * Math.pow(investmentRequired, 2));
     }
 
     /**
@@ -79,7 +87,7 @@ public class ASADModel {
     }
 
     private static double baseDebtInterestEquation(double totalAssets, double currentBalance) {
-        return 1 / (2 * totalAssets + totalAssets * averageGrowthRate) * (Math.sqrt(Math.pow(currentBalance, 2) + 4) - currentBalance); // may not work in cases of negative assets or very negative growth
+        return 1 / (2 * totalAssets + totalAssets * overallGrowth) * (Math.sqrt(Math.pow(currentBalance, 2) + 4) - currentBalance); // may not work in cases of negative assets or very negative growth
     }
 
     static void runCycle() {
@@ -125,11 +133,16 @@ public class ASADModel {
 
         if (cyclesRun == 0) {
             originalOutput = equilibriumOutput;
+            originalPriceLevel = priceLevel;
         } else {
-            growthRate = equilibriumOutput / previousOutput;
-            averageGrowthRate = equilibriumOutput / originalOutput;
+            growth = equilibriumOutput / previousOutput;
+            overallGrowth = equilibriumOutput / originalOutput;
+            inflation = priceLevel / previousPriceLevel;
+            overallInflation = priceLevel / originalPriceLevel;
         }
         previousOutput = equilibriumOutput;
+        previousPriceLevel = priceLevel;
+
         cyclesRun++;
     }
 
@@ -180,11 +193,13 @@ public class ASADModel {
         overallGovtBalanceWInterest = overallGovtBalance + overallGovtBalance * govtDebtInterest;
         GConstant -= (debtRepaymentAmount * govtDebtInterest);
         overallGovtBalanceWInterest -= (debtRepaymentAmount + debtRepaymentAmount * govtDebtInterest);
+        overallGovtBalanceInflationAdjusted = overallGovtBalanceWInterest / priceLevel;
     }
 
     private static void servicePublicDebt() {
         overallPublicBalanceWInterest = overallPublicBalance + overallPublicBalance * publicDebtInterest;
         C -= (debtRepaymentAmount * publicDebtInterest);
         overallPublicBalanceWInterest -= (debtRepaymentAmount + debtRepaymentAmount * publicDebtInterest);
+        overallPublicBalanceInflationAdjusted = overallPublicBalanceWInterest / priceLevel;
     }
 }
