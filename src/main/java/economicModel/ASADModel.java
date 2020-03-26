@@ -2,7 +2,9 @@ package economicModel;
 
 import java.util.ArrayList;
 
-//TODO: incorporate inflation somehow, right now incentive is to keep price level at 1
+//Note: right now incentive is to keep price level at 1
+//TODO: have some kind of unemployment indicator (phillips curve?), right now labour and population are synonymous
+//TODO: incorporate crowding out
 public class ASADModel {
     public double longRunAggregateSupply;
     public double shortRunAggregateSupplyCurve;
@@ -25,7 +27,6 @@ public class ASADModel {
     private double taxMultiplier;
     private double spendingMultiplier;
 
-    //TODO: these should somehow be affected by inflation
     public double govtBalance;
     private double overallGovtBalance;
     private double overallGovtBalanceWInterest;
@@ -157,29 +158,42 @@ public class ASADModel {
         debts.add(Math.abs(balance));
     }
 
-    void changeReserveRequirements() {
+    double calculateReserveMultiplier(){
         double investmentRequired = longRunAggregateSupply - C - G - taxes * taxMultiplier; // find how much investment we need
         double interestRate = interestRateEquation(investmentRequired); // find the new interest rate based on the investment we need.
         double newMoneySupply = moneySupplyEquation(interestRate); // find the money supply we need based on the new interest rate
-        reserveRequirement *= (moneySupply / newMoneySupply); // determine the new reserve requirement based on the new and old money supply
+        return moneySupply / newMoneySupply;
     }
 
-    void changeMoneySupply() {
+    void changeReserveRequirements(double reserveMultiplier) {
+        reserveRequirement *= reserveMultiplier; // determine the new reserve requirement based on the new and old money supply
+    }
+
+    double calculateBondChange(){
         double investmentRequired = longRunAggregateSupply - C - G - taxes * taxMultiplier; // find how much investment we need
         double interestRate = interestRateEquation(investmentRequired); // find the new interest rate based on the investment we need.
         double newMoneySupply = moneySupplyEquation(interestRate); // find the money supply we need based on the new interest rate
         double gap = newMoneySupply - moneySupply; // determine how much more money we need
-        double bondChange = gap * reserveRequirement; // determine how many more bonds we need to buy or sell
+        return gap * reserveRequirement; // determine how many more bonds we need to buy or sell
+    }
+
+    void changeMoneySupply(double bondChange) {
         ownedBonds += bondChange; // add the change in bonds
     }
 
-    void changeSpending() {
-        double spendingChange = outputGap / spendingMultiplier; // find the change in spending required
+    double calculateSpendingChange(){
+        return outputGap / spendingMultiplier; // find the change in spending required
+    }
+
+    void changeSpending(double spendingChange) {
         GConstant += spendingChange; // add spending change to government spending
     }
 
-    void changeTaxes() {
-        double taxChange = outputGap / taxMultiplier; // find the change in taxes required
+    double calculateTaxchange(){
+        return outputGap / taxMultiplier; // find the change in taxes required
+    }
+
+    void changeTaxes(double taxChange) {
         if (taxes + taxChange <= 0) {
             System.out.println("can't cut taxes enough");
         } else {

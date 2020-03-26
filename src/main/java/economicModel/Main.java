@@ -114,7 +114,7 @@ public class Main {
                     isPlaying = false;
                 }
             } else if (mode.equals("a")) {
-                AI ai = new AI();
+                AI ai = new AI(asadModel, solowSwanGrowthModel);
 
             }
         }
