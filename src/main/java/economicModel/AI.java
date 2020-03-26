@@ -78,11 +78,11 @@ public class AI {
         double growth = asadModel.overallGrowth;
         double investment = asadModel.I;
 
-        
+
     }
 
     // regression
-    public void machineLearningRegression() {
+    public void machineLearningRegression() throws IOException {
         ArffLoader arffLoader = new ArffLoader();
         arffLoader.setFile(new File("src/main/resources/growth-info.arff"));
         Enumeration<Attribute> attributeEnumeration = arffLoader.getDataSet().enumerateAttributes();

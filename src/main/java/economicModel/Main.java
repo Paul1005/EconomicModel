@@ -81,22 +81,22 @@ public class Main {
                 switch (option) {
                     case "t":
                         // if we want to change taxes
-                        asadModel.changeTaxes();
+                        //asadModel.changeTaxes();
                         System.out.println("Taxes: " + asadModel.taxes);
                         break;
                     case "g":
                         // if we want to change spending
-                        asadModel.changeSpending();
+                        //asadModel.changeSpending();
                         System.out.println("Government Spending: " + asadModel.G);
                         break;
                     case "m":
                         // if we want to change money supply
-                        asadModel.changeMoneySupply();
+                       // asadModel.changeMoneySupply();
                         System.out.println("Money supply: " + asadModel.moneySupply);
                         break;
                     case "r":
                         // if we want to change reserve requirement
-                        asadModel.changeReserveRequirements();
+                        //asadModel.changeReserveRequirements();
                         System.out.println("Reserve Requirement: " + asadModel.reserveRequirement);
                     default:
                         System.out.println("invalid option");
