@@ -1,5 +1,14 @@
 package economicModel;
 
+import weka.classifiers.Classifier;
+import weka.classifiers.Evaluation;
+import weka.classifiers.functions.LinearRegression;
+import weka.classifiers.pmml.consumer.GeneralRegression;
+import weka.classifiers.functions.IsotonicRegression;
+import weka.classifiers.functions.PaceRegression;
+import weka.classifiers.pmml.consumer.Regression;
+import weka.classifiers.meta.RegressionByDiscretization;
+import weka.classifiers.functions.SimpleLinearRegression;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
@@ -58,37 +67,110 @@ public class AI {
     // fuzzy logic
     public void fuzzyLogic() {
         if (asadModel.overallPublicBalanceInflationAdjusted > 0) {
-
+            asadModel.changeMoneySupply(5);
+            asadModel.changeReserveRequirements(0.5);
         } else if (asadModel.overallPublicBalanceInflationAdjusted < 0) {
-
+            asadModel.changeMoneySupply(-5);
+            asadModel.changeReserveRequirements(2);
         }
 
         if (asadModel.overallGovtBalanceInflationAdjusted < 0) {
-
+            asadModel.changeSpending(-5);
+            asadModel.changeTaxes(5);
         } else if (asadModel.overallGovtBalanceInflationAdjusted > 0) {
-
+            asadModel.changeSpending(5);
+            asadModel.changeTaxes(-5);
         }
     }
 
     // goal oriented behavior
     public void goalOrientedBehavior() {
         double inflation = asadModel.overallInflation;
-        double publicBalance= asadModel.overallPublicBalanceInflationAdjusted;
-        double govtBalance= asadModel.overallGovtBalanceInflationAdjusted;
+        double publicBalance = asadModel.overallPublicBalanceInflationAdjusted;
+        double govtBalance = asadModel.overallGovtBalanceInflationAdjusted;
         double growth = asadModel.overallGrowth;
         double investment = asadModel.I;
 
+        asadModel.changeMoneySupply(5);
+        /*
+        * inflation++
+        * publicBalance--
+        * govtBalance =
+        * growth ++
+        * investment ++
+        * */
 
+        asadModel.changeMoneySupply(-5);
+        /*
+         * inflation--
+         * publicBalance++
+         * govtBalance =
+         * growth --
+         * investment --
+         * */
+
+        asadModel.changeReserveRequirements(0.5);
+        /*
+         * inflation++
+         * publicBalance--
+         * govtBalance =
+         * growth ++
+         * investment ++
+        * */
+
+        asadModel.changeReserveRequirements(2);
+        /*
+         * inflation--
+         * publicBalance++
+         * govtBalance =
+         * growth --
+         * investment --
+         * */
+
+        asadModel.changeSpending(5);
+        /*
+         * inflation++
+         * publicBalance=
+         * govtBalance--
+         * growth ++
+         * investment =
+        * */
+
+        asadModel.changeSpending(-5);
+        /*
+         * inflation--
+         * publicBalance=
+         * govtBalance++
+         * growth --
+         * investment =
+         * */
+
+        asadModel.changeTaxes(-5);
+        /*
+         * inflation++
+         * publicBalance=
+         * govtBalance--
+         * growth ++
+         * investment =
+         * */
+
+        asadModel.changeTaxes(5);
+        /*
+         * inflation--
+         * publicBalance=
+         * govtBalance++
+         * growth --
+         * investment =
+         * */
     }
 
     // regression
-    public void machineLearningRegression() throws IOException {
+    public void machineLearningRegression() throws Exception {
         ArffLoader arffLoader = new ArffLoader();
-        arffLoader.setFile(new File("src/main/resources/growth-info.arff"));
-        Enumeration<Attribute> attributeEnumeration = arffLoader.getDataSet().enumerateAttributes();
-        ArrayList<Attribute> attributes = Collections.list(attributeEnumeration);
+        File file = new File("src/main/resources/growth-info.arff");
+        arffLoader.setFile(file);
 
-        Instances instances = new Instances("GDP records", attributes, 0);
+        Instances instances =  arffLoader.getDataSet();;
 
         double[] denseInstance = new double[instances.numAttributes()];
         denseInstance[0] = asadModel.overallInflation;
@@ -102,6 +184,20 @@ public class AI {
         denseInstance[8] = asadModel.overallGrowth;
 
         instances.add(new DenseInstance(1.0, denseInstance));
+
+        /*Classifier classifier = new LinearRegression();
+        classifier.buildClassifier(instances);
+
+        Evaluation eval = new Evaluation(instances);
+        eval.evaluateModel(classifier, instances);
+
+        Instance predicationDataSet = instances.lastInstance();
+        double value = classifier.classifyInstance(predicationDataSet);*/
+
+        ArffSaver arffSaver = new ArffSaver();
+        arffSaver.setInstances(instances);
+        arffSaver.setFile(file);
+        arffSaver.writeBatch();
     }
 
 

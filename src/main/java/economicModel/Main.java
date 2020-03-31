@@ -28,7 +28,7 @@ public class Main {
         asadModel.mpi = 0.1;
         asadModel.mps = 1 - asadModel.mpc - asadModel.mpi;
         double savingsGrowth = asadModel.mps + asadModel.mpi;
-
+        AI ai = new AI(asadModel, solowSwanGrowthModel);
         boolean isPlaying = true;
         while (isPlaying) {
             System.out.println("Press m for manual play, press a for ai play");
@@ -81,29 +81,37 @@ public class Main {
                 switch (option) {
                     case "t":
                         // if we want to change taxes
-                        //asadModel.changeTaxes();
+                        System.out.println("How much do you wish to change taxes by?");
+                        double taxChange = scanner.nextDouble();
+                        asadModel.changeTaxes(taxChange);
                         System.out.println("Taxes: " + asadModel.taxes);
                         break;
                     case "g":
                         // if we want to change spending
-                        //asadModel.changeSpending();
+                        System.out.println("How much do you wish to change spending by?");
+                        double spendingChange = scanner.nextDouble();
+                        asadModel.changeSpending(spendingChange);
                         System.out.println("Government Spending: " + asadModel.G);
                         break;
                     case "m":
                         // if we want to change money supply
-                       // asadModel.changeMoneySupply();
+                        System.out.println("How much do you wish to change bonds owned by?");
+                        double bondChange = scanner.nextDouble();
+                        asadModel.changeMoneySupply(bondChange);
                         System.out.println("Money supply: " + asadModel.moneySupply);
                         break;
                     case "r":
                         // if we want to change reserve requirement
-                        //asadModel.changeReserveRequirements();
+                        System.out.println("How much do you wish to change reserve requirement by?");
+                        double reserveMultiplier = scanner.nextDouble();
+                        asadModel.changeReserveRequirements(reserveMultiplier);
                         System.out.println("Reserve Requirement: " + asadModel.reserveRequirement);
                     default:
                         System.out.println("invalid option");
                         throw new Exception();
                 }
                 asadModel.runCycle();
-
+                ai.machineLearningRegression();
                 System.out.println('\n' + "-*ASAD Model Information Post-adjustment*-");
                 printData(asadModel);
 
@@ -114,7 +122,7 @@ public class Main {
                     isPlaying = false;
                 }
             } else if (mode.equals("a")) {
-                AI ai = new AI(asadModel, solowSwanGrowthModel);
+
 
             }
         }
@@ -137,7 +145,7 @@ public class Main {
 
         System.out.println('\n' + "-*Inflation Data*-");
         System.out.println("Price Level: " + asadModel.priceLevel);
-        System.out.println("Inflation Rate for last cycle: "  + ((asadModel.inflation - 1) * 100) + '%');
+        System.out.println("Inflation Rate for last cycle: " + ((asadModel.inflation - 1) * 100) + '%');
         System.out.println("Average Inflation Rate: " + (((asadModel.overallInflation - 1) * 100) / asadModel.cyclesRun) + '%');
 
         System.out.println('\n' + "-*Debt and deficit Data*-");
@@ -152,6 +160,6 @@ public class Main {
     }
 
     private static double calculatePopulationGrowth(double intrinsicGrowthRate, int currentPopulation, double carryingCapacity) {
-        return intrinsicGrowthRate * currentPopulation * (1 - (double) currentPopulation /  carryingCapacity);
+        return intrinsicGrowthRate * currentPopulation * (1 - (double) currentPopulation / carryingCapacity);
     }
 }
