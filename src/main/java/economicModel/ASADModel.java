@@ -24,8 +24,8 @@ public class ASADModel {
     public double equilibriumOutput;
     public double I;
 
-    private double taxMultiplier;
-    private double spendingMultiplier;
+    public double taxMultiplier;
+    public double spendingMultiplier;
 
     public double govtBalance;
     private double overallGovtBalance;
@@ -99,13 +99,73 @@ public class ASADModel {
     }
 
     void runCycle() {
-        taxMultiplier = -mpc / mps;
-        spendingMultiplier = 1 / mps;
-
-        moneySupply = ownedBonds / reserveRequirement; // find money supply based on bonds and reserve requirement
-        double interestRate = (longRunAggregateSupply - moneySupply) / longRunAggregateSupply; // find interest rate based on current money supply
+        moneySupply = getMoneySupply(); // find money supply based on bonds and reserve requirement
+        double interestRate = getInterestRate(); // find interest rate based on current money supply
         I = investmentEquation(interestRate); // overall investment
 
+        calculatePublicBalance(interestRate);
+
+        G = getGovernmentSpending(); // overall government spending
+
+        equilibriumOutput = getEquilibriumOutput(); // should equal LRAS when price is set to one
+
+        priceLevel = getPriceLevel(); // find our equilibrium price level
+        aggregateDemandOutputCurve = getAggregateDemandOutput(); // this is the aggregate demand curve
+        shortRunAggregateSupplyCurve = getShortRunAggregateSupply(); // this is the short run aggregate supply curve
+
+        outputGap = getOutputGap(); // find the output gap so that our price will be one
+
+        calculateGovernmentBalance(interestRate);
+
+        calculateGrowthAndInflation();
+        previousOutput = equilibriumOutput;
+        previousPriceLevel = priceLevel;
+
+        cyclesRun++;
+    }
+
+    public void calculateGrowthAndInflation() {
+        if (cyclesRun == 0) {
+            originalOutput = equilibriumOutput;
+            originalPriceLevel = priceLevel;
+        } else {
+            growth = equilibriumOutput / previousOutput;
+            overallGrowth = equilibriumOutput / originalOutput;
+            inflation = priceLevel / previousPriceLevel;
+            overallInflation = priceLevel / originalPriceLevel;
+        }
+    }
+
+    public double getShortRunAggregateSupply() {
+        return longRunAggregateSupply * priceLevel;
+    }
+
+    public double getAggregateDemandOutput() {
+        return (C + I) / priceLevel + G + taxes * taxMultiplier;
+    }
+
+    public double getOutputGap() {
+        return longRunAggregateSupply - equilibriumOutput;
+    }
+
+    public double getInterestRate() {
+        return (longRunAggregateSupply - moneySupply) / longRunAggregateSupply;
+    }
+
+    public void calculateGovernmentBalance(double interestRate) {
+        govtBalance = taxes - GConstant;
+        if (govtBalance < 0) {
+            govtDebtInterest = (baseDebtInterestEquation(longRunAggregateSupply, govtBalance) + interestRate) / 2; // might need a better equation for this
+            takeOutLoan(govtDebts, govtBalance);
+            overallGovtBalance += govtBalance;
+            overallGovtBalanceWInterest = overallGovtBalance + overallGovtBalance * govtDebtInterest;
+            serviceGovtDebt();
+        } else if (govtBalance > 0) {
+            repayGovtLoan(govtBalance);
+        }
+    }
+
+    public void calculatePublicBalance(double interestRate) {
         publicBalance = IConstant - I;
         if (publicBalance < 0) {
             publicDebtInterest = (baseDebtInterestEquation(IConstant, publicBalance) + interestRate) / 2; // might need a better equation for this
@@ -116,42 +176,22 @@ public class ASADModel {
         } else if (govtBalance > 0) {
             repayPublicLoan(publicBalance);
         }
+    }
 
-        G = GConstant * spendingMultiplier; // overall government spending
+    public double getGovernmentSpending() {
+        return GConstant * spendingMultiplier;
+    }
 
-        equilibriumOutput = C + taxes * taxMultiplier + G + I; // should equal LRAS when price is set to one
+    public double getEquilibriumOutput() {
+        return C + taxes * taxMultiplier + G + I;
+    }
 
-        priceLevel = (Math.sqrt(4 * C * longRunAggregateSupply + Math.pow(G, 2) + 2 * G * taxes * taxMultiplier + 4 * longRunAggregateSupply * I + Math.pow(taxes, 2) * Math.pow(taxMultiplier, 2)) + G + taxes * taxMultiplier) / (2 * longRunAggregateSupply); // find our equilibrium price level
-        aggregateDemandOutputCurve = (C + I) / priceLevel + G + taxes * taxMultiplier; // this is the aggregate demand curve
-        shortRunAggregateSupplyCurve = longRunAggregateSupply * priceLevel; // this is the short run aggregate supply curve
+    public double getPriceLevel() {
+        return (Math.sqrt(4 * C * longRunAggregateSupply + Math.pow(G, 2) + 2 * G * taxes * taxMultiplier + 4 * longRunAggregateSupply * I + Math.pow(taxes, 2) * Math.pow(taxMultiplier, 2)) + G + taxes * taxMultiplier) / (2 * longRunAggregateSupply);
+    }
 
-        outputGap = longRunAggregateSupply - equilibriumOutput; // find the output gap so that our price will be one
-
-        govtBalance = taxes - GConstant;
-
-        if (govtBalance < 0) {
-            govtDebtInterest = (baseDebtInterestEquation(longRunAggregateSupply, govtBalance) + interestRate) / 2; // might need a better equation for this
-            takeOutLoan(govtDebts, govtBalance);
-            overallGovtBalance += govtBalance;
-            overallGovtBalanceWInterest = overallGovtBalance + overallGovtBalance * govtDebtInterest;
-            serviceGovtDebt();
-        } else if (govtBalance > 0) {
-            repayGovtLoan(govtBalance);
-        }
-
-        if (cyclesRun == 0) {
-            originalOutput = equilibriumOutput;
-            originalPriceLevel = priceLevel;
-        } else {
-            growth = equilibriumOutput / previousOutput;
-            overallGrowth = equilibriumOutput / originalOutput;
-            inflation = priceLevel / previousPriceLevel;
-            overallInflation = priceLevel / originalPriceLevel;
-        }
-        previousOutput = equilibriumOutput;
-        previousPriceLevel = priceLevel;
-
-        cyclesRun++;
+    public double getMoneySupply() {
+        return ownedBonds / reserveRequirement;
     }
 
     private void takeOutLoan(ArrayList<Double> debts, double balance) {
@@ -189,7 +229,7 @@ public class ASADModel {
         GConstant += spendingChange; // add spending change to government spending
     }
 
-    double calculateTaxchange(){
+    double calculateTaxChange(){
         return outputGap / taxMultiplier; // find the change in taxes required
     }
 

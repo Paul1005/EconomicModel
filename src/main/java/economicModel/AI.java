@@ -18,29 +18,32 @@ import weka.core.converters.ArffSaver;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.Random;
 
 public class AI {
     private ASADModel asadModel;
     private SolowSwanGrowthModel solowSwanGrowthModel;
-
-    public AI(ASADModel asadModel, SolowSwanGrowthModel solowSwanGrowthModel) {
+    Instances instances;
+    File file;
+    public AI(ASADModel asadModel, SolowSwanGrowthModel solowSwanGrowthModel) throws IOException {
         this.asadModel = asadModel;
         this.solowSwanGrowthModel = solowSwanGrowthModel;
+        ArffLoader arffLoader = new ArffLoader();
+        file = new File("src/main/resources/growth-info.arff");
+        arffLoader.setFile(file);
+
+        instances =  arffLoader.getDataSet();;
     }
 
     // rule based AI
-    public void ruleBasedDecisions() throws IOException {
+    public void ruleBasedDecisions() throws Exception {
         Random random = new Random();
         int choice = (int) random.nextDouble() * 4;
 
         double bondChange = asadModel.calculateBondChange();
         double reserveMultiplier = asadModel.calculateReserveMultiplier();
         double spendingChange = asadModel.calculateSpendingChange();
-        double taxChange = asadModel.calculateTaxchange();
+        double taxChange = asadModel.calculateTaxChange();
 
         if (asadModel.overallPublicBalanceInflationAdjusted < asadModel.overallGovtBalanceInflationAdjusted) { // if our govt finances are better than public finances
             if (asadModel.outputGap < 0) { // if equilibrium output is above lras
@@ -61,11 +64,11 @@ public class AI {
         }
 
         asadModel.runCycle();
-
+        recordInfo();
     }
 
     // fuzzy logic
-    public void fuzzyLogic() {
+    public void fuzzyLogic() throws Exception {
         if (asadModel.overallPublicBalanceInflationAdjusted > 0) {
             asadModel.changeMoneySupply(5);
             asadModel.changeReserveRequirements(0.5);
@@ -81,10 +84,11 @@ public class AI {
             asadModel.changeSpending(5);
             asadModel.changeTaxes(-5);
         }
+        recordInfo();
     }
 
     // goal oriented behavior
-    public void goalOrientedBehavior() {
+    public void goalOrientedBehavior() throws Exception {
         double inflation = asadModel.overallInflation;
         double publicBalance = asadModel.overallPublicBalanceInflationAdjusted;
         double govtBalance = asadModel.overallGovtBalanceInflationAdjusted;
@@ -99,6 +103,7 @@ public class AI {
         * growth ++
         * investment ++
         * */
+
 
         asadModel.changeMoneySupply(-5);
         /*
@@ -162,37 +167,46 @@ public class AI {
          * growth --
          * investment =
          * */
+        recordInfo();
+    }
+
+    public void machineLearningRegression() throws Exception {
+        Classifier classifier = new LinearRegression();
+        classifier.buildClassifier(instances);
+
+        //Evaluation eval = new Evaluation(instances);
+        //eval.evaluateModel(classifier, instances); // where testing dataset would be
+        double[] test = new double[instances.numAttributes()];
+        /*test[0] = asadModel.overallInflation;
+        test[1] = asadModel.outputGap;
+        test[2] = asadModel.overallPublicBalanceInflationAdjusted;
+        test[3] = asadModel.overallGovtBalanceInflationAdjusted;*/
+
+        test[0] = 0;
+        test[1] = 0;
+        test[2] = 0;
+        test[3] = 0;
+        test[4] = 0;
+        Instance predicationDataSet = new DenseInstance(1.0, test);
+        double value = classifier.classifyInstance(predicationDataSet);
+
+        recordInfo();
     }
 
     // regression
-    public void machineLearningRegression() throws Exception {
-        ArffLoader arffLoader = new ArffLoader();
-        File file = new File("src/main/resources/growth-info.arff");
-        arffLoader.setFile(file);
-
-        Instances instances =  arffLoader.getDataSet();;
-
+    public void recordInfo() throws Exception {
         double[] denseInstance = new double[instances.numAttributes()];
-        denseInstance[0] = asadModel.overallInflation;
+        /*denseInstance[0] = asadModel.overallInflation;
         denseInstance[1] = asadModel.outputGap;
         denseInstance[2] = asadModel.overallPublicBalanceInflationAdjusted;
-        denseInstance[3] = asadModel.overallGovtBalanceInflationAdjusted;
-        denseInstance[4] = asadModel.taxes;
-        denseInstance[5] = asadModel.G;
-        denseInstance[6] = asadModel.ownedBonds;
-        denseInstance[7] = asadModel.reserveRequirement;
-        denseInstance[8] = asadModel.overallGrowth;
+        denseInstance[3] = asadModel.overallGovtBalanceInflationAdjusted;*/
+        denseInstance[0] = asadModel.taxes;
+        denseInstance[1] = asadModel.G;
+        denseInstance[2] = asadModel.ownedBonds;
+        denseInstance[3] = asadModel.reserveRequirement;
+        denseInstance[4] = asadModel.overallGrowth;
 
         instances.add(new DenseInstance(1.0, denseInstance));
-
-        /*Classifier classifier = new LinearRegression();
-        classifier.buildClassifier(instances);
-
-        Evaluation eval = new Evaluation(instances);
-        eval.evaluateModel(classifier, instances);
-
-        Instance predicationDataSet = instances.lastInstance();
-        double value = classifier.classifyInstance(predicationDataSet);*/
 
         ArffSaver arffSaver = new ArffSaver();
         arffSaver.setInstances(instances);

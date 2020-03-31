@@ -27,6 +27,8 @@ public class Main {
         asadModel.mpc = 0.6;
         asadModel.mpi = 0.1;
         asadModel.mps = 1 - asadModel.mpc - asadModel.mpi;
+        asadModel.taxMultiplier = -asadModel.mpc / asadModel.mps;
+        asadModel.spendingMultiplier = 1 / asadModel.mps;
         double savingsGrowth = asadModel.mps + asadModel.mpi;
         AI ai = new AI(asadModel, solowSwanGrowthModel);
         boolean isPlaying = true;
@@ -111,7 +113,7 @@ public class Main {
                         throw new Exception();
                 }
                 asadModel.runCycle();
-                ai.machineLearningRegression();
+                ai.recordInfo();
                 System.out.println('\n' + "-*ASAD Model Information Post-adjustment*-");
                 printData(asadModel);
 
