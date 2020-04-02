@@ -124,8 +124,35 @@ public class Main {
                     isPlaying = false;
                 }
             } else if (mode.equals("a")) {
+                System.out.println("Cycle number " + (asadModel.cyclesRun + 1));
+                System.out.println("Press enter to run Solow Model cycle");
+                scanner.nextLine();
+                double populationGrowth = 0;
 
+                if (asadModel.cyclesRun != 0) {
+                    double intrinsicGrowth = 1 / (solowSwanGrowthModel.outputPerPerson * 1000);
+                    double carryingCapacity = (int) solowSwanGrowthModel.outputPerPerson * 1000;
+                    populationGrowth = calculatePopulationGrowth(intrinsicGrowth, solowSwanGrowthModel.Labour, carryingCapacity);
+                }
 
+                solowSwanGrowthModel.runCycle(savingsGrowth, populationGrowth, technology, deprecation);
+                System.out.println('\n' + "Press enter to run ASAD Model cycle");
+                asadModel.runCycle();
+                System.out.println("-*ASAD Model Information pre-adjustment*-");
+                printData(asadModel);
+                System.out.println("Select option for policy adjustment:");
+                scanner.nextLine();
+                ai.ruleBasedDecisions();
+                System.out.println('\n' + "-*ASAD Model Information Post-adjustment*-");
+                printData(asadModel);
+
+                technology += (asadModel.I / 1000);
+                System.out.println("Technology Level: " + technology);
+                System.out.println('\n' + "Press enter to continue to next cycle, or type e and press enter to end program");
+                if (scanner.nextLine().equals("e")) {
+                    isPlaying = false;
+                }
+                ai.ruleBasedDecisions();
             }
         }
     }

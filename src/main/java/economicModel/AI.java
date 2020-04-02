@@ -1,23 +1,22 @@
 package economicModel;
 
+import javafx.util.Pair;
 import weka.classifiers.Classifier;
-import weka.classifiers.Evaluation;
 import weka.classifiers.functions.LinearRegression;
-import weka.classifiers.pmml.consumer.GeneralRegression;
-import weka.classifiers.functions.IsotonicRegression;
-import weka.classifiers.functions.PaceRegression;
-import weka.classifiers.pmml.consumer.Regression;
-import weka.classifiers.meta.RegressionByDiscretization;
-import weka.classifiers.functions.SimpleLinearRegression;
-import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.ArffLoader;
 import weka.core.converters.ArffSaver;
+import net.sourceforge.jFuzzyLogic.FIS;
+import net.sourceforge.jFuzzyLogic.rule.*;
 
+import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Random;
 
 public class AI {
@@ -25,148 +24,252 @@ public class AI {
     private SolowSwanGrowthModel solowSwanGrowthModel;
     Instances instances;
     File file;
+    double bondChange;
+    double reserveMultiplier;
+    double spendingChange;
+    double taxChange;
+
     public AI(ASADModel asadModel, SolowSwanGrowthModel solowSwanGrowthModel) throws IOException {
         this.asadModel = asadModel;
         this.solowSwanGrowthModel = solowSwanGrowthModel;
         ArffLoader arffLoader = new ArffLoader();
         file = new File("src/main/resources/growth-info.arff");
         arffLoader.setFile(file);
+        instances = arffLoader.getDataSet();
+    }
 
-        instances =  arffLoader.getDataSet();;
+    public void calculateRequiredChanges() {
+        bondChange = asadModel.calculateBondChange();
+        reserveMultiplier = asadModel.calculateReserveMultiplier();
+        spendingChange = asadModel.calculateSpendingChange();
+        taxChange = asadModel.calculateTaxChange();
+    }
+
+    public int makeRandomChoice(int range) {
+        Random random = new Random();
+        return (int) random.nextDouble() * range;
     }
 
     // rule based AI
     public void ruleBasedDecisions() throws Exception {
-        Random random = new Random();
-        int choice = (int) random.nextDouble() * 4;
-
-        double bondChange = asadModel.calculateBondChange();
-        double reserveMultiplier = asadModel.calculateReserveMultiplier();
-        double spendingChange = asadModel.calculateSpendingChange();
-        double taxChange = asadModel.calculateTaxChange();
-
+        calculateRequiredChanges();
+        int choice = makeRandomChoice(2);
         if (asadModel.overallPublicBalanceInflationAdjusted < asadModel.overallGovtBalanceInflationAdjusted) { // if our govt finances are better than public finances
             if (asadModel.outputGap < 0) { // if equilibrium output is above lras
-                asadModel.changeMoneySupply(bondChange);
-                asadModel.changeReserveRequirements(reserveMultiplier);
+                if (choice == 0) {
+                    asadModel.changeMoneySupply(bondChange);
+                } else if (choice == 1) {
+                    asadModel.changeReserveRequirements(reserveMultiplier);
+                }
             } else if (asadModel.outputGap > 0) { // if equilibrium output is below lras
-                asadModel.changeSpending(spendingChange);
-                asadModel.changeTaxes(taxChange);
+                if (choice == 0) {
+
+                    asadModel.changeSpending(spendingChange);
+                } else if (choice == 1) {
+                    asadModel.changeTaxes(taxChange);
+                }
             }
         } else if (asadModel.overallPublicBalanceInflationAdjusted > asadModel.overallGovtBalanceInflationAdjusted) { // if our public finances are better than govt finances
             if (asadModel.outputGap < 0) {  // if equilibrium output is above lras
-                asadModel.changeSpending(spendingChange);
-                asadModel.changeTaxes(taxChange);
+                if (choice == 0) {
+                    asadModel.changeSpending(spendingChange);
+                } else if (choice == 1) {
+                    asadModel.changeTaxes(taxChange);
+                }
             } else if (asadModel.outputGap > 0) { // if equilibrium output is below lras
-                asadModel.changeMoneySupply(bondChange);
-                asadModel.changeReserveRequirements(reserveMultiplier);
+                if (choice == 0) {
+                    asadModel.changeMoneySupply(bondChange);
+                } else if (choice == 1) {
+                    asadModel.changeReserveRequirements(reserveMultiplier);
+                }
             }
         }
-
         asadModel.runCycle();
         recordInfo();
     }
 
     // fuzzy logic
     public void fuzzyLogic() throws Exception {
-        if (asadModel.overallPublicBalanceInflationAdjusted > 0) {
-            asadModel.changeMoneySupply(5);
-            asadModel.changeReserveRequirements(0.5);
-        } else if (asadModel.overallPublicBalanceInflationAdjusted < 0) {
-            asadModel.changeMoneySupply(-5);
-            asadModel.changeReserveRequirements(2);
+        calculateRequiredChanges();
+        int choice = makeRandomChoice(2);
+
+        String fileName = "src/main/resources/economy.fcl";
+        FIS fis = FIS.load(fileName,true);
+
+        // Set inputs
+        fis.setVariable("publicBalance", asadModel.overallPublicBalanceInflationAdjusted);
+        fis.setVariable("govtBalance", asadModel.overallGovtBalanceInflationAdjusted);
+        fis.setVariable("growth", asadModel.overallGrowth);
+        fis.setVariable("og", asadModel.outputGap);
+        // Evaluate
+        fis.evaluate();
+
+        double decision = fis.getVariable("decision").getLatestDefuzzifiedValue();
+
+        if (asadModel.overallPublicBalanceInflationAdjusted > 100) {
+            if (choice == 0) {
+                asadModel.changeMoneySupply(5);
+            } else if (choice == 1) {
+                asadModel.changeReserveRequirements(0.5);
+            }
+        } else if (asadModel.overallPublicBalanceInflationAdjusted < -100) {
+            if (choice == 0) {
+                asadModel.changeMoneySupply(-5);
+            } else if (choice == 1) {
+                asadModel.changeReserveRequirements(2);
+            }
         }
 
-        if (asadModel.overallGovtBalanceInflationAdjusted < 0) {
-            asadModel.changeSpending(-5);
-            asadModel.changeTaxes(5);
-        } else if (asadModel.overallGovtBalanceInflationAdjusted > 0) {
-            asadModel.changeSpending(5);
-            asadModel.changeTaxes(-5);
+        if (asadModel.overallGovtBalanceInflationAdjusted < 100) {
+            if (choice == 0) {
+                asadModel.changeSpending(-5);
+            } else if (choice == 1) {
+                asadModel.changeTaxes(5);
+            }
+        } else if (asadModel.overallGovtBalanceInflationAdjusted > -100) {
+            if (choice == 0) {
+                asadModel.changeSpending(5);
+            } else if (choice == 1) {
+                asadModel.changeTaxes(-5);
+            }
         }
         recordInfo();
     }
 
     // goal oriented behavior
     public void goalOrientedBehavior() throws Exception {
-        double inflation = asadModel.overallInflation;
-        double publicBalance = asadModel.overallPublicBalanceInflationAdjusted;
-        double govtBalance = asadModel.overallGovtBalanceInflationAdjusted;
-        double growth = asadModel.overallGrowth;
-        double investment = asadModel.I;
+        calculateRequiredChanges();
+        double inflation;
+        double publicBalance;
+        double govtBalance;
+        double growth;
+        double gdp;
 
-        asadModel.changeMoneySupply(5);
-        /*
-        * inflation++
-        * publicBalance--
-        * govtBalance =
-        * growth ++
-        * investment ++
-        * */
+        int positiveBondChange = 5;
+        int negativeBondChange = -5;
+        float positiveReserveMultiplier = 2;
+        float negativeReserveMultiplier = 0.5f;
+        float positiveSpendingChange = 5;
+        float negativeSpendingChange = -5;
+        float negativeTaxChange = -5;
+        float positiveTaxChange = 5;
 
+        double economicHealth = 0;
+        int option = 0;
+        for (int i = 0; i < 8; i++) {
+            ASADModel testModel = asadModel;
+            if (i == 0) {
+                testModel.changeMoneySupply(bondChange);
+                testModel.runCycle();
+                inflation = testModel.overallInflation;
+                publicBalance = testModel.overallPublicBalanceInflationAdjusted;
+                govtBalance = testModel.overallGovtBalanceInflationAdjusted;
+                growth = testModel.overallGrowth;
+                gdp = testModel.longRunAggregateSupply;
+                economicHealth = gdp * growth - (publicBalance + govtBalance) * inflation;
+            } else if (i == 1) {
+                testModel.changeMoneySupply(bondChange);
+                inflation = testModel.overallInflation;
+                publicBalance = testModel.overallPublicBalanceInflationAdjusted;
+                govtBalance = testModel.overallGovtBalanceInflationAdjusted;
+                growth = testModel.overallGrowth;
+                gdp = testModel.longRunAggregateSupply;
+                if (gdp * growth - (publicBalance + govtBalance) * inflation > economicHealth) {
+                    economicHealth = gdp * growth - (publicBalance + govtBalance) * inflation;
+                    option = i;
+                }
+            } else if (i == 2) {
+                testModel.changeReserveRequirements(reserveMultiplier);
+                inflation = testModel.overallInflation;
+                publicBalance = testModel.overallPublicBalanceInflationAdjusted;
+                govtBalance = testModel.overallGovtBalanceInflationAdjusted;
+                growth = testModel.overallGrowth;
+                gdp = testModel.longRunAggregateSupply;
+                economicHealth = gdp * growth - (publicBalance + govtBalance) * inflation;
+                if (gdp * growth - (publicBalance + govtBalance) * inflation > economicHealth) {
+                    economicHealth = gdp * growth - (publicBalance + govtBalance) * inflation;
+                    option = i;
+                }
+            } else if (i == 3) {
+                testModel.changeReserveRequirements(reserveMultiplier);
+                inflation = testModel.overallInflation;
+                publicBalance = testModel.overallPublicBalanceInflationAdjusted;
+                govtBalance = testModel.overallGovtBalanceInflationAdjusted;
+                growth = testModel.overallGrowth;
+                gdp = testModel.longRunAggregateSupply;
+                economicHealth = gdp * growth - (publicBalance + govtBalance) * inflation;
+                if (gdp * growth - (publicBalance + govtBalance) * inflation > economicHealth) {
+                    economicHealth = gdp * growth - (publicBalance + govtBalance) * inflation;
+                    option = i;
+                }
+            } else if (i == 4) {
+                testModel.changeSpending(spendingChange);
+                inflation = testModel.overallInflation;
+                publicBalance = testModel.overallPublicBalanceInflationAdjusted;
+                govtBalance = testModel.overallGovtBalanceInflationAdjusted;
+                growth = testModel.overallGrowth;
+                gdp = testModel.longRunAggregateSupply;
+                economicHealth = gdp * growth - (publicBalance + govtBalance) * inflation;
+                if (gdp * growth - (publicBalance + govtBalance) * inflation > economicHealth) {
+                    economicHealth = gdp * growth - (publicBalance + govtBalance) * inflation;
+                    option = i;
+                }
+            } else if (i == 5) {
+                testModel.changeSpending(spendingChange);
+                inflation = testModel.overallInflation;
+                publicBalance = testModel.overallPublicBalanceInflationAdjusted;
+                govtBalance = testModel.overallGovtBalanceInflationAdjusted;
+                growth = testModel.overallGrowth;
+                gdp = testModel.longRunAggregateSupply;
+                economicHealth = gdp * growth - (publicBalance + govtBalance) * inflation;
+                if (gdp * growth - (publicBalance + govtBalance) * inflation > economicHealth) {
+                    economicHealth = gdp * growth - (publicBalance + govtBalance) * inflation;
+                    option = i;
+                }
+            } else if (i == 6) {
+                testModel.changeTaxes(taxChange);
+                inflation = testModel.overallInflation;
+                publicBalance = testModel.overallPublicBalanceInflationAdjusted;
+                govtBalance = testModel.overallGovtBalanceInflationAdjusted;
+                growth = testModel.overallGrowth;
+                gdp = testModel.longRunAggregateSupply;
+                economicHealth = gdp * growth - (publicBalance + govtBalance) * inflation;
+                if (gdp * growth - (publicBalance + govtBalance) * inflation > economicHealth) {
+                    economicHealth = gdp * growth - (publicBalance + govtBalance) * inflation;
+                    option = i;
+                }
+            } else {
+                testModel.changeTaxes(taxChange);
+                inflation = testModel.overallInflation;
+                publicBalance = testModel.overallPublicBalanceInflationAdjusted;
+                govtBalance = testModel.overallGovtBalanceInflationAdjusted;
+                growth = testModel.overallGrowth;
+                gdp = testModel.longRunAggregateSupply;
+                economicHealth = gdp * growth - (publicBalance + govtBalance) * inflation;
+                if (gdp * growth - (publicBalance + govtBalance) * inflation > economicHealth) {
+                    economicHealth = gdp * growth - (publicBalance + govtBalance) * inflation;
+                    option = i;
+                }
+            }
+        }
 
-        asadModel.changeMoneySupply(-5);
-        /*
-         * inflation--
-         * publicBalance++
-         * govtBalance =
-         * growth --
-         * investment --
-         * */
-
-        asadModel.changeReserveRequirements(0.5);
-        /*
-         * inflation++
-         * publicBalance--
-         * govtBalance =
-         * growth ++
-         * investment ++
-        * */
-
-        asadModel.changeReserveRequirements(2);
-        /*
-         * inflation--
-         * publicBalance++
-         * govtBalance =
-         * growth --
-         * investment --
-         * */
-
-        asadModel.changeSpending(5);
-        /*
-         * inflation++
-         * publicBalance=
-         * govtBalance--
-         * growth ++
-         * investment =
-        * */
-
-        asadModel.changeSpending(-5);
-        /*
-         * inflation--
-         * publicBalance=
-         * govtBalance++
-         * growth --
-         * investment =
-         * */
-
-        asadModel.changeTaxes(-5);
-        /*
-         * inflation++
-         * publicBalance=
-         * govtBalance--
-         * growth ++
-         * investment =
-         * */
-
-        asadModel.changeTaxes(5);
-        /*
-         * inflation--
-         * publicBalance=
-         * govtBalance++
-         * growth --
-         * investment =
-         * */
+        if (option == 0) {
+            asadModel.changeMoneySupply(positiveBondChange);
+        } else if (option == 1) {
+            asadModel.changeMoneySupply(negativeBondChange);
+        } else if (option == 2) {
+            asadModel.changeReserveRequirements(positiveReserveMultiplier);
+        } else if (option == 3) {
+            asadModel.changeReserveRequirements(negativeReserveMultiplier);
+        } else if (option == 4) {
+            asadModel.changeSpending(positiveSpendingChange);
+        } else if (option == 5) {
+            asadModel.changeSpending(negativeSpendingChange);
+        } else if (option == 6) {
+            asadModel.changeTaxes(negativeTaxChange);
+        } else {
+            asadModel.changeTaxes(positiveTaxChange);
+        }
         recordInfo();
     }
 

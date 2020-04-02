@@ -21,6 +21,7 @@ dependencies {
     compile group: 'nz.ac.waikato.cms.weka', name: 'weka-dev', version: '3.9.4'
     compile group: 'nz.ac.waikato.cms.weka', name: 'isotonicRegression', version: '1.0.2'
     compile group: 'nz.ac.waikato.cms.weka', name: 'paceRegression', version: '1.0.2'
+    compile files('jFuzzyLogic.jar')
 }
 
 intellij {

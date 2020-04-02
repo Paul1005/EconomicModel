@@ -1,0 +1,93 @@
+// Block definition (there may be more than one block per file)
+FUNCTION_BLOCK tipper
+
+// Define input variables
+VAR_INPUT
+    publicBalance : REAL;
+    govtBalance : REAL;
+END_VAR
+
+// Define output variable
+VAR_OUTPUT
+    decision : REAL;
+END_VAR
+
+FUZZIFY publicBalance
+    TERM low := (-50.0, 1.0) (-10.0, 0.0);
+    TERM medium := (-50.0, 0.0) (-10.0, 1.0) (10.0, 1.0) (50.0, 0.0);
+    TERM high := (10.0, 0.0) (50.0, 1.0);
+END_FUZZIFY
+
+FUZZIFY govtBalance
+    TERM low := (-50.0, 1.0) (-10.0, 0.0);
+    TERM medium := (-50.0, 0.0) (-10.0, 1.0) (10.0, 1.0) (50.0, 0.0);
+    TERM high := (10.0, 0.0) (50.0, 1.0);
+END_FUZZIFY
+
+FUZZIFY growth
+    TERM low := (0.0, 1.0) (1.0, 1.0) (2.0, 0.0);
+    TERM medium := (2.0, 0.0 (3.0, 1.0) (4.0, 1.0) (5.0, 0.0);
+    TERM high := (4.0, 0.0) (5.0, 1.0);
+END_FUZZIFY
+
+FUZZIFY og
+    TERM negative := (-1000.0, 1.0) (-100.0, 0.0);
+    TERM correct := (-1000.0, 0.0) (-100.0, 1.0) (100.0, 1.0) (1000.0, 0.0);
+    TERM positive := (100.0, 0.0) (1000.0, 1.0);
+END_FUZZIFY
+
+RULEBLOCK No1
+
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK
+
+/*    ArrayList<Pair<Double, Double>> publicBalanceHigh = new ArrayList<>(Arrays.asList(
+                  new Pair<>(-50.0, 1.0),
+                  new Pair<>(-10.0, 0.0)));
+          ArrayList<Pair<Double, Double>> publicBalanceMedium = new ArrayList<>(Arrays.asList(
+                  new Pair<>(-50.0, 0.0),
+                  new Pair<>(-10.0, 1.0),
+                  new Pair<>(10.0, 1.0),
+                  new Pair<>(50.0, 0.0)));
+          ArrayList<Pair<Double, Double>> publicBalanceLow = new ArrayList<>(Arrays.asList(
+                  new Pair<>(10.0, 0.0),
+                  new Pair<>(50.0, 1.0)));
+
+          ArrayList<Pair<Double, Double>> govtBalanceHigh = new ArrayList<>(Arrays.asList(
+                  new Pair<>(-50.0, 1.0),
+                  new Pair<>(-10.0, 0.0)));
+          ArrayList<Pair<Double, Double>> govtBalanceMedium = new ArrayList<>(Arrays.asList(
+                  new Pair<>(-50.0, 0.0),
+                  new Pair<>(-10.0, 1.0),
+                  new Pair<>(10.0, 1.0),
+                  new Pair<>(50.0, 0.0)));
+          ArrayList<Pair<Double, Double>> govtBalanceLow = new ArrayList<>(Arrays.asList(
+                  new Pair<>(10.0, 0.0),
+                  new Pair<>(50.0, 1.0)));
+
+          ArrayList<Pair<Double, Double>> growthIslow = new ArrayList<>(Arrays.asList(
+                  new Pair<>(0.0, 1.0),
+                  new Pair<>(1.0, 1.0),
+                  new Pair<>(2.0, 0.0)));
+          ArrayList<Pair<Double, Double>> growthIsMedium = new ArrayList<>(Arrays.asList(
+                  new Pair<>(2.0, 0.0),
+                  new Pair<>(3.0, 1.0),
+                  new Pair<>(4.0, 1.0),
+                  new Pair<>(5.0, 0.0)));
+          ArrayList<Pair<Double, Double>> growthIsHigh = new ArrayList<>(Arrays.asList(
+                  new Pair<>(4.0, 0.0),
+                  new Pair<>(5.0, 1.0)));
+
+          ArrayList<Pair<Double, Double>> ogIsNegative = new ArrayList<>(Arrays.asList(
+                  new Pair<>(-1000.0, 1.0),
+                  new Pair<>(-100.0, 0.0)));
+          ArrayList<Pair<Double, Double>> ogIsCorrect = new ArrayList<>(Arrays.asList(
+                  new Pair<>(-1000.0, 0.0),
+                  new Pair<>(-100.0, 1.0),
+                  new Pair<>(100.0, 1.0),
+                  new Pair<>(1000.0, 0.0)));
+          ArrayList<Pair<Double, Double>> ogIsPositive = new ArrayList<>(Arrays.asList(
+                  new Pair<>(100.0, 0.0),
+                  new Pair<>(1000.0, 1.0)));
+*/
