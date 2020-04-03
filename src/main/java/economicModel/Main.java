@@ -1,10 +1,32 @@
 package economicModel;
 
+import net.sourceforge.jFuzzyLogic.FIS;
+
 import java.util.Scanner;
 
 //TODO: still need to incorporate inflation somehow, maybe price should affect capital?
 public class Main {
     public static void main(String args[]) throws Exception {
+      /*  // Load from 'FCL' file
+        String fileName = "src/main/resources/tipper.fcl";
+        FIS fis = FIS.load(fileName,true);
+        // Error while loading?
+
+        // Set inputs
+        fis.setVariable("service", 8.99);
+        fis.setVariable("food", 7.01);
+
+        // Evaluate
+        fis.evaluate();
+
+        System.out.println(fis.getVariable("tip").getLatestDefuzzifiedValue());
+        System.out.println(fis.getVariable("tip").getMembership("cheap"));
+        System.out.println(fis.getVariable("tip").getMembership("average"));
+        System.out.println(fis.getVariable("tip").getMembership("generous"));
+
+        if(true){
+            return;
+        }*/
         Scanner scanner = new Scanner(System.in);  // Create a Scanner object
 
         ASADModel asadModel = new ASADModel();
@@ -143,6 +165,9 @@ public class Main {
                 System.out.println("Select option for policy adjustment:");
                 scanner.nextLine();
                 ai.ruleBasedDecisions();
+                ai.machineLearningRegression();
+                ai.fuzzyLogic();
+                ai.goalOrientedBehavior();
                 System.out.println('\n' + "-*ASAD Model Information Post-adjustment*-");
                 printData(asadModel);
 

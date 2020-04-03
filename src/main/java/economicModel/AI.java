@@ -1,6 +1,5 @@
 package economicModel;
 
-import javafx.util.Pair;
 import weka.classifiers.Classifier;
 import weka.classifiers.functions.LinearRegression;
 import weka.core.DenseInstance;
@@ -9,14 +8,8 @@ import weka.core.Instances;
 import weka.core.converters.ArffLoader;
 import weka.core.converters.ArffSaver;
 import net.sourceforge.jFuzzyLogic.FIS;
-import net.sourceforge.jFuzzyLogic.rule.*;
-
-import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Random;
 
 public class AI {
@@ -97,42 +90,21 @@ public class AI {
         FIS fis = FIS.load(fileName,true);
 
         // Set inputs
-        fis.setVariable("publicBalance", asadModel.overallPublicBalanceInflationAdjusted);
+        //fis.setVariable("publicBalance", asadModel.overallPublicBalanceInflationAdjusted);
         fis.setVariable("govtBalance", asadModel.overallGovtBalanceInflationAdjusted);
-        fis.setVariable("growth", asadModel.overallGrowth);
+       // fis.setVariable("growth", asadModel.overallGrowth);
         fis.setVariable("og", asadModel.outputGap);
         // Evaluate
         fis.evaluate();
 
-        double decision = fis.getVariable("decision").getLatestDefuzzifiedValue();
+        double spending = fis.getVariable("govtSpending").getLatestDefuzzifiedValue();
 
-        if (asadModel.overallPublicBalanceInflationAdjusted > 100) {
-            if (choice == 0) {
-                asadModel.changeMoneySupply(5);
-            } else if (choice == 1) {
-                asadModel.changeReserveRequirements(0.5);
-            }
-        } else if (asadModel.overallPublicBalanceInflationAdjusted < -100) {
-            if (choice == 0) {
-                asadModel.changeMoneySupply(-5);
-            } else if (choice == 1) {
-                asadModel.changeReserveRequirements(2);
-            }
+        if(choice == 0){
+            asadModel.changeTaxes(spending / asadModel.taxMultiplier);
+        } else if (choice == 1){
+            asadModel.changeSpending(spending / asadModel.spendingMultiplier);
         }
 
-        if (asadModel.overallGovtBalanceInflationAdjusted < 100) {
-            if (choice == 0) {
-                asadModel.changeSpending(-5);
-            } else if (choice == 1) {
-                asadModel.changeTaxes(5);
-            }
-        } else if (asadModel.overallGovtBalanceInflationAdjusted > -100) {
-            if (choice == 0) {
-                asadModel.changeSpending(5);
-            } else if (choice == 1) {
-                asadModel.changeTaxes(-5);
-            }
-        }
         recordInfo();
     }
 
@@ -274,7 +246,7 @@ public class AI {
     }
 
     public void machineLearningRegression() throws Exception {
-        Classifier classifier = new LinearRegression();
+        Classifier classifier = new LinearRegression(); // may need to use different regression method
         classifier.buildClassifier(instances);
 
         //Evaluation eval = new Evaluation(instances);
