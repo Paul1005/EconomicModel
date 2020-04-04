@@ -5,6 +5,7 @@ import java.util.ArrayList;
 //Note: right now incentive is to keep price level at 1
 //TODO: have some kind of unemployment indicator (phillips curve?), right now labour and population are synonymous
 //TODO: incorporate crowding out
+//TODO: go over how C and I are calculated
 public class ASADModel {
     public double longRunAggregateSupply;
     public double shortRunAggregateSupplyCurve;
@@ -198,8 +199,7 @@ public class ASADModel {
         debts.add(Math.abs(balance));
     }
 
-    double calculateReserveMultiplier(){
-        double investmentRequired = longRunAggregateSupply - C - G - taxes * taxMultiplier; // find how much investment we need
+    double calculateReserveMultiplier(double investmentRequired){
         double interestRate = interestRateEquation(investmentRequired); // find the new interest rate based on the investment we need.
         double newMoneySupply = moneySupplyEquation(interestRate); // find the money supply we need based on the new interest rate
         return moneySupply / newMoneySupply;
@@ -209,12 +209,15 @@ public class ASADModel {
         reserveRequirement *= reserveMultiplier; // determine the new reserve requirement based on the new and old money supply
     }
 
-    double calculateBondChange(){
-        double investmentRequired = longRunAggregateSupply - C - G - taxes * taxMultiplier; // find how much investment we need
+    double calculateBondChange(double investmentRequired){
         double interestRate = interestRateEquation(investmentRequired); // find the new interest rate based on the investment we need.
         double newMoneySupply = moneySupplyEquation(interestRate); // find the money supply we need based on the new interest rate
         double gap = newMoneySupply - moneySupply; // determine how much more money we need
         return gap * reserveRequirement; // determine how many more bonds we need to buy or sell
+    }
+
+    public double getInvestmentRequired() {
+        return longRunAggregateSupply - C - G - taxes * taxMultiplier;
     }
 
     void changeMoneySupply(double bondChange) {

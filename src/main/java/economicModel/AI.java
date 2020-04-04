@@ -32,8 +32,9 @@ public class AI {
     }
 
     public void calculateRequiredChanges() {
-        bondChange = asadModel.calculateBondChange();
-        reserveMultiplier = asadModel.calculateReserveMultiplier();
+        double investmentRequired = asadModel.getInvestmentRequired(); // find how much investment we need
+        bondChange = asadModel.calculateBondChange(investmentRequired);
+        reserveMultiplier = asadModel.calculateReserveMultiplier(investmentRequired);
         spendingChange = asadModel.calculateSpendingChange();
         taxChange = asadModel.calculateTaxChange();
     }
@@ -90,19 +91,29 @@ public class AI {
         FIS fis = FIS.load(fileName,true);
 
         // Set inputs
-        //fis.setVariable("publicBalance", asadModel.overallPublicBalanceInflationAdjusted);
+        fis.setVariable("publicBalance", asadModel.overallPublicBalanceInflationAdjusted);
         fis.setVariable("govtBalance", asadModel.overallGovtBalanceInflationAdjusted);
        // fis.setVariable("growth", asadModel.overallGrowth);
-        fis.setVariable("og", asadModel.outputGap);
+        fis.setVariable("og", asadModel.outputGap / 2); // since we're doing both public and govt spending, divide og by 2
         // Evaluate
         fis.evaluate();
 
-        double spending = fis.getVariable("govtSpending").getLatestDefuzzifiedValue();
+        double govtSpending = fis.getVariable("govtSpending").getLatestDefuzzifiedValue();
+        double publicSpending = fis.getVariable("publicSpending").getLatestDefuzzifiedValue();
 
         if(choice == 0){
-            asadModel.changeTaxes(spending / asadModel.taxMultiplier);
+            asadModel.changeTaxes(govtSpending / asadModel.taxMultiplier);
         } else if (choice == 1){
-            asadModel.changeSpending(spending / asadModel.spendingMultiplier);
+            asadModel.changeSpending(govtSpending / asadModel.spendingMultiplier);
+        }
+
+        choice = makeRandomChoice(2);
+        if(choice == 0){
+            double bonds = asadModel.calculateBondChange(publicSpending);
+            asadModel.changeMoneySupply(bonds);
+        } else if (choice == 1){
+            double reserveRequirement = asadModel.calculateReserveMultiplier(publicSpending);
+            asadModel.changeReserveRequirements(reserveRequirement);
         }
 
         recordInfo();

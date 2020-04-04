@@ -1,16 +1,18 @@
 // Block definition (there may be more than one block per file)
-// these numbers are placeholders
-FUNCTION_BLOCK tipper
+// these numbers are placeholders, may way to use functions of some kind
+FUNCTION_BLOCK economy
 
 // Define input variables
 VAR_INPUT
     publicBalance : REAL;
     govtBalance : REAL;
+    og : REAL;
 END_VAR
 
 // Define output variable
 VAR_OUTPUT
-    decision : REAL;
+    publicSpending : REAL;
+    govtSpending : REAL;
 END_VAR
 
 FUZZIFY publicBalance
@@ -77,6 +79,30 @@ RULEBLOCK No1
     RULE 3 : IF govtBalance IS debt OR
     (og IS positive AND govtBalance IS neutral)
     THEN govtSpending IS surplus
+END_RULEBLOCK
+
+RULEBLOCK No2
+// Use 'min' for 'and' (also implicit use 'max'
+    // for 'or' to fulfill DeMorgan's Law)
+    AND : MIN;
+    // Use 'min' activation method
+    ACT : MIN;
+    // Use 'max' accumulation method
+    ACCU : MAX;
+
+    RULE 1 : IF publicBalance IS reserve OR
+    (og IS negative AND publicBalance IS neutral)
+    THEN publicSpending IS deficit
+
+    RULE 2 : IF publicBalance IS neutral OR
+    og IS correct OR
+    (og IS negative AND publicBalance IS negative) OR
+    (og IS negative AND publicBalance IS negative)
+    THEN publicSpending IS neutral
+
+    RULE 3 : IF publicBalance IS debt OR
+    (og IS positive AND publicBalance IS neutral)
+    THEN publicSpending IS surplus
 END_RULEBLOCK
 
 END_FUNCTION_BLOCK
