@@ -1,9 +1,5 @@
 @relation growth.symbolic
 
-@attribute inflation numeric
-@attribute output_gap numeric
-@attribute public_debt numeric
-@attribute govt_debt numeric
 @attribute tax numeric
 @attribute spending numeric
 @attribute owned_bonds numeric

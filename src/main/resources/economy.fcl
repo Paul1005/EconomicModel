@@ -7,6 +7,7 @@ VAR_INPUT
     publicBalance : REAL;
     govtBalance : REAL;
     og : REAL;
+    balanceNeutral, balanceHigh, spendingNeutral, spendingHigh, ogLow, ogHigh: Real;
 END_VAR
 
 // Define output variable
@@ -16,15 +17,15 @@ VAR_OUTPUT
 END_VAR
 
 FUZZIFY publicBalance
-    TERM debt := (-50.0, 1.0) (-10.0, 0.0);
-    TERM neutral := (-50.0, 0.0) (-10.0, 1.0) (10.0, 1.0) (50.0, 0.0);
-    TERM reserve := (10.0, 0.0) (50.0, 1.0);
+    TERM debt := (-balanceHigh, 1.0) (-balanceNeutral, 0.0);
+    TERM neutral := (-balanceHigh, 0.0) (-balanceNeutral, 1.0) (balanceNeutral, 1.0) (balanceHigh, 0.0);
+    TERM reserve := (balanceNeutral, 0.0) (balanceHigh, 1.0);
 END_FUZZIFY
 
 FUZZIFY govtBalance
-    TERM debt := (-50.0, 1.0) (-10.0, 0.0);
-    TERM neutral := (-50.0, 0.0) (-10.0, 1.0) (10.0, 1.0) (50.0, 0.0);
-    TERM reserve := (10.0, 0.0) (50.0, 1.0);
+    TERM debt := (-balanceHigh, 1.0) (-balanceNeutral, 0.0);
+    TERM neutral := (-balanceHigh, 0.0) (-balanceNeutral, 1.0) (balanceNeutral, 1.0) (balanceHigh, 0.0);
+    TERM reserve := (balanceNeutral, 0.0) (balanceHigh, 1.0);
 END_FUZZIFY
 
 FUZZIFY growth
@@ -34,24 +35,24 @@ FUZZIFY growth
 END_FUZZIFY
 
 FUZZIFY og
-    TERM negative := (-1000.0, 1.0) (-100.0, 0.0);
-    TERM correct := (-1000.0, 0.0) (-100.0, 1.0) (100.0, 1.0) (1000.0, 0.0);
-    TERM positive := (100.0, 0.0) (1000.0, 1.0);
+    TERM negative := (-ogHigh, 1.0) (-ogLow, 0.0);
+    TERM correct := (-ogHigh, 0.0) (-ogLow, 1.0) (ogLow, 1.0) (ogHigh, 0.0);
+    TERM positive := (ogLow, 0.0) (ogHigh, 1.0);
 END_FUZZIFY
 
 DEFUZZIFY publicSpending
-    TERM deficit := (-100, 1) (-10, 0);
-    TERM neutral := (-10,0) (0,1) (10,0);
-    TERM surplus := (10, 0) (100, 1);
+    TERM deficit := (-spendingHigh, 1) (-spendingNeutral, 0);
+    TERM neutral := (-spendingHigh,0) (0,1) (spendingNeutral,0);
+    TERM surplus := (spendingNeutral, 0) (spendingHigh, 1);
     METHOD : COG;
     // Default value is 0 (if no rule activates defuzzifier)
     DEFAULT := 0;
 END_DEFUZZIFY
 
 DEFUZZIFY govtSpending
-    TERM deficit := (-100, 1) (-10, 0);
-    TERM neutral := (-10,0) (0,1) (10,0);
-    TERM surplus := (10, 0) (100, 1);
+    TERM deficit := (-spendingHigh, 1) (-spendingNeutral, 0);
+    TERM neutral := (-spendingHigh,0) (0,1) (spendingNeutral,0);
+    TERM surplus := (spendingNeutral, 0) (spendingHigh, 1);
     METHOD : COG;
     // Default value is 0 (if no rule activates defuzzifier)
     DEFAULT := 0;

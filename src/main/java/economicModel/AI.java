@@ -1,5 +1,9 @@
 package economicModel;
 
+import net.sourceforge.jFuzzyLogic.FunctionBlock;
+import net.sourceforge.jFuzzyLogic.defuzzifier.Defuzzifier;
+import net.sourceforge.jFuzzyLogic.defuzzifier.DefuzzifierCenterOfGravity;
+import net.sourceforge.jFuzzyLogic.rule.Variable;
 import weka.classifiers.Classifier;
 import weka.classifiers.functions.LinearRegression;
 import weka.core.DenseInstance;
@@ -8,6 +12,7 @@ import weka.core.Instances;
 import weka.core.converters.ArffLoader;
 import weka.core.converters.ArffSaver;
 import net.sourceforge.jFuzzyLogic.FIS;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Random;
@@ -88,12 +93,26 @@ public class AI {
         int choice = makeRandomChoice(2);
 
         String fileName = "src/main/resources/economy.fcl";
-        FIS fis = FIS.load(fileName,true);
+        FIS fis = FIS.load(fileName, true);
+
+        double balanceNeutral = asadModel.longRunAggregateSupply / 2;
+        double balanceHigh = asadModel.longRunAggregateSupply;
+        double spendingNeutral = asadModel.longRunAggregateSupply;
+        double spendingHigh = asadModel.longRunAggregateSupply;
+        double ogLow = asadModel.longRunAggregateSupply / 8;
+        double ogHigh = asadModel.longRunAggregateSupply / 4;
+
+        fis.setVariable("balanceNeutral", balanceNeutral);
+        fis.setVariable("balanceHigh", balanceHigh);
+        fis.setVariable("spendingNeutral", spendingNeutral);
+        fis.setVariable("spendingHigh", spendingHigh);
+        fis.setVariable("ogLow", ogLow);
+        fis.setVariable("ogHigh", ogHigh);
 
         // Set inputs
         fis.setVariable("publicBalance", asadModel.overallPublicBalanceInflationAdjusted);
         fis.setVariable("govtBalance", asadModel.overallGovtBalanceInflationAdjusted);
-       // fis.setVariable("growth", asadModel.overallGrowth);
+        // fis.setVariable("growth", asadModel.overallGrowth);
         fis.setVariable("og", asadModel.outputGap / 2); // since we're doing both public and govt spending, divide og by 2
         // Evaluate
         fis.evaluate();
@@ -101,17 +120,17 @@ public class AI {
         double govtSpending = fis.getVariable("govtSpending").getLatestDefuzzifiedValue();
         double publicSpending = fis.getVariable("publicSpending").getLatestDefuzzifiedValue();
 
-        if(choice == 0){
+        if (choice == 0) {
             asadModel.changeTaxes(govtSpending / asadModel.taxMultiplier);
-        } else if (choice == 1){
+        } else if (choice == 1) {
             asadModel.changeSpending(govtSpending / asadModel.spendingMultiplier);
         }
 
         choice = makeRandomChoice(2);
-        if(choice == 0){
+        if (choice == 0) {
             double bonds = asadModel.calculateBondChange(publicSpending);
             asadModel.changeMoneySupply(bonds);
-        } else if (choice == 1){
+        } else if (choice == 1) {
             double reserveRequirement = asadModel.calculateReserveMultiplier(publicSpending);
             asadModel.changeReserveRequirements(reserveRequirement);
         }
