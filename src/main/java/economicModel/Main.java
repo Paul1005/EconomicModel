@@ -57,6 +57,7 @@ public class Main {
 
                 asadModel.longRunAggregateSupply = solowSwanGrowthModel.output;
 
+                // TODO: not sure if these are ideal
                 asadModel.C = asadModel.longRunAggregateSupply * asadModel.mpc;
                 asadModel.IConstant = asadModel.longRunAggregateSupply * asadModel.mpi;
                 //inflation = quantity * velocity;

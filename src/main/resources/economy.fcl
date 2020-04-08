@@ -46,18 +46,18 @@ FUZZIFY og
 END_FUZZIFY
 
 DEFUZZIFY publicSpending
-    TERM deficit := (spendingHighNegative, 1) (spendingNeutralNegative, 0);
+    TERM surplus := (spendingHighNegative, 1) (spendingNeutralNegative, 0);
     TERM neutral := (spendingNeutralNegative,0) (0,1) (spendingNeutralPositive,0);
-    TERM surplus := (spendingNeutralPositive, 0) (spendingHighPositive, 1);
+    TERM deficit := (spendingNeutralPositive, 0) (spendingHighPositive, 1);
     METHOD : COG;
     // Default value is 0 (if no rule activates defuzzifier)
     DEFAULT := 0;
 END_DEFUZZIFY
 
 DEFUZZIFY govtSpending
-    TERM deficit := (spendingHighNegative, 1) (spendingNeutralNegative, 0);
+    TERM surplus := (spendingHighNegative, 1) (spendingNeutralNegative, 0);
     TERM neutral := (spendingNeutralNegative,0) (0,1) (spendingNeutralPositive,0);
-    TERM surplus := (spendingNeutralPositive, 0) (spendingHighPositive, 1);
+    TERM deficit := (spendingNeutralPositive, 0) (spendingHighPositive, 1);
     METHOD : COG;
     // Default value is 0 (if no rule activates defuzzifier)
     DEFAULT := 0;

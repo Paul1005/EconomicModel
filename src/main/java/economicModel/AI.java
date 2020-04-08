@@ -101,8 +101,8 @@ public class AI {
 
         double balanceNeutral = asadModel.longRunAggregateSupply / 2;
         double balanceHigh = asadModel.longRunAggregateSupply;
-        double spendingNeutral = asadModel.longRunAggregateSupply;
-        double spendingHigh = asadModel.longRunAggregateSupply;
+        double spendingNeutral = asadModel.longRunAggregateSupply / 8;
+        double spendingHigh = asadModel.longRunAggregateSupply / 4;
         double ogLow = asadModel.longRunAggregateSupply / 16;
         double ogHigh = asadModel.longRunAggregateSupply / 8;
 
@@ -130,14 +130,14 @@ public class AI {
         double govtSpending = fis.getVariable("govtSpending").getLatestDefuzzifiedValue();
         double publicSpending = fis.getVariable("publicSpending").getLatestDefuzzifiedValue();
 
-        int choice = random.nextInt(2);
-        if (choice == 0) {
+        if(asadModel.G + govtSpending <= 0){
             asadModel.changeTaxes(govtSpending / asadModel.taxMultiplier);
-        } else if (choice == 1) {
+        } else {
             asadModel.changeSpending(govtSpending / asadModel.spendingMultiplier);
         }
 
-        choice = random.nextInt(2);
+        int choice = random.nextInt(2);
+
         if (choice == 0) {
             double bonds = asadModel.calculateBondChange(publicSpending);
             asadModel.changeMoneySupply(bonds);
@@ -146,6 +146,7 @@ public class AI {
             asadModel.changeReserveRequirements(reserveRequirement);
         }
 
+        asadModel.runCycle();
         recordInfo(asadModel);
         return asadModel;
     }
@@ -284,6 +285,8 @@ public class AI {
         } else {
             asadModel.changeTaxes(positiveTaxChange);
         }
+
+        asadModel.runCycle();
         recordInfo(asadModel);
         return asadModel;
     }
@@ -308,6 +311,7 @@ public class AI {
         Instance predicationDataSet = new DenseInstance(1.0, test);
         double value = classifier.classifyInstance(predicationDataSet);
 
+        asadModel.runCycle();
         recordInfo(asadModel);
         return asadModel;
     }
