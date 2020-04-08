@@ -61,13 +61,13 @@ public class AI {
 
     private void publicIsRich(ASADModel asadModel) {
         int choice = random.nextInt(2);
-        if (asadModel.outputGap < 0) {  // if equilibrium output is above lras
+        if (asadModel.outputGap > 0) {  // if equilibrium output is above lras
             if (choice == 0) {
                 asadModel.changeSpending(spendingChange);
             } else if (choice == 1) {
                 asadModel.changeTaxes(taxChange);
             }
-        } else if (asadModel.outputGap > 0) { // if equilibrium output is below lras
+        } else if (asadModel.outputGap < 0) { // if equilibrium output is below lras
             if (choice == 0) {
                 asadModel.changeMoneySupply(bondChange);
             } else if (choice == 1) {
@@ -78,13 +78,13 @@ public class AI {
 
     private void govtIsRich(ASADModel asadModel) {
         int choice = random.nextInt(2);
-        if (asadModel.outputGap < 0) { // if equilibrium output is above lras
+        if (asadModel.outputGap > 0) { // if equilibrium output is above lras
             if (choice == 0) {
                 asadModel.changeMoneySupply(bondChange);
             } else if (choice == 1) {
                 asadModel.changeReserveRequirements(reserveMultiplier);
             }
-        } else if (asadModel.outputGap > 0) { // if equilibrium output is below lras
+        } else if (asadModel.outputGap < 0) { // if equilibrium output is below lras
             if (choice == 0) {
 
                 asadModel.changeSpending(spendingChange);
@@ -103,8 +103,8 @@ public class AI {
         double balanceHigh = asadModel.longRunAggregateSupply;
         double spendingNeutral = asadModel.longRunAggregateSupply;
         double spendingHigh = asadModel.longRunAggregateSupply;
-        double ogLow = asadModel.longRunAggregateSupply / 8;
-        double ogHigh = asadModel.longRunAggregateSupply / 4;
+        double ogLow = asadModel.longRunAggregateSupply / 16;
+        double ogHigh = asadModel.longRunAggregateSupply / 8;
 
         fis.setVariable("balanceHighNegative", -balanceHigh);
         fis.setVariable("balanceNeutralNegative", -balanceNeutral);

@@ -146,7 +146,7 @@ public class ASADModel {
     }
 
     public double getOutputGap() {
-        return longRunAggregateSupply - equilibriumOutput;
+        return equilibriumOutput - longRunAggregateSupply;
     }
 
     public double getInterestRate() {
