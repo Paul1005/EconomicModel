@@ -96,9 +96,6 @@ public class AI {
 
     // fuzzy logic
     public ASADModel fuzzyLogic(ASADModel asadModel) throws Exception {
-        calculateRequiredChanges(asadModel);
-        int choice = random.nextInt(2);
-
         String fileName = "src/main/resources/economy.fcl";
         FIS fis = FIS.load(fileName, true);
 
@@ -109,12 +106,18 @@ public class AI {
         double ogLow = asadModel.longRunAggregateSupply / 8;
         double ogHigh = asadModel.longRunAggregateSupply / 4;
 
-        fis.setVariable("balanceNeutral", balanceNeutral);
-        fis.setVariable("balanceHigh", balanceHigh);
-        fis.setVariable("spendingNeutral", spendingNeutral);
-        fis.setVariable("spendingHigh", spendingHigh);
-        fis.setVariable("ogLow", ogLow);
-        fis.setVariable("ogHigh", ogHigh);
+        fis.setVariable("balanceHighNegative", -balanceHigh);
+        fis.setVariable("balanceNeutralNegative", -balanceNeutral);
+        fis.setVariable("balanceNeutralPositive", balanceNeutral);
+        fis.setVariable("balanceHighPositive", balanceHigh);
+        fis.setVariable("spendingHighNegative", -spendingHigh);
+        fis.setVariable("spendingNeutralNegative", -spendingNeutral);
+        fis.setVariable("spendingNeutralPositive", spendingNeutral);
+        fis.setVariable("spendingHighPositive", spendingHigh);
+        fis.setVariable("ogHighNegative", -ogHigh);
+        fis.setVariable("ogLowNegative", -ogLow);
+        fis.setVariable("ogLowPositive", ogLow);
+        fis.setVariable("ogHighPositive", ogHigh);
 
         // Set inputs
         fis.setVariable("publicBalance", asadModel.overallPublicBalanceInflationAdjusted);
@@ -127,6 +130,7 @@ public class AI {
         double govtSpending = fis.getVariable("govtSpending").getLatestDefuzzifiedValue();
         double publicSpending = fis.getVariable("publicSpending").getLatestDefuzzifiedValue();
 
+        int choice = random.nextInt(2);
         if (choice == 0) {
             asadModel.changeTaxes(govtSpending / asadModel.taxMultiplier);
         } else if (choice == 1) {

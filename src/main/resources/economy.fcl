@@ -7,7 +7,18 @@ VAR_INPUT
     publicBalance : REAL;
     govtBalance : REAL;
     og : REAL;
-    balanceNeutral, balanceHigh, spendingNeutral, spendingHigh, ogLow, ogHigh: Real;
+    balanceHighNegative: REAL;
+    balanceNeutralNegative: REAL;
+    balanceNeutralPositive : REAL;
+    balanceHighPositive : REAL;
+    spendingHighNegative : REAL;
+    spendingNeutralNegative : REAL;
+    spendingNeutralPositive : REAL;
+    spendingHighPositive : REAL;
+    ogHighNegative : REAL;
+    ogLowNegative : REAL;
+    ogLowPositive : REAL;
+    ogHighPositive : REAL;
 END_VAR
 
 // Define output variable
@@ -17,42 +28,36 @@ VAR_OUTPUT
 END_VAR
 
 FUZZIFY publicBalance
-    TERM debt := (-balanceHigh, 1.0) (-balanceNeutral, 0.0);
-    TERM neutral := (-balanceHigh, 0.0) (-balanceNeutral, 1.0) (balanceNeutral, 1.0) (balanceHigh, 0.0);
-    TERM reserve := (balanceNeutral, 0.0) (balanceHigh, 1.0);
+    TERM debt := (balanceHighNegative, 1.0) (balanceNeutralNegative, 0.0);
+    TERM neutral := (balanceHighNegative, 0.0) (balanceNeutralNegative, 1.0) (balanceNeutralPositive, 1.0) (balanceHighPositive, 0.0);
+    TERM reserve := (balanceNeutralPositive, 0.0) (balanceHighPositive, 1.0);
 END_FUZZIFY
 
 FUZZIFY govtBalance
-    TERM debt := (-balanceHigh, 1.0) (-balanceNeutral, 0.0);
-    TERM neutral := (-balanceHigh, 0.0) (-balanceNeutral, 1.0) (balanceNeutral, 1.0) (balanceHigh, 0.0);
-    TERM reserve := (balanceNeutral, 0.0) (balanceHigh, 1.0);
-END_FUZZIFY
-
-FUZZIFY growth
-    TERM low := (0.0, 1.0) (1.0, 1.0) (2.0, 0.0);
-    TERM medium := (2.0, 0.0 (3.0, 1.0) (4.0, 1.0) (5.0, 0.0);
-    TERM high := (4.0, 0.0) (5.0, 1.0);
+    TERM debt := (balanceHighNegative, 1.0) (balanceNeutralNegative, 0.0);
+    TERM neutral := (balanceHighNegative, 0.0) (balanceNeutralNegative, 1.0) (balanceNeutralPositive, 1.0) (balanceHighPositive, 0.0);
+    TERM reserve := (balanceNeutralPositive, 0.0) (balanceHighPositive, 1.0);
 END_FUZZIFY
 
 FUZZIFY og
-    TERM negative := (-ogHigh, 1.0) (-ogLow, 0.0);
-    TERM correct := (-ogHigh, 0.0) (-ogLow, 1.0) (ogLow, 1.0) (ogHigh, 0.0);
-    TERM positive := (ogLow, 0.0) (ogHigh, 1.0);
+    TERM negative := (ogHighNegative, 1.0) (ogLowNegative, 0.0);
+    TERM correct := (ogHighNegative, 0.0) (ogLowNegative, 1.0) (ogLowPositive, 1.0) (ogHighPositive, 0.0);
+    TERM positive := (ogLowPositive, 0.0) (ogHighPositive, 1.0);
 END_FUZZIFY
 
 DEFUZZIFY publicSpending
-    TERM deficit := (-spendingHigh, 1) (-spendingNeutral, 0);
-    TERM neutral := (-spendingHigh,0) (0,1) (spendingNeutral,0);
-    TERM surplus := (spendingNeutral, 0) (spendingHigh, 1);
+    TERM deficit := (spendingHighNegative, 1) (spendingNeutralNegative, 0);
+    TERM neutral := (spendingNeutralNegative,0) (0,1) (spendingNeutralPositive,0);
+    TERM surplus := (spendingNeutralPositive, 0) (spendingHighPositive, 1);
     METHOD : COG;
     // Default value is 0 (if no rule activates defuzzifier)
     DEFAULT := 0;
 END_DEFUZZIFY
 
 DEFUZZIFY govtSpending
-    TERM deficit := (-spendingHigh, 1) (-spendingNeutral, 0);
-    TERM neutral := (-spendingHigh,0) (0,1) (spendingNeutral,0);
-    TERM surplus := (spendingNeutral, 0) (spendingHigh, 1);
+    TERM deficit := (spendingHighNegative, 1) (spendingNeutralNegative, 0);
+    TERM neutral := (spendingNeutralNegative,0) (0,1) (spendingNeutralPositive,0);
+    TERM surplus := (spendingNeutralPositive, 0) (spendingHighPositive, 1);
     METHOD : COG;
     // Default value is 0 (if no rule activates defuzzifier)
     DEFAULT := 0;
@@ -69,17 +74,15 @@ RULEBLOCK No1
 
     RULE 1 : IF govtBalance IS reserve OR
     (og IS negative AND govtBalance IS neutral)
-    THEN govtSpending IS deficit
+    THEN govtSpending IS deficit;
 
-    RULE 2 : IF govtBalance IS neutral OR
-    og IS correct OR
-    (og IS negative AND govtBalance IS negative) OR
-    (og IS negative AND govtBalance IS negative)
-    THEN govtSpending IS neutral
+    RULE 2 : IF og IS correct OR
+    (og IS negative AND govtBalance IS debt)
+    THEN govtSpending IS neutral;
 
     RULE 3 : IF govtBalance IS debt OR
     (og IS positive AND govtBalance IS neutral)
-    THEN govtSpending IS surplus
+    THEN govtSpending IS surplus;
 END_RULEBLOCK
 
 RULEBLOCK No2
@@ -93,17 +96,15 @@ RULEBLOCK No2
 
     RULE 1 : IF publicBalance IS reserve OR
     (og IS negative AND publicBalance IS neutral)
-    THEN publicSpending IS deficit
+    THEN publicSpending IS deficit;
 
-    RULE 2 : IF publicBalance IS neutral OR
-    og IS correct OR
-    (og IS negative AND publicBalance IS negative) OR
-    (og IS negative AND publicBalance IS negative)
-    THEN publicSpending IS neutral
+    RULE 2 : IF og IS correct OR
+    (og IS negative AND publicBalance IS debt)
+    THEN publicSpending IS neutral;
 
     RULE 3 : IF publicBalance IS debt OR
     (og IS positive AND publicBalance IS neutral)
-    THEN publicSpending IS surplus
+    THEN publicSpending IS surplus;
 END_RULEBLOCK
 
 END_FUNCTION_BLOCK
