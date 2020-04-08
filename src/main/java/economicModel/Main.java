@@ -7,26 +7,6 @@ import java.util.Scanner;
 //TODO: still need to incorporate inflation somehow, maybe price should affect capital?
 public class Main {
     public static void main(String args[]) throws Exception {
-      /*  // Load from 'FCL' file
-        String fileName = "src/main/resources/tipper.fcl";
-        FIS fis = FIS.load(fileName,true);
-        // Error while loading?
-
-        // Set inputs
-        fis.setVariable("service", 8.99);
-        fis.setVariable("food", 7.01);
-
-        // Evaluate
-        fis.evaluate();
-
-        System.out.println(fis.getVariable("tip").getLatestDefuzzifiedValue());
-        System.out.println(fis.getVariable("tip").getMembership("cheap"));
-        System.out.println(fis.getVariable("tip").getMembership("average"));
-        System.out.println(fis.getVariable("tip").getMembership("generous"));
-
-        if(true){
-            return;
-        }*/
         Scanner scanner = new Scanner(System.in);  // Create a Scanner object
 
         ASADModel asadModel = new ASADModel();
@@ -52,7 +32,7 @@ public class Main {
         asadModel.taxMultiplier = -asadModel.mpc / asadModel.mps;
         asadModel.spendingMultiplier = 1 / asadModel.mps;
         double savingsGrowth = asadModel.mps + asadModel.mpi;
-        AI ai = new AI(asadModel, solowSwanGrowthModel);
+        AI ai = new AI();
         boolean isPlaying = true;
         while (isPlaying) {
             System.out.println("Press m for manual play, press a for ai play");
@@ -73,14 +53,7 @@ public class Main {
 
                 System.out.println("-*Solow Model Information*-");
                 System.out.println("Population Growth rate: " + populationGrowth);
-                //System.out.println("Capital per person: " + SolowSwanGrowthModel.capitalPerPerson);
-                //System.out.println("Output/GDP per person: " + SolowSwanGrowthModel.outputPerPerson);
-                //System.out.println("Gain per person: " + SolowSwanGrowthModel.netGainPerPerson);
                 System.out.println("Total Output: " + solowSwanGrowthModel.output);
-                //System.out.println("Steady state capital per person: " + SolowSwanGrowthModel.steadyStateCapitalPerPerson);
-                //System.out.println("Steady state capital: " + SolowSwanGrowthModel.steadyStateCapital);
-                //System.out.println("Steady state output per person: " + SolowSwanGrowthModel.steadyStateOutputPerPerson);
-                //System.out.println("Steady state output: " + SolowSwanGrowthModel.steadyStateOutput);
 
                 asadModel.longRunAggregateSupply = solowSwanGrowthModel.output;
 
@@ -135,7 +108,7 @@ public class Main {
                         throw new Exception();
                 }
                 asadModel.runCycle();
-                ai.recordInfo();
+                ai.recordInfo(asadModel);
                 System.out.println('\n' + "-*ASAD Model Information Post-adjustment*-");
                 printData(asadModel);
 
@@ -146,6 +119,11 @@ public class Main {
                     isPlaying = false;
                 }
             } else if (mode.equals("a")) {
+                /*System.out.println("Enter number of cycles for AI to run");
+                int cyclesToRun = Integer.parseInt(scanner.nextLine());
+                while(cyclesToRun > 0){
+                    cyclesToRun--;
+                }*/
                 System.out.println("Cycle number " + (asadModel.cyclesRun + 1));
                 System.out.println("Press enter to run Solow Model cycle");
                 scanner.nextLine();
@@ -158,16 +136,47 @@ public class Main {
                 }
 
                 solowSwanGrowthModel.runCycle(savingsGrowth, populationGrowth, technology, deprecation);
+
+                System.out.println("-*Solow Model Information*-");
+                System.out.println("Population Growth rate: " + populationGrowth);
+                System.out.println("Total Output: " + solowSwanGrowthModel.output);
+
+                asadModel.longRunAggregateSupply = solowSwanGrowthModel.output;
+
+                asadModel.C = asadModel.longRunAggregateSupply * asadModel.mpc;
+                asadModel.IConstant = asadModel.longRunAggregateSupply * asadModel.mpi;
+                //inflation = quantity * velocity;
+                //money supply * velocity of money = price level * real gdp
+                //price level * real gdp = nominal gdp
                 System.out.println('\n' + "Press enter to run ASAD Model cycle");
+                scanner.nextLine();
                 asadModel.runCycle();
+
                 System.out.println("-*ASAD Model Information pre-adjustment*-");
                 printData(asadModel);
-                System.out.println("Select option for policy adjustment:");
-                scanner.nextLine();
-                ai.ruleBasedDecisions();
-                ai.machineLearningRegression();
-                ai.fuzzyLogic();
-                ai.goalOrientedBehavior();
+
+                System.out.println('\n' + "Select option for ai testing:" +
+                        '\n' + "r for rule based decisions" +
+                        '\n' + "m for machine learning" +
+                        '\n' + "f for fuzzy logic" +
+                        '\n' + "g for goal oriented behavior");
+                String option = scanner.nextLine();
+                switch (option) {
+                    case "r":
+                        asadModel = ai.ruleBasedDecisions(asadModel);
+                        break;
+                    case "m":
+                        asadModel = ai.machineLearningRegression(asadModel);
+                        break;
+                    case "f":
+                        asadModel = ai.fuzzyLogic(asadModel);
+                        break;
+                    case "g":
+                        asadModel = ai.goalOrientedBehavior(asadModel);
+                    default:
+                        System.out.println("invalid option");
+                        throw new Exception();
+                }
                 System.out.println('\n' + "-*ASAD Model Information Post-adjustment*-");
                 printData(asadModel);
 
@@ -177,7 +186,6 @@ public class Main {
                 if (scanner.nextLine().equals("e")) {
                     isPlaying = false;
                 }
-                ai.ruleBasedDecisions();
             }
         }
     }

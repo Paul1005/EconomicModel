@@ -1,9 +1,5 @@
 package economicModel;
 
-import net.sourceforge.jFuzzyLogic.FunctionBlock;
-import net.sourceforge.jFuzzyLogic.defuzzifier.Defuzzifier;
-import net.sourceforge.jFuzzyLogic.defuzzifier.DefuzzifierCenterOfGravity;
-import net.sourceforge.jFuzzyLogic.rule.Variable;
 import weka.classifiers.Classifier;
 import weka.classifiers.functions.LinearRegression;
 import weka.core.DenseInstance;
@@ -18,25 +14,23 @@ import java.io.IOException;
 import java.util.Random;
 
 public class AI {
-    private ASADModel asadModel;
-    private SolowSwanGrowthModel solowSwanGrowthModel;
     Instances instances;
     File file;
     double bondChange;
     double reserveMultiplier;
     double spendingChange;
     double taxChange;
+    Random random;
 
-    public AI(ASADModel asadModel, SolowSwanGrowthModel solowSwanGrowthModel) throws IOException {
-        this.asadModel = asadModel;
-        this.solowSwanGrowthModel = solowSwanGrowthModel;
+    public AI() throws IOException {
         ArffLoader arffLoader = new ArffLoader();
         file = new File("src/main/resources/growth-info.arff");
         arffLoader.setFile(file);
         instances = arffLoader.getDataSet();
+        random = new Random();
     }
 
-    public void calculateRequiredChanges() {
+    public void calculateRequiredChanges(ASADModel asadModel) {
         double investmentRequired = asadModel.getInvestmentRequired(); // find how much investment we need
         bondChange = asadModel.calculateBondChange(investmentRequired);
         reserveMultiplier = asadModel.calculateReserveMultiplier(investmentRequired);
@@ -44,53 +38,66 @@ public class AI {
         taxChange = asadModel.calculateTaxChange();
     }
 
-    public int makeRandomChoice(int range) {
-        Random random = new Random();
-        return (int) random.nextDouble() * range;
-    }
-
     // rule based AI
-    public void ruleBasedDecisions() throws Exception {
-        calculateRequiredChanges();
-        int choice = makeRandomChoice(2);
+    public ASADModel ruleBasedDecisions(ASADModel asadModel) throws Exception {
+        calculateRequiredChanges(asadModel);
         if (asadModel.overallPublicBalanceInflationAdjusted < asadModel.overallGovtBalanceInflationAdjusted) { // if our govt finances are better than public finances
-            if (asadModel.outputGap < 0) { // if equilibrium output is above lras
-                if (choice == 0) {
-                    asadModel.changeMoneySupply(bondChange);
-                } else if (choice == 1) {
-                    asadModel.changeReserveRequirements(reserveMultiplier);
-                }
-            } else if (asadModel.outputGap > 0) { // if equilibrium output is below lras
-                if (choice == 0) {
-
-                    asadModel.changeSpending(spendingChange);
-                } else if (choice == 1) {
-                    asadModel.changeTaxes(taxChange);
-                }
-            }
+            govtIsRich(asadModel);
         } else if (asadModel.overallPublicBalanceInflationAdjusted > asadModel.overallGovtBalanceInflationAdjusted) { // if our public finances are better than govt finances
-            if (asadModel.outputGap < 0) {  // if equilibrium output is above lras
-                if (choice == 0) {
-                    asadModel.changeSpending(spendingChange);
-                } else if (choice == 1) {
-                    asadModel.changeTaxes(taxChange);
-                }
-            } else if (asadModel.outputGap > 0) { // if equilibrium output is below lras
-                if (choice == 0) {
-                    asadModel.changeMoneySupply(bondChange);
-                } else if (choice == 1) {
-                    asadModel.changeReserveRequirements(reserveMultiplier);
-                }
+            publicIsRich(asadModel);
+        } else if (asadModel.overallPublicBalanceInflationAdjusted == asadModel.overallGovtBalanceInflationAdjusted) { // if they are identical
+            int choice = random.nextInt(2);
+            if (choice == 0) {
+                govtIsRich(asadModel);
+            } else if (choice == 1) {
+                publicIsRich(asadModel);
             }
         }
+
         asadModel.runCycle();
-        recordInfo();
+        recordInfo(asadModel);
+        return asadModel;
+    }
+
+    private void publicIsRich(ASADModel asadModel) {
+        int choice = random.nextInt(2);
+        if (asadModel.outputGap < 0) {  // if equilibrium output is above lras
+            if (choice == 0) {
+                asadModel.changeSpending(spendingChange);
+            } else if (choice == 1) {
+                asadModel.changeTaxes(taxChange);
+            }
+        } else if (asadModel.outputGap > 0) { // if equilibrium output is below lras
+            if (choice == 0) {
+                asadModel.changeMoneySupply(bondChange);
+            } else if (choice == 1) {
+                asadModel.changeReserveRequirements(reserveMultiplier);
+            }
+        }
+    }
+
+    private void govtIsRich(ASADModel asadModel) {
+        int choice = random.nextInt(2);
+        if (asadModel.outputGap < 0) { // if equilibrium output is above lras
+            if (choice == 0) {
+                asadModel.changeMoneySupply(bondChange);
+            } else if (choice == 1) {
+                asadModel.changeReserveRequirements(reserveMultiplier);
+            }
+        } else if (asadModel.outputGap > 0) { // if equilibrium output is below lras
+            if (choice == 0) {
+
+                asadModel.changeSpending(spendingChange);
+            } else if (choice == 1) {
+                asadModel.changeTaxes(taxChange);
+            }
+        }
     }
 
     // fuzzy logic
-    public void fuzzyLogic() throws Exception {
-        calculateRequiredChanges();
-        int choice = makeRandomChoice(2);
+    public ASADModel fuzzyLogic(ASADModel asadModel) throws Exception {
+        calculateRequiredChanges(asadModel);
+        int choice = random.nextInt(2);
 
         String fileName = "src/main/resources/economy.fcl";
         FIS fis = FIS.load(fileName, true);
@@ -126,7 +133,7 @@ public class AI {
             asadModel.changeSpending(govtSpending / asadModel.spendingMultiplier);
         }
 
-        choice = makeRandomChoice(2);
+        choice = random.nextInt(2);
         if (choice == 0) {
             double bonds = asadModel.calculateBondChange(publicSpending);
             asadModel.changeMoneySupply(bonds);
@@ -135,12 +142,13 @@ public class AI {
             asadModel.changeReserveRequirements(reserveRequirement);
         }
 
-        recordInfo();
+        recordInfo(asadModel);
+        return asadModel;
     }
 
     // goal oriented behavior
-    public void goalOrientedBehavior() throws Exception {
-        calculateRequiredChanges();
+    public ASADModel goalOrientedBehavior(ASADModel asadModel) throws Exception {
+        calculateRequiredChanges(asadModel);
         double inflation;
         double publicBalance;
         double govtBalance;
@@ -272,10 +280,11 @@ public class AI {
         } else {
             asadModel.changeTaxes(positiveTaxChange);
         }
-        recordInfo();
+        recordInfo(asadModel);
+        return asadModel;
     }
 
-    public void machineLearningRegression() throws Exception {
+    public ASADModel machineLearningRegression(ASADModel asadModel) throws Exception {
         Classifier classifier = new LinearRegression(); // may need to use different regression method
         classifier.buildClassifier(instances);
 
@@ -295,11 +304,12 @@ public class AI {
         Instance predicationDataSet = new DenseInstance(1.0, test);
         double value = classifier.classifyInstance(predicationDataSet);
 
-        recordInfo();
+        recordInfo(asadModel);
+        return asadModel;
     }
 
     // regression
-    public void recordInfo() throws Exception {
+    public void recordInfo(ASADModel asadModel) throws Exception {
         double[] denseInstance = new double[instances.numAttributes()];
         /*denseInstance[0] = asadModel.overallInflation;
         denseInstance[1] = asadModel.outputGap;
