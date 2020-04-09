@@ -103,8 +103,8 @@ public class AI {
         double balanceHigh = asadModel.longRunAggregateSupply;
         double spendingNeutral = asadModel.longRunAggregateSupply / 8;
         double spendingHigh = asadModel.longRunAggregateSupply / 4;
-        double ogLow = asadModel.longRunAggregateSupply / 16;
-        double ogHigh = asadModel.longRunAggregateSupply / 8;
+        double ogLow = asadModel.longRunAggregateSupply / 2 / 4;
+        double ogHigh = asadModel.longRunAggregateSupply / 2 / 2;
 
         fis.setVariable("balanceHighNegative", -balanceHigh);
         fis.setVariable("balanceNeutralNegative", -balanceNeutral);
@@ -122,7 +122,6 @@ public class AI {
         // Set inputs
         fis.setVariable("publicBalance", asadModel.overallPublicBalanceInflationAdjusted);
         fis.setVariable("govtBalance", asadModel.overallGovtBalanceInflationAdjusted);
-        // fis.setVariable("growth", asadModel.overallGrowth);
         fis.setVariable("og", asadModel.outputGap / 2); // since we're doing both public and govt spending, divide og by 2
         // Evaluate
         fis.evaluate();
@@ -139,10 +138,10 @@ public class AI {
         int choice = random.nextInt(2);
 
         if (choice == 0) {
-            double bonds = asadModel.calculateBondChange(publicSpending);
+            double bonds = asadModel.calculateBondChange(publicSpending + asadModel.I);
             asadModel.changeMoneySupply(bonds);
         } else if (choice == 1) {
-            double reserveRequirement = asadModel.calculateReserveMultiplier(publicSpending);
+            double reserveRequirement = asadModel.calculateReserveMultiplier(publicSpending + asadModel.I);
             asadModel.changeReserveRequirements(reserveRequirement);
         }
 

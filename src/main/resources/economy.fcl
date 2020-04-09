@@ -40,9 +40,9 @@ FUZZIFY govtBalance
 END_FUZZIFY
 
 FUZZIFY og
-    TERM negative := (ogHighNegative, 1.0) (ogLowNegative, 0.0);
-    TERM correct := (ogHighNegative, 0.0) (ogLowNegative, 1.0) (ogLowPositive, 1.0) (ogHighPositive, 0.0);
-    TERM positive := (ogLowPositive, 0.0) (ogHighPositive, 1.0);
+    TERM negative := (ogHighNegative, 1.0) (0, 0.0);
+    TERM correct := (ogLowNegative,0) (0,1) (ogLowPositive,0);
+    TERM positive := (0, 0.0) (ogHighPositive, 1.0);
 END_FUZZIFY
 
 DEFUZZIFY publicSpending
