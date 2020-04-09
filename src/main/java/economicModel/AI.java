@@ -153,11 +153,6 @@ public class AI {
     // goal oriented behavior
     public ASADModel goalOrientedBehavior(ASADModel asadModel) throws Exception {
         calculateRequiredChanges(asadModel);
-        double inflation;
-        double publicBalance;
-        double govtBalance;
-        double growth;
-        double gdp;
 
         int positiveBondChange = 5;
         int negativeBondChange = -5;
@@ -173,28 +168,29 @@ public class AI {
         for (int i = 0; i < 8; i++) {
             ASADModel testModel = new ASADModel(asadModel);
             tryOptions(testModel, positiveBondChange, negativeBondChange, positiveReserveMultiplier, negativeReserveMultiplier, positiveSpendingChange, negativeSpendingChange, negativeTaxChange, positiveTaxChange, i);
-            testModel.runCycle();
-            inflation = testModel.overallInflation;
-            publicBalance = testModel.overallPublicBalanceInflationAdjusted;
-            govtBalance = testModel.overallGovtBalanceInflationAdjusted;
-            growth = testModel.overallGrowth;
-            gdp = testModel.longRunAggregateSupply;
-            if(i != 0){
-                if (gdp * growth - (publicBalance + govtBalance) * inflation > economicHealth) {
-                    economicHealth = gdp * growth - (publicBalance + govtBalance) * inflation;
+            double inflation = testModel.overallInflation;
+            double publicBalance = testModel.overallPublicBalanceInflationAdjusted;
+            double govtBalance = testModel.overallGovtBalanceInflationAdjusted;
+            double growth = testModel.overallGrowth;
+            double gdp = testModel.longRunAggregateSupply;
+            if (i != 0) {
+                if (getEconomicHealth(inflation, publicBalance, govtBalance, growth, gdp) > economicHealth) {
+                    economicHealth = getEconomicHealth(inflation, publicBalance, govtBalance, growth, gdp);
                     option = i;
                 }
             } else {
-                economicHealth = gdp * growth - (publicBalance + govtBalance) * inflation;
-                option = i;
+                economicHealth = getEconomicHealth(inflation, publicBalance, govtBalance, growth, gdp);
             }
         }
 
         tryOptions(asadModel, positiveBondChange, negativeBondChange, positiveReserveMultiplier, negativeReserveMultiplier, positiveSpendingChange, negativeSpendingChange, negativeTaxChange, positiveTaxChange, option);
 
-        asadModel.runCycle();
         recordInfo(asadModel);
         return asadModel;
+    }
+
+    private double getEconomicHealth(double inflation, double publicBalance, double govtBalance, double growth, double gdp) {
+        return gdp * growth - (publicBalance + govtBalance) * inflation;
     }
 
     private void tryOptions(ASADModel asadModel, int positiveBondChange, int negativeBondChange, float positiveReserveMultiplier, float negativeReserveMultiplier, float positiveSpendingChange, float negativeSpendingChange, float negativeTaxChange, float positiveTaxChange, int option) {
@@ -215,6 +211,7 @@ public class AI {
         } else {
             asadModel.changeTaxes(positiveTaxChange);
         }
+        asadModel.runCycle();
     }
 
     public ASADModel machineLearningRegression(ASADModel asadModel) throws Exception {

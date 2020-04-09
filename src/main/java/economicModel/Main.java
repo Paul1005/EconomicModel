@@ -174,6 +174,7 @@ public class Main {
                         break;
                     case "g":
                         asadModel = ai.goalOrientedBehavior(asadModel);
+                        break;
                     default:
                         System.out.println("invalid option");
                         throw new Exception();
