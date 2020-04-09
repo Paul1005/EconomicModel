@@ -1,7 +1,7 @@
 package economicModel;
 
-import weka.classifiers.Classifier;
-import weka.classifiers.functions.LinearRegression;
+import weka.classifiers.functions.*;
+import weka.classifiers.bayes.BayesianLogisticRegression;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -10,24 +10,19 @@ import weka.core.converters.ArffSaver;
 import net.sourceforge.jFuzzyLogic.FIS;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Random;
 
 public class AI {
-    Instances instances;
-    File file;
-    double bondChange;
-    double reserveMultiplier;
-    double spendingChange;
-    double taxChange;
-    Random random;
+    private double bondChange;
+    private double reserveMultiplier;
+    private double spendingChange;
+    private double taxChange;
+    private Random random;
+    private String arffFilePath;
 
-    public AI() throws IOException {
-        ArffLoader arffLoader = new ArffLoader();
-        file = new File("src/main/resources/growth-info.arff");
-        arffLoader.setFile(file);
-        instances = arffLoader.getDataSet();
+    public AI() {
         random = new Random();
+        arffFilePath = "src/main/resources/growth-info.arff";
     }
 
     public void calculateRequiredChanges(ASADModel asadModel) {
@@ -54,8 +49,7 @@ public class AI {
             }
         }
 
-        asadModel.runCycle();
-        recordInfo(asadModel);
+        runCycleAndRecordInfo(asadModel);
         return asadModel;
     }
 
@@ -145,15 +139,12 @@ public class AI {
             asadModel.changeReserveRequirements(reserveRequirement);
         }
 
-        asadModel.runCycle();
-        recordInfo(asadModel);
+        runCycleAndRecordInfo(asadModel);
         return asadModel;
     }
 
     // goal oriented behavior
     public ASADModel goalOrientedBehavior(ASADModel asadModel) throws Exception {
-        calculateRequiredChanges(asadModel);
-
         double bondChange = asadModel.moneySupply / 128;
         double positiveReserveMultiplier = 2;
         double negativeReserveMultiplier = 0.5f;
@@ -164,7 +155,8 @@ public class AI {
         int option = 0;
         for (int i = 0; i < 9; i++) {
             ASADModel testModel = new ASADModel(asadModel);
-            tryOptions(testModel, bondChange, positiveReserveMultiplier, negativeReserveMultiplier, spendingChange, taxChange, i);
+            tryOption(testModel, bondChange, positiveReserveMultiplier, negativeReserveMultiplier, spendingChange, taxChange, i);
+            testModel.runCycle();
             double inflation = testModel.overallInflation;
             double publicBalance = testModel.overallPublicBalanceInflationAdjusted;
             double govtBalance = testModel.overallGovtBalanceInflationAdjusted;
@@ -180,8 +172,8 @@ public class AI {
             }
         }
 
-        tryOptions(asadModel, bondChange, positiveReserveMultiplier, negativeReserveMultiplier, spendingChange, taxChange, option);
-        recordInfo(asadModel);
+        tryOption(asadModel, bondChange, positiveReserveMultiplier, negativeReserveMultiplier, spendingChange, taxChange, option);
+        runCycleAndRecordInfo(asadModel);
         return asadModel;
     }
 
@@ -189,7 +181,7 @@ public class AI {
         return gdp * growth - (publicBalance + govtBalance) * inflation;
     }
 
-    private void tryOptions(ASADModel asadModel, double bondChange, double positiveReserveMultiplier, double negativeReserveMultiplier, double spendingChange, double taxChange, int option) {
+    private void tryOption(ASADModel asadModel, double bondChange, double positiveReserveMultiplier, double negativeReserveMultiplier, double spendingChange, double taxChange, int option) {
         if (option == 0) {
             asadModel.changeMoneySupply(bondChange);
         } else if (option == 1) {
@@ -206,51 +198,85 @@ public class AI {
             if (taxChange > asadModel.taxes) {
                 asadModel.changeTaxes(-taxChange);
             }
-        } else if (option == 7){
+        } else if (option == 7) {
             asadModel.changeTaxes(taxChange);
         } else {
             // do nothing
         }
-        asadModel.runCycle();
     }
 
     public ASADModel machineLearningRegression(ASADModel asadModel) throws Exception {
-        Classifier classifier = new LinearRegression(); // may need to use different regression method
-        classifier.buildClassifier(instances);
+        ArffLoader arffLoader = new ArffLoader();
+        File file = new File(arffFilePath);
+        arffLoader.setFile(file);
+        Instances instances = arffLoader.getDataSet();
+        instances.setClassIndex(instances.numAttributes() - 1);
+        LinearRegression linearRegression = new LinearRegression();
+        GaussianProcesses gaussianProcess = new GaussianProcesses(); // may need to use different regression method
+        SMOreg smoReg = new SMOreg();
 
-        //Evaluation eval = new Evaluation(instances);
-        //eval.evaluateModel(classifier, instances); // where testing dataset would be
-        double[] test = new double[instances.numAttributes()];
-        /*test[0] = asadModel.overallInflation;
-        test[1] = asadModel.outputGap;
-        test[2] = asadModel.overallPublicBalanceInflationAdjusted;
-        test[3] = asadModel.overallGovtBalanceInflationAdjusted;*/
+        linearRegression.buildClassifier(instances);
+        smoReg.buildClassifier(instances);
+        gaussianProcess.buildClassifier(instances);
+        double bondChange = asadModel.moneySupply / 128;
+        double positiveReserveMultiplier = 2;
+        double negativeReserveMultiplier = 0.5f;
+        double spendingChange = asadModel.longRunAggregateSupply / 128;
+        double taxChange = asadModel.longRunAggregateSupply / 96;
+        double LRASGrowth = 0;
+        int option = 0;
+        for (int i = 0; i < 9; i++) {
+            Instance predicationDataSet = instances.lastInstance();
+            predicationDataSet.setValue(predicationDataSet.numAttributes() - 1, null);
+            if (i == 0) {
+                predicationDataSet.setValue(i, taxChange);
+            } else if (i == 1) {
+                predicationDataSet.setValue(i, spendingChange);
+            } else if (i == 2) {
+                predicationDataSet.setValue(i, bondChange);
+            } else if (i == 3) {
+                predicationDataSet.setValue(i, positiveReserveMultiplier);
+            } else if (i == 4) {
+                predicationDataSet.setValue(i - 4, -taxChange);
+            } else if (i == 5) {
+                predicationDataSet.setValue(i - 4, -spendingChange);
+            } else if (i == 6) {
+                predicationDataSet.setValue(i - 4, -bondChange);
+            } else if (i == 7) {
+                predicationDataSet.setValue(i - 4, negativeReserveMultiplier);
+            } else {
+                // leave things the same
+            }
 
-        test[0] = 0;
-        test[1] = 0;
-        test[2] = 0;
-        test[3] = 0;
-        test[4] = 0;
-        Instance predicationDataSet = new DenseInstance(1.0, test);
-        double value = classifier.classifyInstance(predicationDataSet);
+            if (i != 0) {
+                LRASGrowth = (linearRegression.classifyInstance(predicationDataSet) + smoReg.classifyInstance(predicationDataSet) + gaussianProcess.classifyInstance(predicationDataSet)) / 3;
+            } else {
+                if (gaussianProcess.classifyInstance(predicationDataSet) > LRASGrowth) {
+                    LRASGrowth = gaussianProcess.classifyInstance(predicationDataSet);
+                    option = i;
+                }
+            }
+        }
 
-        asadModel.runCycle();
-        recordInfo(asadModel);
+        tryOption(asadModel, bondChange, positiveReserveMultiplier, negativeReserveMultiplier, spendingChange, taxChange, option);
+        runCycleAndRecordInfo(asadModel);
         return asadModel;
     }
 
     // regression
-    public void recordInfo(ASADModel asadModel) throws Exception {
+    public void runCycleAndRecordInfo(ASADModel asadModel) throws Exception {
+        double oldLRAS = asadModel.longRunAggregateSupply;
+        asadModel.runCycle();
+        ArffLoader arffLoader = new ArffLoader();
+        File file = new File(arffFilePath);
+        arffLoader.setFile(file);
+        Instances instances = arffLoader.getDataSet();
         double[] denseInstance = new double[instances.numAttributes()];
-        /*denseInstance[0] = asadModel.overallInflation;
-        denseInstance[1] = asadModel.outputGap;
-        denseInstance[2] = asadModel.overallPublicBalanceInflationAdjusted;
-        denseInstance[3] = asadModel.overallGovtBalanceInflationAdjusted;*/
         denseInstance[0] = asadModel.taxes;
         denseInstance[1] = asadModel.G;
         denseInstance[2] = asadModel.ownedBonds;
         denseInstance[3] = asadModel.reserveRequirement;
-        denseInstance[4] = asadModel.overallGrowth;
+        denseInstance[4] = asadModel.longRunAggregateSupply / oldLRAS;
 
         instances.add(new DenseInstance(1.0, denseInstance));
 

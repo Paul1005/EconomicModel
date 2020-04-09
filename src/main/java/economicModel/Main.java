@@ -1,7 +1,5 @@
 package economicModel;
 
-import net.sourceforge.jFuzzyLogic.FIS;
-
 import java.util.Scanner;
 
 //TODO: still need to incorporate inflation somehow, maybe price should affect capital?
@@ -109,7 +107,7 @@ public class Main {
                         throw new Exception();
                 }
                 asadModel.runCycle();
-                ai.recordInfo(asadModel);
+                ai.runCycleAndRecordInfo(asadModel);
                 System.out.println('\n' + "-*ASAD Model Information Post-adjustment*-");
                 printData(asadModel);
 
