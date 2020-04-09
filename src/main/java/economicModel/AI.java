@@ -1,7 +1,6 @@
 package economicModel;
 
 import weka.classifiers.functions.*;
-import weka.classifiers.bayes.BayesianLogisticRegression;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
