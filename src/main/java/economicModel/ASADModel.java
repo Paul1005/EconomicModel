@@ -57,6 +57,56 @@ public class ASADModel {
     public double overallInflation;
     public double inflation;
 
+    //default constructor
+    public ASADModel() {
+
+    }
+
+    //copy constructor
+    public ASADModel(ASADModel asadModel){
+        this.longRunAggregateSupply = asadModel.longRunAggregateSupply;
+        this.shortRunAggregateSupplyCurve = asadModel.shortRunAggregateSupplyCurve;
+        this.taxes = asadModel.taxes;
+        this.mpc = asadModel.mpc;
+        this.mpi = asadModel.mpi;
+        this.mps = asadModel.mps;
+        this.reserveRequirement = asadModel.reserveRequirement;
+        this.ownedBonds = asadModel.ownedBonds;
+        this.moneySupply = asadModel.moneySupply;
+        this.GConstant = asadModel.GConstant;
+        this.IConstant = asadModel.IConstant;
+        this.G = asadModel.G;
+        this.outputGap = asadModel.outputGap;
+        this.C = asadModel.C;
+        this.aggregateDemandOutputCurve = asadModel.aggregateDemandOutputCurve;
+        this.equilibriumOutput = asadModel.equilibriumOutput;
+        this.I = asadModel.I;
+        this.taxMultiplier = asadModel.taxMultiplier;
+        this.spendingMultiplier = asadModel.spendingMultiplier;
+        this.govtBalance = asadModel.govtBalance;
+        this.overallGovtBalance = asadModel.overallGovtBalance;
+        this.overallGovtBalanceWInterest = asadModel.overallGovtBalanceWInterest;
+        this.publicBalance = asadModel.publicBalance;
+        this.overallPublicBalance = asadModel.overallPublicBalance;
+        this.overallPublicBalanceWInterest = asadModel.overallPublicBalanceWInterest;
+        this.overallGovtBalanceInflationAdjusted = asadModel.overallGovtBalanceInflationAdjusted;
+        this.overallPublicBalanceInflationAdjusted = asadModel.overallPublicBalanceInflationAdjusted;
+        this.publicDebtInterest = asadModel.publicDebtInterest;
+        this.govtDebtInterest = asadModel.govtDebtInterest;
+        this.debtRepaymentAmount = asadModel.debtRepaymentAmount;
+        this.govtDebts = asadModel.govtDebts;
+        this.publicDebts = asadModel.publicDebts;
+        this.growth = asadModel.growth;
+        this.overallGrowth = asadModel.overallGrowth;
+        this.cyclesRun = asadModel.cyclesRun;
+        this.originalOutput = asadModel.originalOutput;
+        this.previousOutput = asadModel.previousOutput;
+        this.priceLevel = asadModel.priceLevel;
+        this.previousPriceLevel = asadModel.previousPriceLevel;
+        this.originalPriceLevel = asadModel.originalPriceLevel;
+        this.overallInflation = asadModel.overallInflation;
+        this.inflation = asadModel.inflation;
+    }
 
     /**
      * Find investment based on interest rate, IConstant, and mpi. Is the inverse(swap x and y) of the equation below. \frac{a\sqrt{\sqrt{x^{2}+4}-x}}{\sqrt{2}\cdot b}
@@ -199,7 +249,7 @@ public class ASADModel {
         debts.add(Math.abs(balance));
     }
 
-    double calculateReserveMultiplier(double investmentRequired){
+    double calculateReserveMultiplier(double investmentRequired) {
         double interestRate = interestRateEquation(investmentRequired); // find the new interest rate based on the investment we need.
         double newMoneySupply = moneySupplyEquation(interestRate); // find the money supply we need based on the new interest rate
         return moneySupply / newMoneySupply;
@@ -209,7 +259,7 @@ public class ASADModel {
         reserveRequirement *= reserveMultiplier; // determine the new reserve requirement based on the new and old money supply
     }
 
-    double calculateBondChange(double investmentRequired){
+    double calculateBondChange(double investmentRequired) {
         double interestRate = interestRateEquation(investmentRequired); // find the new interest rate based on the investment we need.
         double newMoneySupply = moneySupplyEquation(interestRate); // find the money supply we need based on the new interest rate
         double gap = newMoneySupply - moneySupply; // determine how much more money we need
@@ -224,7 +274,7 @@ public class ASADModel {
         ownedBonds += bondChange; // add the change in bonds
     }
 
-    double calculateSpendingChange(){
+    double calculateSpendingChange() {
         return outputGap / spendingMultiplier; // find the change in spending required
     }
 
@@ -232,7 +282,7 @@ public class ASADModel {
         GConstant += spendingChange; // add spending change to government spending
     }
 
-    double calculateTaxChange(){
+    double calculateTaxChange() {
         return outputGap / taxMultiplier; // find the change in taxes required
     }
 
