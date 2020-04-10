@@ -226,36 +226,44 @@ public class AI {
         double taxChange = asadModel.longRunAggregateSupply / 96;
         double LRASGrowth = 0;
         int option = 0;
+
         for (int i = 0; i < 9; i++) {
-            Instance predicationDataSet = instances.lastInstance();
-            predicationDataSet.setValue(predicationDataSet.numAttributes() - 1, null);
+            double[] denseInstance = new double[instances.numAttributes()];
+            denseInstance[0] = asadModel.taxes;
+            denseInstance[1] = asadModel.G;
+            denseInstance[2] = asadModel.ownedBonds;
+            denseInstance[3] = asadModel.reserveRequirement;
             if (i == 0) {
-                predicationDataSet.setValue(i, taxChange);
+                denseInstance[i] = asadModel.taxes + taxChange;
             } else if (i == 1) {
-                predicationDataSet.setValue(i, spendingChange);
+                denseInstance[i] = asadModel.G + spendingChange;
             } else if (i == 2) {
-                predicationDataSet.setValue(i, bondChange);
+                denseInstance[i] = asadModel.ownedBonds + bondChange;
             } else if (i == 3) {
-                predicationDataSet.setValue(i, positiveReserveMultiplier);
+                denseInstance[i] = asadModel.reserveRequirement * positiveReserveMultiplier;
             } else if (i == 4) {
-                predicationDataSet.setValue(i - 4, -taxChange);
+                denseInstance[i- 4] = asadModel.taxes - taxChange;
             } else if (i == 5) {
-                predicationDataSet.setValue(i - 4, -spendingChange);
+                denseInstance[i- 4] = asadModel.G - spendingChange;
             } else if (i == 6) {
-                predicationDataSet.setValue(i - 4, -bondChange);
+                denseInstance[i- 4] = asadModel.ownedBonds - bondChange;
             } else if (i == 7) {
-                predicationDataSet.setValue(i - 4, negativeReserveMultiplier);
+                denseInstance[i- 4] = asadModel.reserveRequirement * negativeReserveMultiplier;
             } else {
                 // leave things the same
             }
+            Instance predicationDataSet = new DenseInstance(1.0, denseInstance);
+            predicationDataSet.setValue(predicationDataSet.numAttributes() - 1, '?');
+            predicationDataSet.setDataset(instances);
+            double newGrowth = (linearRegression.classifyInstance(predicationDataSet) + smoReg.classifyInstance(predicationDataSet) + gaussianProcess.classifyInstance(predicationDataSet)) / 3; // maybe do a better implementation for this
 
             if (i != 0) {
-                LRASGrowth = (linearRegression.classifyInstance(predicationDataSet) + smoReg.classifyInstance(predicationDataSet) + gaussianProcess.classifyInstance(predicationDataSet)) / 3;
-            } else {
-                if (gaussianProcess.classifyInstance(predicationDataSet) > LRASGrowth) {
-                    LRASGrowth = gaussianProcess.classifyInstance(predicationDataSet);
+                if (newGrowth > LRASGrowth) {
+                    LRASGrowth = newGrowth;
                     option = i;
                 }
+            } else {
+                LRASGrowth = newGrowth;
             }
         }
 
@@ -267,7 +275,7 @@ public class AI {
     // regression
     public void runCycleAndRecordInfo(ASADModel asadModel) throws Exception {
         double LRASGrowth;
-        if(oldLRAS == -1){
+        if (oldLRAS == -1) {
             LRASGrowth = 1;
         } else {
             LRASGrowth = asadModel.longRunAggregateSupply / oldLRAS;
