@@ -179,7 +179,7 @@ public class AI {
     }
 
     private double getEconomicHealth(double inflation, double publicBalance, double govtBalance, double growth, double gdp) {
-        return gdp * growth - (publicBalance + govtBalance) * inflation;
+        return gdp * growth - ((publicBalance + govtBalance) / inflation);
     }
 
     private void tryOption(ASADModel asadModel, double bondChange, double positiveReserveMultiplier, double negativeReserveMultiplier, double spendingChange, double taxChange, int option) {

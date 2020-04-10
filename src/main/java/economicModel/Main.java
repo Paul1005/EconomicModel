@@ -15,7 +15,7 @@ public class Main {
         ASADModel asadModel = new ASADModel();
         SolowSwanGrowthModel solowSwanGrowthModel = new SolowSwanGrowthModel();
         //starting variables
-        asadModel.debtRepaymentAmount = 1;
+        asadModel.debtRepaymentAmount = 10;
         asadModel.cyclesRun = 0;
         asadModel.growth = 1;
         asadModel.overallGrowth = 1;

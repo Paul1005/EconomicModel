@@ -41,9 +41,7 @@ public class ASADModel {
     public double govtDebtInterest;
 
     //public  int debtCycles; // number of cycles we use to pay of debt
-    public int debtRepaymentAmount; // min debt repayment required
-    private ArrayList<Double> govtDebts = new ArrayList<>();
-    private ArrayList<Double> publicDebts = new ArrayList<>();
+    public double debtRepaymentAmount; // min debt repayment required
 
     double growth;
     double overallGrowth;
@@ -63,7 +61,7 @@ public class ASADModel {
     }
 
     //copy constructor
-    public ASADModel(ASADModel asadModel){
+    public ASADModel(ASADModel asadModel) {
         this.longRunAggregateSupply = asadModel.longRunAggregateSupply;
         this.shortRunAggregateSupplyCurve = asadModel.shortRunAggregateSupplyCurve;
         this.taxes = asadModel.taxes;
@@ -94,8 +92,6 @@ public class ASADModel {
         this.publicDebtInterest = asadModel.publicDebtInterest;
         this.govtDebtInterest = asadModel.govtDebtInterest;
         this.debtRepaymentAmount = asadModel.debtRepaymentAmount;
-        this.govtDebts = asadModel.govtDebts;
-        this.publicDebts = asadModel.publicDebts;
         this.growth = asadModel.growth;
         this.overallGrowth = asadModel.overallGrowth;
         this.cyclesRun = asadModel.cyclesRun;
@@ -207,12 +203,10 @@ public class ASADModel {
         govtBalance = taxes - GConstant;
         if (govtBalance < 0) {
             govtDebtInterest = (baseDebtInterestEquation(longRunAggregateSupply, govtBalance) + interestRate) / 2; // might need a better equation for this
-            takeOutLoan(govtDebts, govtBalance);
-            overallGovtBalance += govtBalance;
-            overallGovtBalanceWInterest = overallGovtBalance + overallGovtBalance * govtDebtInterest;
+            overallGovtBalanceInflationAdjusted += (govtBalance + govtBalance * govtDebtInterest) / priceLevel;
             serviceGovtDebt();
         } else if (govtBalance > 0) {
-            repayGovtLoan(govtBalance);
+            overallGovtBalanceInflationAdjusted += (govtBalance / priceLevel);
         }
     }
 
@@ -220,12 +214,10 @@ public class ASADModel {
         publicBalance = IConstant - I;
         if (publicBalance < 0) {
             publicDebtInterest = (baseDebtInterestEquation(IConstant, publicBalance) + interestRate) / 2; // might need a better equation for this
-            takeOutLoan(publicDebts, publicBalance);
-            overallPublicBalance += publicBalance;
-            overallPublicBalanceWInterest = overallPublicBalance + overallPublicBalance * publicDebtInterest;
+            overallPublicBalanceInflationAdjusted += (publicBalance + publicBalance * publicDebtInterest) / priceLevel;
             servicePublicDebt();
         } else if (govtBalance > 0) {
-            repayPublicLoan(publicBalance);
+            overallPublicBalanceInflationAdjusted += (publicBalance / priceLevel);
         }
     }
 
@@ -245,9 +237,6 @@ public class ASADModel {
         return ownedBonds / reserveRequirement;
     }
 
-    private void takeOutLoan(ArrayList<Double> debts, double balance) {
-        debts.add(Math.abs(balance));
-    }
 
     double calculateReserveMultiplier(double investmentRequired) {
         double interestRate = interestRateEquation(investmentRequired); // find the new interest rate based on the investment we need.
@@ -294,27 +283,25 @@ public class ASADModel {
         }
     }
 
-    // repay loans using surplus
-    private void repayGovtLoan(double govtBalance) {
-        overallGovtBalance -= govtBalance;
-    }
-
-    private void repayPublicLoan(double publicBalance) {
-        overallPublicBalance -= publicBalance;
-    }
-
     // overall debt servicing, might need to make these harsher
     private void serviceGovtDebt() {
-        overallGovtBalanceWInterest = overallGovtBalance + overallGovtBalance * govtDebtInterest;
-        GConstant -= (debtRepaymentAmount * govtDebtInterest);
-        overallGovtBalanceWInterest -= (debtRepaymentAmount + debtRepaymentAmount * govtDebtInterest);
-        overallGovtBalanceInflationAdjusted = overallGovtBalanceWInterest / priceLevel;
+        //debtRepaymentAmount = overallGovtBalanceWInterest / 16;
+        System.out.println("govt debt repayment: " + (debtRepaymentAmount + debtRepaymentAmount * govtDebtInterest) / priceLevel);
+        GConstant -= ((debtRepaymentAmount + debtRepaymentAmount * govtDebtInterest) / priceLevel);
+        overallGovtBalanceInflationAdjusted += (debtRepaymentAmount / priceLevel);
     }
 
     private void servicePublicDebt() {
-        overallPublicBalanceWInterest = overallPublicBalance + overallPublicBalance * publicDebtInterest;
-        C -= (debtRepaymentAmount * publicDebtInterest);
-        overallPublicBalanceWInterest -= (debtRepaymentAmount + debtRepaymentAmount * publicDebtInterest);
-        overallPublicBalanceInflationAdjusted = overallPublicBalanceWInterest / priceLevel;
+        //debtRepaymentAmount = overallPublicBalanceWInterest / 16;
+        System.out.println("public debt repayment" + (debtRepaymentAmount + debtRepaymentAmount * publicDebtInterest) / priceLevel);
+        C -= ((debtRepaymentAmount + debtRepaymentAmount * publicDebtInterest) / priceLevel);
+        overallPublicBalanceInflationAdjusted += (debtRepaymentAmount / priceLevel);
+    }
+
+    private void serviceDebt(double overallBalanceWInterest, double overallBalance, double debtInterest, double money, double overallBalanceInflationAdjusted){
+        //debtRepaymentAmount = overallBalanceWInterest / 16;
+        System.out.println("public debt repayment" + (debtRepaymentAmount + debtRepaymentAmount * debtInterest) / priceLevel);
+        money -= ((debtRepaymentAmount + debtRepaymentAmount * debtInterest) / priceLevel);
+        overallBalanceInflationAdjusted += (debtRepaymentAmount / priceLevel);
     }
 }
