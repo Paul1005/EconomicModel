@@ -1,5 +1,10 @@
 package economicModel;
 
+import weka.core.Instances;
+import weka.core.converters.ArffLoader;
+
+import java.io.File;
+import java.util.Random;
 import java.util.Scanner;
 
 //TODO: still need to incorporate inflation somehow, maybe price should affect capital?
@@ -118,76 +123,97 @@ public class Main {
                     isPlaying = false;
                 }
             } else if (mode.equals("a")) {
-                /*System.out.println("Enter number of cycles for AI to run");
+                System.out.println("Enter number of cycles for AI to run");
                 int cyclesToRun = Integer.parseInt(scanner.nextLine());
                 while(cyclesToRun > 0){
                     cyclesToRun--;
-                }*/
-                System.out.println("Cycle number " + (asadModel.cyclesRun + 1));
-                System.out.println("Press enter to run Solow Model cycle");
-                scanner.nextLine();
-                double populationGrowth = 0;
-
-                if (asadModel.cyclesRun != 0) {
-                    double intrinsicGrowth = 1 / (solowSwanGrowthModel.outputPerPerson * 1000);
-                    double carryingCapacity = (int) solowSwanGrowthModel.outputPerPerson * 1000;
-                    populationGrowth = calculatePopulationGrowth(intrinsicGrowth, solowSwanGrowthModel.Labour, carryingCapacity);
-                }
-
-                solowSwanGrowthModel.runCycle(savingsGrowth, populationGrowth, technology, deprecation);
-
-                System.out.println("-*Solow Model Information*-");
-                System.out.println("Population Growth rate: " + populationGrowth);
-                System.out.println("Total Output: " + solowSwanGrowthModel.output);
-
-                asadModel.longRunAggregateSupply = solowSwanGrowthModel.output;
-
-                asadModel.C = asadModel.longRunAggregateSupply * asadModel.mpc;
-                asadModel.IConstant = asadModel.longRunAggregateSupply * asadModel.mpi;
-                //inflation = quantity * velocity;
-                //money supply * velocity of money = price level * real gdp
-                //price level * real gdp = nominal gdp
-                System.out.println('\n' + "Press enter to run ASAD Model cycle");
-                scanner.nextLine();
-                asadModel.runCycle();
-
-                System.out.println("-*ASAD Model Information pre-adjustment*-");
-                printData(asadModel);
-
-                System.out.println('\n' + "Select option for ai testing:" +
-                        '\n' + "r for rule based decisions" +
-                        '\n' + "f for fuzzy logic" +
-                        '\n' + "g for goal oriented behavior" +
-                        '\n' + "m for machine learning");
-                String option = scanner.nextLine();
-                switch (option) {
-                    case "r":
-                        asadModel = ai.ruleBasedDecisions(asadModel);
-                        break;
-                    case "f":
-                        asadModel = ai.fuzzyLogic(asadModel);
-                        break;
-                    case "g":
-                        asadModel = ai.goalOrientedBehavior(asadModel);
-                        break;
-                    case "m":
-                        asadModel = ai.machineLearningRegression(asadModel);
-                        break;
-                    default:
-                        System.out.println("invalid option");
-                        throw new Exception();
-                }
-                System.out.println('\n' + "-*ASAD Model Information Post-adjustment*-");
-                printData(asadModel);
-
-                technology += (asadModel.I / 1000);
-                System.out.println("Technology Level: " + technology);
-                System.out.println('\n' + "Press enter to continue to next cycle, or type e and press enter to end program");
-                if (scanner.nextLine().equals("e")) {
-                    isPlaying = false;
+                    runAICycle(ai, asadModel, solowSwanGrowthModel, savingsGrowth, technology, deprecation);
                 }
             }
         }
+    }
+
+    private static void runAICycle(AI ai, ASADModel asadModel, SolowSwanGrowthModel solowSwanGrowthModel, double savingsGrowth, double technology, double deprecation) throws Exception {
+        System.out.println("Cycle number " + (asadModel.cyclesRun + 1));
+        //System.out.println("Press enter to run Solow Model cycle");
+        //scanner.nextLine();
+        double populationGrowth = 0;
+
+        if (asadModel.cyclesRun != 0) {
+            double intrinsicGrowth = 1 / (solowSwanGrowthModel.outputPerPerson * 1000);
+            double carryingCapacity = (int) solowSwanGrowthModel.outputPerPerson * 1000;
+            populationGrowth = calculatePopulationGrowth(intrinsicGrowth, solowSwanGrowthModel.Labour, carryingCapacity);
+        }
+
+        solowSwanGrowthModel.runCycle(savingsGrowth, populationGrowth, technology, deprecation);
+
+        //System.out.println("-*Solow Model Information*-");
+        //System.out.println("Population Growth rate: " + populationGrowth);
+        //System.out.println("Total Output: " + solowSwanGrowthModel.output);
+
+        asadModel.longRunAggregateSupply = solowSwanGrowthModel.output;
+
+        asadModel.C = asadModel.longRunAggregateSupply * asadModel.mpc;
+        asadModel.IConstant = asadModel.longRunAggregateSupply * asadModel.mpi;
+        //inflation = quantity * velocity;
+        //money supply * velocity of money = price level * real gdp
+        //price level * real gdp = nominal gdp
+        //System.out.println('\n' + "Press enter to run ASAD Model cycle");
+        //scanner.nextLine();
+        asadModel.runCycle();
+
+        //printData(asadModel);
+        //System.out.println("-*ASAD Model Information pre-adjustment*-");
+       // System.out.println("Long Run Aggregate Supply: " + asadModel.longRunAggregateSupply);
+       // System.out.println("Average growth Rate: " + (((asadModel.overallGrowth - 1) * 100) / asadModel.cyclesRun) + '%');
+
+       /* System.out.println('\n' + "Select option for ai testing:" +
+                '\n' + "r for rule based decisions" +
+                '\n' + "f for fuzzy logic" +
+                '\n' + "g for goal oriented behavior" +
+                '\n' + "m for machine learning");
+        String option = scanner.nextLine();*/
+
+        ArffLoader arffLoader = new ArffLoader();
+        File file = new File(ai.arffFilePath);
+        arffLoader.setFile(file);
+        Instances instances = arffLoader.getDataSet();
+        int bound;
+        if(instances.size() == 0){
+            bound = 3;
+        } else {
+            bound = 4;
+        }
+        Random random = new Random();
+        int option = random.nextInt(bound);
+        switch (option) {
+            case 0:
+                asadModel = ai.ruleBasedDecisions(asadModel);
+                break;
+            case 1:
+                asadModel = ai.fuzzyLogic(asadModel);
+                break;
+            case 2:
+                asadModel = ai.goalOrientedBehavior(asadModel);
+                break;
+            case 3:
+                asadModel = ai.machineLearningRegression(asadModel);
+                break;
+            default:
+                System.out.println("invalid option");
+                throw new Exception();
+        }
+        System.out.println('\n' + "-*ASAD Model Information Post-adjustment*-");
+        //printData(asadModel);
+        System.out.println("Long Run Aggregate Supply: " + asadModel.longRunAggregateSupply);
+        System.out.println("Average growth Rate: " + (((asadModel.overallGrowth - 1) * 100) / asadModel.cyclesRun) + '%' + '\n');
+
+        technology += (asadModel.I / 1000);
+        //System.out.println("Technology Level: " + technology);
+        //System.out.println('\n' + "Press enter to continue to next cycle, or type e and press enter to end program");
+        /*if (scanner.nextLine().equals("e")) {
+            isPlaying = false;
+        }*/
     }
 
     private static void printData(ASADModel asadModel) {

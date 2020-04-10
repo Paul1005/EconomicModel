@@ -17,7 +17,7 @@ public class AI {
     private double spendingChange;
     private double taxChange;
     private Random random;
-    private String arffFilePath;
+    public String arffFilePath;
     private double oldLRAS;
 
     public AI() {
