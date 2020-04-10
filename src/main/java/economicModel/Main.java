@@ -156,22 +156,22 @@ public class Main {
 
                 System.out.println('\n' + "Select option for ai testing:" +
                         '\n' + "r for rule based decisions" +
-                        '\n' + "m for machine learning" +
                         '\n' + "f for fuzzy logic" +
-                        '\n' + "g for goal oriented behavior");
+                        '\n' + "g for goal oriented behavior" +
+                        '\n' + "m for machine learning");
                 String option = scanner.nextLine();
                 switch (option) {
                     case "r":
                         asadModel = ai.ruleBasedDecisions(asadModel);
-                        break;
-                    case "m":
-                        asadModel = ai.machineLearningRegression(asadModel);
                         break;
                     case "f":
                         asadModel = ai.fuzzyLogic(asadModel);
                         break;
                     case "g":
                         asadModel = ai.goalOrientedBehavior(asadModel);
+                        break;
+                    case "m":
+                        asadModel = ai.machineLearningRegression(asadModel);
                         break;
                     default:
                         System.out.println("invalid option");

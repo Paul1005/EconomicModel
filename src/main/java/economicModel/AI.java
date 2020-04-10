@@ -18,10 +18,12 @@ public class AI {
     private double taxChange;
     private Random random;
     private String arffFilePath;
+    private double oldLRAS;
 
     public AI() {
         random = new Random();
         arffFilePath = "src/main/resources/growth-info.arff";
+        oldLRAS = -1;
     }
 
     public void calculateRequiredChanges(ASADModel asadModel) {
@@ -264,7 +266,12 @@ public class AI {
 
     // regression
     public void runCycleAndRecordInfo(ASADModel asadModel) throws Exception {
-        double oldLRAS = asadModel.longRunAggregateSupply;
+        double LRASGrowth;
+        if(oldLRAS == -1){
+            LRASGrowth = 1;
+        } else {
+            LRASGrowth = asadModel.longRunAggregateSupply / oldLRAS;
+        }
         asadModel.runCycle();
         ArffLoader arffLoader = new ArffLoader();
         File file = new File(arffFilePath);
@@ -275,7 +282,7 @@ public class AI {
         denseInstance[1] = asadModel.G;
         denseInstance[2] = asadModel.ownedBonds;
         denseInstance[3] = asadModel.reserveRequirement;
-        denseInstance[4] = asadModel.longRunAggregateSupply / oldLRAS;
+        denseInstance[4] = LRASGrowth;
 
         instances.add(new DenseInstance(1.0, denseInstance));
 
@@ -283,7 +290,6 @@ public class AI {
         arffSaver.setInstances(instances);
         arffSaver.setFile(file);
         arffSaver.writeBatch();
+        oldLRAS = asadModel.longRunAggregateSupply;
     }
-
-
 }

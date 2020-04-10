@@ -275,7 +275,7 @@ public class ASADModel {
     }
 
     double calculateSpendingChange() {
-        return outputGap / spendingMultiplier; // find the change in spending required
+        return outputGap / -spendingMultiplier; // find the change in spending required
     }
 
     void changeSpending(double spendingChange) {
@@ -283,7 +283,7 @@ public class ASADModel {
     }
 
     double calculateTaxChange() {
-        return outputGap / taxMultiplier; // find the change in taxes required
+        return outputGap / -taxMultiplier; // find the change in taxes required
     }
 
     void changeTaxes(double taxChange) {
