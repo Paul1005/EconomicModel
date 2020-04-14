@@ -28,8 +28,8 @@ public class ASADModel {
 
     private double govtBalance;
     private double publicBalance;
-    private double overallGovtBalanceInflationAdjusted;
-    private double overallPublicBalanceInflationAdjusted;
+    private double overallGovtBalance;
+    private double overallPublicBalance;
 
     //public  int debtCycles; // number of cycles we use to pay of debt
     private double debtRepaymentAmount; // min debt repayment required
@@ -74,8 +74,8 @@ public class ASADModel {
         this.spendingMultiplier = asadModel.spendingMultiplier;
         this.govtBalance = asadModel.govtBalance;
         this.publicBalance = asadModel.publicBalance;
-        this.overallGovtBalanceInflationAdjusted = asadModel.overallGovtBalanceInflationAdjusted;
-        this.overallPublicBalanceInflationAdjusted = asadModel.overallPublicBalanceInflationAdjusted;
+        this.overallGovtBalance = asadModel.overallGovtBalance;
+        this.overallPublicBalance = asadModel.overallPublicBalance;
         this.debtRepaymentAmount = asadModel.debtRepaymentAmount;
         this.growth = asadModel.growth;
         this.overallGrowth = asadModel.overallGrowth;
@@ -137,7 +137,7 @@ public class ASADModel {
         govtBalance = taxes - GConstant;
 
         double govtDebtInterest = (baseDebtInterestEquation(longRunAggregateSupply, govtBalance) + interestRate) / 2;
-        overallGovtBalanceInflationAdjusted = calculateBalance(govtBalance, govtDebtInterest, overallGovtBalanceInflationAdjusted);
+        overallGovtBalance = calculateBalance(govtBalance, govtDebtInterest, overallGovtBalance);
         GConstant = calculateSpending(govtBalance, govtDebtInterest, GConstant);
 
         G = getGovernmentSpending(); // overall government spending
@@ -155,7 +155,7 @@ public class ASADModel {
         publicBalance = IConstant - I;
 
         double publicDebtInterest = (baseDebtInterestEquation(longRunAggregateSupply, publicBalance) + interestRate) / 2;
-        overallPublicBalanceInflationAdjusted = calculateBalance(publicBalance, publicDebtInterest, overallPublicBalanceInflationAdjusted);
+        overallPublicBalance = calculateBalance(publicBalance, publicDebtInterest, overallPublicBalance);
         I = calculateSpending(publicBalance, publicDebtInterest, I);
 
         calculateGrowthAndInflation();
@@ -193,21 +193,21 @@ public class ASADModel {
         return (longRunAggregateSupply - moneySupply) / longRunAggregateSupply;
     }
 
-    private double calculateBalance(double balance, double interestRate, double overallBalanceInflationAdjusted) {
+    private double calculateBalance(double balance, double interestRate, double overallBalance) {
         if (balance < 0) {
             double debtInterest = (baseDebtInterestEquation(longRunAggregateSupply, balance) + interestRate) / 2;
-            overallBalanceInflationAdjusted += (balance + balance * debtInterest) / priceLevel;
-            overallBalanceInflationAdjusted += (debtRepaymentAmount / priceLevel);
+            overallBalance += (balance + balance * debtInterest) * priceLevel;
+            overallBalance += ((debtRepaymentAmount + debtRepaymentAmount * debtInterest) * priceLevel);
         } else if (balance > 0) {
-            overallBalanceInflationAdjusted += (balance / priceLevel);
+            overallBalance += (balance * priceLevel);
         }
-        return overallBalanceInflationAdjusted;
+        return overallBalance;
     }
 
     private double calculateSpending(double balance, double interestRate, double spending) {
         if (balance < 0) {
             double debtInterest = (baseDebtInterestEquation(longRunAggregateSupply, balance) + interestRate) / 2;
-            spending -= ((debtRepaymentAmount + debtRepaymentAmount * debtInterest) / priceLevel);
+            spending -= (debtRepaymentAmount + debtRepaymentAmount * debtInterest);
         }
         return spending;
     }
@@ -410,12 +410,12 @@ public class ASADModel {
         return publicBalance;
     }
 
-    public double getOverallGovtBalanceInflationAdjusted() {
-        return overallGovtBalanceInflationAdjusted;
+    public double getOverallGovtBalance() {
+        return overallGovtBalance;
     }
 
-    public double getOverallPublicBalanceInflationAdjusted() {
-        return overallPublicBalanceInflationAdjusted;
+    public double getOverallPublicBalance() {
+        return overallPublicBalance;
     }
 
     public double getGrowth() {

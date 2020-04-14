@@ -37,11 +37,11 @@ public class AI {
     // rule based AI
     public ASADModel ruleBasedDecisions(ASADModel asadModel) throws Exception {
         calculateRequiredChanges(asadModel);
-        if (asadModel.getOverallPublicBalanceInflationAdjusted() < asadModel.getOverallGovtBalanceInflationAdjusted()) { // if our govt finances are better than public finances
+        if (asadModel.getOverallPublicBalance() < asadModel.getOverallGovtBalance()) { // if our govt finances are better than public finances
             govtIsRich(asadModel);
-        } else if (asadModel.getOverallPublicBalanceInflationAdjusted() > asadModel.getOverallGovtBalanceInflationAdjusted()) { // if our public finances are better than govt finances
+        } else if (asadModel.getOverallPublicBalance() > asadModel.getOverallGovtBalance()) { // if our public finances are better than govt finances
             publicIsRich(asadModel);
-        } else if (asadModel.getOverallPublicBalanceInflationAdjusted() == asadModel.getOverallGovtBalanceInflationAdjusted()) { // if they are identical
+        } else if (asadModel.getOverallPublicBalance() == asadModel.getOverallGovtBalance()) { // if they are identical
             int choice = random.nextInt(2);
             if (choice == 0) {
                 govtIsRich(asadModel);
@@ -115,8 +115,8 @@ public class AI {
         fis.setVariable("ogHighPositive", ogHigh);
 
         // Set inputs
-        fis.setVariable("publicBalance", asadModel.getOverallPublicBalanceInflationAdjusted());
-        fis.setVariable("govtBalance", asadModel.getOverallGovtBalanceInflationAdjusted());
+        fis.setVariable("publicBalance", asadModel.getOverallPublicBalance());
+        fis.setVariable("govtBalance", asadModel.getOverallGovtBalance());
         fis.setVariable("og", asadModel.getOutputGap() / 2); // since we're doing both public and govt spending, divide og by 2
         // Evaluate
         fis.evaluate();
@@ -159,8 +159,8 @@ public class AI {
             tryOption(testModel, bondChange, positiveReserveMultiplier, negativeReserveMultiplier, spendingChange, taxChange, i);
             testModel.runCycle();
             double inflation = testModel.getOverallInflation();
-            double publicBalance = testModel.getOverallPublicBalanceInflationAdjusted();
-            double govtBalance = testModel.getOverallGovtBalanceInflationAdjusted();
+            double publicBalance = testModel.getOverallPublicBalance();
+            double govtBalance = testModel.getOverallGovtBalance();
             double growth = testModel.getOverallGrowth();
             double gdp = testModel.getLongRunAggregateSupply();
             if (i != 0) {

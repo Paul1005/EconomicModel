@@ -242,8 +242,8 @@ public class Main {
         System.out.println('\n' + "-*Debt and deficit Data*-");
         System.out.println("Government Balance: " + asadModel.getGovtBalance());
         System.out.println("Public Balance: " + asadModel.getPublicBalance());
-        System.out.println("Total Government Debt: " + asadModel.getOverallGovtBalanceInflationAdjusted());
-        System.out.println("Total Public Debt: " + asadModel.getOverallPublicBalanceInflationAdjusted());
+        System.out.println("Total Government Debt: " + asadModel.getOverallGovtBalance());
+        System.out.println("Total Public Debt: " + asadModel.getOverallPublicBalance());
 
         System.out.println('\n' + "-*Economic growth information*-");
         System.out.println("Growth Rate for last cycle: " + ((asadModel.getGrowth() - 1) * 100) + '%');
