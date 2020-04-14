@@ -5,7 +5,7 @@ public class SolowSwanGrowthModel {
     public double output;
     public double a;
     public double productivityPerWorker;
-    public int Labour;
+    public int labour;
     public double eL;
     public double depreciationPerWorker;
     public double capitalPerPerson;
@@ -20,17 +20,17 @@ public class SolowSwanGrowthModel {
     public void runCycle(double savingsGrowth, double populationGrowth, double technology, double depreciation) {
         a = 1.0 / 3.0;
         productivityPerWorker = 1.0;
-        eL = productivityPerWorker * Labour;
+        eL = productivityPerWorker * labour;
 
-        capitalPerPerson = capital / Labour;
+        capitalPerPerson = capital / labour;
         depreciationPerWorker = (depreciation + populationGrowth) * capitalPerPerson;
         netGainPerPerson = savingsGrowth * technology * Math.pow(capitalPerPerson, a) - depreciationPerWorker;
-        netGain = netGainPerPerson * Labour;
+        netGain = netGainPerPerson * labour;
 
         steadyStateCapitalPerPerson = Math.pow((savingsGrowth * technology) / (depreciation + populationGrowth), 1 / (1 - a));
-        steadyStateCapital = steadyStateCapitalPerPerson * Labour;
+        steadyStateCapital = steadyStateCapitalPerPerson * labour;
         steadyStateOutputPerPerson = Math.pow(technology, 1 / (1 - a)) * Math.pow(savingsGrowth / (depreciation + populationGrowth), a / (1 - a));
-        steadyStateOutput = steadyStateOutputPerPerson * Labour;
+        steadyStateOutput = steadyStateOutputPerPerson * labour;
 
         output = technology * Math.pow(capital, a) * Math.pow(eL, (1 - a));
 
@@ -38,7 +38,18 @@ public class SolowSwanGrowthModel {
 
         capital += netGain;
 
-        Labour += Labour * populationGrowth;
+        labour += labour * populationGrowth;
     }
 
+    public void setCapital(int i) {
+        capital = i;
+    }
+
+    public void setLabour(int i) {
+        labour = i;
+    }
+
+    public double getOutput() {
+        return output;
+    }
 }

@@ -15,41 +15,41 @@ public class Main {
         ASADModel asadModel = new ASADModel();
         SolowSwanGrowthModel solowSwanGrowthModel = new SolowSwanGrowthModel();
         //starting variables
-        asadModel.debtRepaymentAmount = 10;
-        asadModel.cyclesRun = 0;
-        asadModel.growth = 1;
-        asadModel.overallGrowth = 1;
-        asadModel.inflation = 1;
-        asadModel.overallInflation = 1;
+        asadModel.setDebtRepaymentAmount(10);
+        asadModel.setCyclesRun(0);
+        asadModel.setGrowth(1);
+        asadModel.setOverallGrowth(1);
+        asadModel.setInflation(1);
+        asadModel.setOverallInflation(1);
         double technology = 1;
         double deprecation = 0.005;
-        solowSwanGrowthModel.capital = 18000;
-        solowSwanGrowthModel.Labour = 100;
-        asadModel.ownedBonds = 10;
-        asadModel.reserveRequirement = 0.125;
-        asadModel.taxes = 100;
-        asadModel.GConstant = 100;
-        asadModel.mpc = 0.6;
-        asadModel.mpi = 0.1;
-        asadModel.mps = 1 - asadModel.mpc - asadModel.mpi;
-        asadModel.taxMultiplier = -asadModel.mpc / asadModel.mps;
-        asadModel.spendingMultiplier = 1 / asadModel.mps;
-        double savingsGrowth = asadModel.mps + asadModel.mpi;
+        solowSwanGrowthModel.setCapital(18000);
+        solowSwanGrowthModel.setLabour(100);
+        asadModel.setOwnedBonds(10);
+        asadModel.setReserveRequirement(0.125);
+        asadModel.setTaxes(100);
+        asadModel.setGConstant(100);
+        asadModel.setmpc(0.6);
+        asadModel.setmpi(0.1);
+        asadModel.setmps(1 - asadModel.getmpc() - asadModel.getmpi());
+        asadModel.setTaxMultiplier(-asadModel.getmpc() / asadModel.getmps());
+        asadModel.setSpendingMultiplier(1 / asadModel.getmps());
+        double savingsGrowth = asadModel.getmps() + asadModel.getmpi();
         AI ai = new AI();
         boolean isPlaying = true;
         while (isPlaying) {
             System.out.println("Press m for manual play, press a for ai play");
             String mode = scanner.nextLine();
             if (mode.equals("m")) {
-                System.out.println("Cycle number " + (asadModel.cyclesRun + 1));
+                System.out.println("Cycle number " + (asadModel.getCyclesRun() + 1));
                 System.out.println("Press enter to run Solow Model cycle");
                 scanner.nextLine();
                 double populationGrowth = 0;
 
-                if (asadModel.cyclesRun != 0) {
+                if (asadModel.getCyclesRun() != 0) {
                     double intrinsicGrowth = 1 / (solowSwanGrowthModel.outputPerPerson * 1000);
                     double carryingCapacity = (int) solowSwanGrowthModel.outputPerPerson * 1000;
-                    populationGrowth = calculatePopulationGrowth(intrinsicGrowth, solowSwanGrowthModel.Labour, carryingCapacity);
+                    populationGrowth = calculatePopulationGrowth(intrinsicGrowth, solowSwanGrowthModel.labour, carryingCapacity);
                 }
 
                 solowSwanGrowthModel.runCycle(savingsGrowth, populationGrowth, technology, deprecation);
@@ -58,11 +58,11 @@ public class Main {
                 System.out.println("Population Growth rate: " + populationGrowth);
                 System.out.println("Total Output: " + solowSwanGrowthModel.output);
 
-                asadModel.longRunAggregateSupply = solowSwanGrowthModel.output;
+                asadModel.setLongRunAggregateSupply(solowSwanGrowthModel.output);
 
                 // TODO: not sure if these are ideal
-                asadModel.C = asadModel.longRunAggregateSupply * asadModel.mpc;
-                asadModel.IConstant = asadModel.longRunAggregateSupply * asadModel.mpi;
+                asadModel.setC(asadModel.getLongRunAggregateSupply() * asadModel.getmpc());
+                asadModel.setIConstant(asadModel.getLongRunAggregateSupply() * asadModel.getmpi());
                 //inflation = quantity * velocity;
                 //money supply * velocity of money = price level * real gdp
                 //price level * real gdp = nominal gdp
@@ -85,28 +85,28 @@ public class Main {
                         System.out.println("How much do you wish to change taxes by?");
                         double taxChange = scanner.nextDouble();
                         asadModel.changeTaxes(taxChange);
-                        System.out.println("Taxes: " + asadModel.taxes);
+                        System.out.println("Taxes: " + asadModel.getTaxes());
                         break;
                     case "g":
                         // if we want to change spending
                         System.out.println("How much do you wish to change spending by?");
                         double spendingChange = scanner.nextDouble();
                         asadModel.changeSpending(spendingChange);
-                        System.out.println("Government Spending: " + asadModel.G);
+                        System.out.println("Government Spending: " + asadModel.getG());
                         break;
                     case "m":
                         // if we want to change money supply
                         System.out.println("How much do you wish to change bonds owned by?");
                         double bondChange = scanner.nextDouble();
                         asadModel.changeMoneySupply(bondChange);
-                        System.out.println("Money supply: " + asadModel.moneySupply);
+                        System.out.println("Money supply: " + asadModel.getMoneySupply());
                         break;
                     case "r":
                         // if we want to change reserve requirement
                         System.out.println("How much do you wish to change reserve requirement by?");
                         double reserveMultiplier = scanner.nextDouble();
                         asadModel.changeReserveRequirements(reserveMultiplier);
-                        System.out.println("Reserve Requirement: " + asadModel.reserveRequirement);
+                        System.out.println("Reserve Requirement: " + asadModel.getReserveRequirement());
                     default:
                         System.out.println("invalid option");
                         throw new Exception();
@@ -116,7 +116,7 @@ public class Main {
                 System.out.println('\n' + "-*ASAD Model Information Post-adjustment*-");
                 printData(asadModel);
 
-                technology += (asadModel.I / 1000);
+                technology += (asadModel.getI() / 1000);
                 System.out.println("Technology Level: " + technology);
                 System.out.println('\n' + "Press enter to continue to next cycle, or type e and press enter to end program");
                 if (scanner.nextLine().equals("e")) {
@@ -134,15 +134,15 @@ public class Main {
     }
 
     private static void runAICycle(AI ai, ASADModel asadModel, SolowSwanGrowthModel solowSwanGrowthModel, double savingsGrowth, double technology, double deprecation) throws Exception {
-        System.out.println("Cycle number " + (asadModel.cyclesRun + 1));
+        System.out.println("Cycle number " + (asadModel.getCyclesRun() + 1));
         //System.out.println("Press enter to run Solow Model cycle");
         //scanner.nextLine();
         double populationGrowth = 0;
 
-        if (asadModel.cyclesRun != 0) {
+        if (asadModel.getCyclesRun() != 0) {
             double intrinsicGrowth = 1 / (solowSwanGrowthModel.outputPerPerson * 1000);
             double carryingCapacity = (int) solowSwanGrowthModel.outputPerPerson * 1000;
-            populationGrowth = calculatePopulationGrowth(intrinsicGrowth, solowSwanGrowthModel.Labour, carryingCapacity);
+            populationGrowth = calculatePopulationGrowth(intrinsicGrowth, solowSwanGrowthModel.labour, carryingCapacity);
         }
 
         solowSwanGrowthModel.runCycle(savingsGrowth, populationGrowth, technology, deprecation);
@@ -151,19 +151,18 @@ public class Main {
         //System.out.println("Population Growth rate: " + populationGrowth);
         //System.out.println("Total Output: " + solowSwanGrowthModel.output);
 
-        asadModel.longRunAggregateSupply = solowSwanGrowthModel.output;
+        asadModel.setLongRunAggregateSupply(solowSwanGrowthModel.getOutput());
 
-        asadModel.C = asadModel.longRunAggregateSupply * asadModel.mpc;
-        asadModel.IConstant = asadModel.longRunAggregateSupply * asadModel.mpi;
+        asadModel.setC(asadModel.getLongRunAggregateSupply() * asadModel.getmpc());
+        asadModel.setIConstant(asadModel.getLongRunAggregateSupply() * asadModel.getmpi());
         //inflation = quantity * velocity;
         //money supply * velocity of money = price level * real gdp
         //price level * real gdp = nominal gdp
         //System.out.println('\n' + "Press enter to run ASAD Model cycle");
         //scanner.nextLine();
         asadModel.runCycle();
-
-        //printData(asadModel);
-        //System.out.println("-*ASAD Model Information pre-adjustment*-");
+        System.out.println("-*ASAD Model Information pre-adjustment*-");
+        printData(asadModel);
        // System.out.println("Long Run Aggregate Supply: " + asadModel.longRunAggregateSupply);
        // System.out.println("Average growth Rate: " + (((asadModel.overallGrowth - 1) * 100) / asadModel.cyclesRun) + '%');
 
@@ -204,11 +203,11 @@ public class Main {
                 throw new Exception();
         }
         System.out.println('\n' + "-*ASAD Model Information Post-adjustment*-");
-        //printData(asadModel);
-        System.out.println("Long Run Aggregate Supply: " + asadModel.longRunAggregateSupply);
-        System.out.println("Average growth Rate: " + (((asadModel.overallGrowth - 1) * 100) / asadModel.cyclesRun) + '%' + '\n');
+        printData(asadModel);
+        //System.out.println("Long Run Aggregate Supply: " + asadModel.longRunAggregateSupply);
+        //System.out.println("Average growth Rate: " + (((asadModel.overallGrowth - 1) * 100) / asadModel.cyclesRun) + '%' + '\n');
 
-        technology += (asadModel.I / 1000);
+        technology += (asadModel.getI() / 1000);
         //System.out.println("Technology Level: " + technology);
         //System.out.println('\n' + "Press enter to continue to next cycle, or type e and press enter to end program");
         /*if (scanner.nextLine().equals("e")) {
@@ -218,33 +217,33 @@ public class Main {
 
     private static void printData(ASADModel asadModel) {
         System.out.println("-*Output Gap Data*-");
-        System.out.println("Long Run Aggregate Supply: " + asadModel.longRunAggregateSupply);
-        System.out.println("Aggregate Demand: " + asadModel.aggregateDemandOutputCurve);
-        System.out.println("Short Run aggregate supply: " + asadModel.shortRunAggregateSupplyCurve);
-        System.out.println("Equilibrium output: " + asadModel.equilibriumOutput);
-        System.out.println("Gap: " + asadModel.outputGap);
+        System.out.println("Long Run Aggregate Supply: " + asadModel.getLongRunAggregateSupply());
+        System.out.println("Aggregate Demand: " + asadModel.getAggregateDemandOutputCurve());
+        System.out.println("Short Run aggregate supply: " + asadModel.getShortRunAggregateSupplyCurve());
+        System.out.println("Equilibrium output: " + asadModel.getEquilibriumOutput());
+        System.out.println("Gap: " + asadModel.getOutputGap());
 
         System.out.println('\n' + "-*Financial Data*-");
-        System.out.println("Taxes: " + asadModel.taxes);
-        System.out.println("Government Spending: " + asadModel.G);
-        System.out.println("Consumption: " + asadModel.C);
-        System.out.println("Investment: " + asadModel.I);
-        System.out.println("Reserve Requirement: " + asadModel.reserveRequirement);
+        System.out.println("Taxes: " + asadModel.getTaxes());
+        System.out.println("Government Spending: " + asadModel.getG());
+        System.out.println("Consumption: " + asadModel.getC());
+        System.out.println("Investment: " + asadModel.getI());
+        System.out.println("Reserve Requirement: " + asadModel.getReserveRequirement());
 
         System.out.println('\n' + "-*Inflation Data*-");
-        System.out.println("Price Level: " + asadModel.priceLevel);
-        System.out.println("Inflation Rate for last cycle: " + ((asadModel.inflation - 1) * 100) + '%');
-        System.out.println("Average Inflation Rate: " + (((asadModel.overallInflation - 1) * 100) / asadModel.cyclesRun) + '%');
+        System.out.println("Price Level: " + asadModel.getPriceLevel());
+        System.out.println("Inflation Rate for last cycle: " + ((asadModel.getInflation() - 1) * 100) + '%');
+        System.out.println("Average Inflation Rate: " + (((asadModel.getOverallInflation() - 1) * 100) / asadModel.getCyclesRun()) + '%');
 
         System.out.println('\n' + "-*Debt and deficit Data*-");
-        System.out.println("Government Balance: " + asadModel.govtBalance);
-        System.out.println("Public Balance: " + asadModel.publicBalance);
-        System.out.println("Total Government Debt: " + asadModel.overallGovtBalanceInflationAdjusted);
-        System.out.println("Total Public Debt: " + asadModel.overallPublicBalanceInflationAdjusted);
+        System.out.println("Government Balance: " + asadModel.getGovtBalance());
+        System.out.println("Public Balance: " + asadModel.getPublicBalance());
+        System.out.println("Total Government Debt: " + asadModel.getOverallGovtBalanceInflationAdjusted());
+        System.out.println("Total Public Debt: " + asadModel.getOverallPublicBalanceInflationAdjusted());
 
         System.out.println('\n' + "-*Economic growth information*-");
-        System.out.println("Growth Rate for last cycle: " + ((asadModel.growth - 1) * 100) + '%');
-        System.out.println("Average growth Rate: " + (((asadModel.overallGrowth - 1) * 100) / asadModel.cyclesRun) + '%');
+        System.out.println("Growth Rate for last cycle: " + ((asadModel.getGrowth() - 1) * 100) + '%');
+        System.out.println("Average growth Rate: " + (((asadModel.getOverallGrowth() - 1) * 100) / asadModel.getCyclesRun()) + '%');
     }
 
     private static double calculatePopulationGrowth(double intrinsicGrowthRate, int currentPopulation, double carryingCapacity) {
