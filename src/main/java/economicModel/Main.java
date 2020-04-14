@@ -183,7 +183,7 @@ public class Main {
             bound = 4;
         }
         Random random = new Random();
-        int option = 0;//random.nextInt(bound);
+        int option = random.nextInt(bound);
         switch (option) {
             case 0:
                 asadModel = ai.ruleBasedDecisions(asadModel);
