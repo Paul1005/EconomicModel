@@ -81,7 +81,7 @@ public class Main {
                     case "t":
                         // if we want to change taxes
                         System.out.println("How much do you wish to change taxes by?");
-                        System.out.println("Size of tax change needed: " + asadModel.calculateTaxChange());
+                        System.out.println("Size of tax change needed to close the gap: " + asadModel.calculateTaxChange());
                         double taxChange = scanner.nextDouble();
                         asadModel.changeTaxes(taxChange);
                         System.out.println("Taxes: " + asadModel.getTaxes());
@@ -89,7 +89,7 @@ public class Main {
                     case "g":
                         // if we want to change spending
                         System.out.println("How much do you wish to change spending by?");
-                        System.out.println("Size of spending change needed: " + asadModel.calculateSpendingChange());
+                        System.out.println("Size of spending change needed to close the gap: " + asadModel.calculateSpendingChange());
                         double spendingChange = scanner.nextDouble();
                         asadModel.changeSpending(spendingChange);
                         System.out.println("Government Spending: " + asadModel.getG());
@@ -97,7 +97,7 @@ public class Main {
                     case "m":
                         // if we want to change money supply
                         System.out.println("How much do you wish to change bonds owned by?");
-                        System.out.println("Size of bond change needed: " + asadModel.calculateBondChange(asadModel.getInvestmentRequired()));
+                        System.out.println("Size of bond change needed to close the gap: " + asadModel.calculateBondChange(asadModel.getInvestmentRequired()));
                         double bondChange = scanner.nextDouble();
                         asadModel.changeMoneySupply(bondChange);
                         System.out.println("Money supply: " + asadModel.getMoneySupply());
@@ -105,7 +105,7 @@ public class Main {
                     case "r":
                         // if we want to change reserve requirement
                         System.out.println("How much do you wish to change reserve requirement by?");
-                        System.out.println("Size of reserve requirement change needed: " + asadModel.calculateReserveMultiplier(asadModel.getInvestmentRequired()));
+                        System.out.println("Size of reserve requirement change needed to close the gap: " + asadModel.calculateReserveMultiplier(asadModel.getInvestmentRequired()));
                         double reserveMultiplier = scanner.nextDouble();
                         asadModel.changeReserveRequirements(reserveMultiplier);
                         System.out.println("Reserve Requirement: " + asadModel.getReserveRequirement());
