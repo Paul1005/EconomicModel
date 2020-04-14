@@ -136,9 +136,8 @@ public class ASADModel {
         double interestRate = getInterestRate(); // find interest rate based on current money supply
         govtBalance = taxes - GConstant;
 
-        double govtDebtInterest = (baseDebtInterestEquation(longRunAggregateSupply, govtBalance) + interestRate) / 2;
-        overallGovtBalance = calculateBalance(govtBalance, govtDebtInterest, overallGovtBalance);
-        GConstant = calculateSpending(govtBalance, govtDebtInterest, GConstant);
+        overallGovtBalance = calculateBalance(govtBalance, interestRate, overallGovtBalance);
+        GConstant = calculateSpending(govtBalance, interestRate, GConstant);
 
         G = getGovernmentSpending(); // overall government spending
 
@@ -154,9 +153,8 @@ public class ASADModel {
 
         publicBalance = IConstant - I;
 
-        double publicDebtInterest = (baseDebtInterestEquation(longRunAggregateSupply, publicBalance) + interestRate) / 2;
-        overallPublicBalance = calculateBalance(publicBalance, publicDebtInterest, overallPublicBalance);
-        I = calculateSpending(publicBalance, publicDebtInterest, I);
+        overallPublicBalance = calculateBalance(publicBalance, interestRate, overallPublicBalance);
+        I = calculateSpending(publicBalance, interestRate, I);
 
         calculateGrowthAndInflation();
         previousOutput = equilibriumOutput;
