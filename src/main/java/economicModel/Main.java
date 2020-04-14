@@ -84,7 +84,6 @@ public class Main {
                         System.out.println("Size of tax change needed to close the gap: " + asadModel.calculateTaxChange());
                         double taxChange = scanner.nextDouble();
                         asadModel.changeTaxes(taxChange);
-                        System.out.println("Taxes: " + asadModel.getTaxes());
                         break;
                     case "g":
                         // if we want to change spending
@@ -92,7 +91,6 @@ public class Main {
                         System.out.println("Size of spending change needed to close the gap: " + asadModel.calculateSpendingChange());
                         double spendingChange = scanner.nextDouble();
                         asadModel.changeSpending(spendingChange);
-                        System.out.println("Government Spending: " + asadModel.getG());
                         break;
                     case "m":
                         // if we want to change money supply
@@ -100,7 +98,6 @@ public class Main {
                         System.out.println("Size of bond change needed to close the gap: " + asadModel.calculateBondChange(asadModel.getInvestmentRequired()));
                         double bondChange = scanner.nextDouble();
                         asadModel.changeMoneySupply(bondChange);
-                        System.out.println("Money supply: " + asadModel.getMoneySupply());
                         break;
                     case "r":
                         // if we want to change reserve requirement
@@ -108,7 +105,6 @@ public class Main {
                         System.out.println("Size of reserve requirement change needed to close the gap: " + asadModel.calculateReserveMultiplier(asadModel.getInvestmentRequired()));
                         double reserveMultiplier = scanner.nextDouble();
                         asadModel.changeReserveRequirements(reserveMultiplier);
-                        System.out.println("Reserve Requirement: " + asadModel.getReserveRequirement());
                         break;
                     default:
                         System.out.println("invalid option");
