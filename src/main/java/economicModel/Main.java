@@ -111,12 +111,12 @@ public class Main {
                         double reserveMultiplier = scanner.nextDouble();
                         asadModel.changeReserveRequirements(reserveMultiplier);
                         System.out.println("Reserve Requirement: " + asadModel.getReserveRequirement());
+                        break;
                     default:
                         System.out.println("invalid option");
                         throw new Exception();
                 }
                 asadModel.runCycle();
-                ai.runCycleAndRecordInfo(asadModel);
                 System.out.println('\n' + "-*ASAD Model Information Post-adjustment*-");
                 printData(asadModel);
 
