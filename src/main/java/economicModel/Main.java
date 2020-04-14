@@ -15,7 +15,7 @@ public class Main {
         ASADModel asadModel = new ASADModel();
         SolowSwanGrowthModel solowSwanGrowthModel = new SolowSwanGrowthModel();
         //starting variables
-        asadModel.setDebtRepaymentAmount(10);
+        asadModel.setDebtRepaymentAmount(1);
         asadModel.setCyclesRun(0);
         asadModel.setGrowth(1);
         asadModel.setOverallGrowth(1);
@@ -83,6 +83,7 @@ public class Main {
                     case "t":
                         // if we want to change taxes
                         System.out.println("How much do you wish to change taxes by?");
+                        System.out.println("Size of tax change needed: " + asadModel.calculateTaxChange());
                         double taxChange = scanner.nextDouble();
                         asadModel.changeTaxes(taxChange);
                         System.out.println("Taxes: " + asadModel.getTaxes());
@@ -90,6 +91,7 @@ public class Main {
                     case "g":
                         // if we want to change spending
                         System.out.println("How much do you wish to change spending by?");
+                        System.out.println("Size of spending change needed: " + asadModel.calculateSpendingChange());
                         double spendingChange = scanner.nextDouble();
                         asadModel.changeSpending(spendingChange);
                         System.out.println("Government Spending: " + asadModel.getG());
@@ -97,6 +99,7 @@ public class Main {
                     case "m":
                         // if we want to change money supply
                         System.out.println("How much do you wish to change bonds owned by?");
+                        System.out.println("Size of bond change needed: " + asadModel.calculateBondChange(asadModel.getInvestmentRequired()));
                         double bondChange = scanner.nextDouble();
                         asadModel.changeMoneySupply(bondChange);
                         System.out.println("Money supply: " + asadModel.getMoneySupply());
@@ -104,6 +107,7 @@ public class Main {
                     case "r":
                         // if we want to change reserve requirement
                         System.out.println("How much do you wish to change reserve requirement by?");
+                        System.out.println("Size of reserve requirement change needed: " + asadModel.calculateReserveMultiplier(asadModel.getInvestmentRequired()));
                         double reserveMultiplier = scanner.nextDouble();
                         asadModel.changeReserveRequirements(reserveMultiplier);
                         System.out.println("Reserve Requirement: " + asadModel.getReserveRequirement());
@@ -184,7 +188,7 @@ public class Main {
             bound = 4;
         }
         Random random = new Random();
-        int option = random.nextInt(bound);
+        int option = 0;//random.nextInt(bound);
         switch (option) {
             case 0:
                 asadModel = ai.ruleBasedDecisions(asadModel);
@@ -208,7 +212,7 @@ public class Main {
         //System.out.println("Average growth Rate: " + (((asadModel.overallGrowth - 1) * 100) / asadModel.cyclesRun) + '%' + '\n');
 
         technology += (asadModel.getI() / 1000);
-        //System.out.println("Technology Level: " + technology);
+        System.out.println("Technology Level: " + technology);
         //System.out.println('\n' + "Press enter to continue to next cycle, or type e and press enter to end program");
         /*if (scanner.nextLine().equals("e")) {
             isPlaying = false;

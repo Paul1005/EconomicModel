@@ -1,9 +1,5 @@
 package economicModel;
 
-import sun.misc.GC;
-
-import java.util.ArrayList;
-
 //Note: right now incentive is to keep price level at 1
 //TODO: have some kind of unemployment indicator (phillips curve?), right now labour and population are synonymous
 //TODO: incorporate crowding out
@@ -12,9 +8,9 @@ public class ASADModel {
     private double longRunAggregateSupply;
     private double shortRunAggregateSupplyCurve;
     private double taxes;
-    double mpc;
-    double mpi;
-    double mps;
+    private  double mpc;
+    private double mpi;
+    private double mps;
     private double reserveRequirement;
     private double ownedBonds;
     private double moneySupply;
@@ -146,15 +142,16 @@ public class ASADModel {
 
         G = getGovernmentSpending(); // overall government spending
 
-        equilibriumOutput = getEquilibriumOutput(); // should equal LRAS when price is set to one
+        I = investmentEquation(interestRate); // overall investment
+
+        equilibriumOutput = calculateEquilibriumOutput(); // should equal LRAS when price is set to one
 
         priceLevel = getPriceLevel(); // find our equilibrium price level
         aggregateDemandOutputCurve = getAggregateDemandOutput(); // this is the aggregate demand curve
         shortRunAggregateSupplyCurve = getShortRunAggregateSupply(); // this is the short run aggregate supply curve
 
-        outputGap = getOutputGap(); // find the output gap so that our price will be one
+        outputGap = calculateOutputGap(); // find the output gap so that our price will be one
 
-        I = investmentEquation(interestRate); // overall investment
         publicBalance = IConstant - I;
 
         double publicDebtInterest = (baseDebtInterestEquation(longRunAggregateSupply, publicBalance) + interestRate) / 2;
@@ -188,7 +185,7 @@ public class ASADModel {
         return (C + I) / priceLevel + G + taxes * taxMultiplier;
     }
 
-    public double getOutputGap() {
+    public double calculateOutputGap() {
         return equilibriumOutput - longRunAggregateSupply;
     }
 
@@ -219,7 +216,7 @@ public class ASADModel {
         return GConstant * spendingMultiplier;
     }
 
-    public double getEquilibriumOutput() {
+    public double calculateEquilibriumOutput() {
         return C + taxes * taxMultiplier + G + I;
     }
 
@@ -439,5 +436,13 @@ public class ASADModel {
 
     public double getOwnedBonds() {
         return ownedBonds;
+    }
+
+    public double getOutputGap(){
+        return outputGap;
+    }
+
+    public double getEquilibriumOutput(){
+        return equilibriumOutput;
     }
 }
