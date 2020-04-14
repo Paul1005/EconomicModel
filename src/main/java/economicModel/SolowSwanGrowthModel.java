@@ -16,6 +16,7 @@ public class SolowSwanGrowthModel {
     public double steadyStateOutputPerPerson;
     public double steadyStateOutput;
     public double outputPerPerson;
+    private int cyclesRun;
 
     public void runCycle(double savingsGrowth, double populationGrowth, double technology, double depreciation) {
         a = 1.0 / 3.0;
@@ -51,5 +52,9 @@ public class SolowSwanGrowthModel {
 
     public double getOutput() {
         return output;
+    }
+
+    public void setCyclesRun(int i){
+        cyclesRun = i;
     }
 }

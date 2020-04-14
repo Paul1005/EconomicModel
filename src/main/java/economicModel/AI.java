@@ -9,6 +9,7 @@ import weka.core.converters.ArffSaver;
 import net.sourceforge.jFuzzyLogic.FIS;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Random;
 
 public class AI {
@@ -274,30 +275,36 @@ public class AI {
 
     // regression
     public void runCycleAndRecordInfo(ASADModel asadModel) throws Exception {
+        asadModel.runCycle();
+        recordInfo(asadModel);
+    }
+
+    public void recordInfo(ASADModel asadModel) throws IOException {
         double LRASGrowth;
         if (oldLRAS == -1) {
             LRASGrowth = 1;
         } else {
             LRASGrowth = asadModel.getLongRunAggregateSupply() / oldLRAS;
         }
-        asadModel.runCycle();
-        ArffLoader arffLoader = new ArffLoader();
-        File file = new File(arffFilePath);
-        arffLoader.setFile(file);
-        Instances instances = arffLoader.getDataSet();
-        double[] denseInstance = new double[instances.numAttributes()];
-        denseInstance[0] = asadModel.getTaxes();
-        denseInstance[1] = asadModel.getG();
-        denseInstance[2] = asadModel.getOwnedBonds();
-        denseInstance[3] = asadModel.getReserveRequirement();
-        denseInstance[4] = LRASGrowth;
+        if(asadModel.getCyclesRun() > 3){
+            ArffLoader arffLoader = new ArffLoader();
+            File file = new File(arffFilePath);
+            arffLoader.setFile(file);
+            Instances instances = arffLoader.getDataSet();
+            double[] denseInstance = new double[instances.numAttributes()];
+            denseInstance[0] = asadModel.getTaxes();
+            denseInstance[1] = asadModel.getG();
+            denseInstance[2] = asadModel.getOwnedBonds();
+            denseInstance[3] = asadModel.getReserveRequirement();
+            denseInstance[4] = LRASGrowth;
 
-        instances.add(new DenseInstance(1.0, denseInstance));
+            instances.add(new DenseInstance(1.0, denseInstance));
 
-        ArffSaver arffSaver = new ArffSaver();
-        arffSaver.setInstances(instances);
-        arffSaver.setFile(file);
-        arffSaver.writeBatch();
+            ArffSaver arffSaver = new ArffSaver();
+            arffSaver.setInstances(instances);
+            arffSaver.setFile(file);
+            arffSaver.writeBatch();
+        }
         oldLRAS = asadModel.getLongRunAggregateSupply();
     }
 }

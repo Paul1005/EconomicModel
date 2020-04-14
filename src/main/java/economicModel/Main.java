@@ -17,9 +17,7 @@ public class Main {
         //starting variables
         asadModel.setDebtRepaymentAmount(1);
         asadModel.setCyclesRun(0);
-        asadModel.setGrowth(1);
         asadModel.setOverallGrowth(1);
-        asadModel.setInflation(1);
         asadModel.setOverallInflation(1);
         double technology = 1;
         double deprecation = 0.005;
@@ -117,6 +115,7 @@ public class Main {
                         throw new Exception();
                 }
                 asadModel.runCycle();
+                ai.recordInfo(asadModel);
                 System.out.println('\n' + "-*ASAD Model Information Post-adjustment*-");
                 printData(asadModel);
 
