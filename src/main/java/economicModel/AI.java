@@ -286,7 +286,7 @@ public class AI {
         } else {
             LRASGrowth = asadModel.getLongRunAggregateSupply() / oldLRAS;
         }
-        if(asadModel.getCyclesRun() > 3){
+        if(asadModel.getCyclesRun() > 3){ // only run it if we have run enough cycles to see lras growth
             ArffLoader arffLoader = new ArffLoader();
             File file = new File(arffFilePath);
             arffLoader.setFile(file);

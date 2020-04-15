@@ -40,6 +40,8 @@ public class SolowSwanGrowthModel {
         capital += netGain;
 
         labour += labour * populationGrowth;
+
+        cyclesRun++;
     }
 
     public void setCapital(int i) {
@@ -56,5 +58,9 @@ public class SolowSwanGrowthModel {
 
     public void setCyclesRun(int i){
         cyclesRun = i;
+    }
+
+    public int getCyclesRun(){
+        return cyclesRun;
     }
 }

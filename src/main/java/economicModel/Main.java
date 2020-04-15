@@ -23,6 +23,7 @@ public class Main {
         double deprecation = 0.005;
         solowSwanGrowthModel.setCapital(18000);
         solowSwanGrowthModel.setLabour(100);
+        solowSwanGrowthModel.setCyclesRun(0);
         asadModel.setOwnedBonds(10);
         asadModel.setReserveRequirement(0.125);
         asadModel.setTaxes(100);
@@ -39,7 +40,7 @@ public class Main {
             System.out.println("Press m for manual play, press a for ai play");
             String mode = scanner.nextLine();
             if (mode.equals("m")) {
-                System.out.println("Cycle number " + (asadModel.getCyclesRun() + 1));
+                System.out.println("Cycle number " + (solowSwanGrowthModel.getCyclesRun() + 1) + '\n');
                 System.out.println("Press enter to run Solow Model cycle");
                 scanner.nextLine();
                 double populationGrowth = 0;
@@ -242,7 +243,7 @@ public class Main {
 
         System.out.println('\n' + "-*Economic growth information*-");
         System.out.println("Growth Rate for last cycle: " + ((asadModel.getGrowth() - 1) * 100) + '%');
-        System.out.println("Average growth Rate: " + (((asadModel.getOverallGrowth() - 1) * 100) / asadModel.getCyclesRun()) + '%');
+        System.out.println("Average growth Rate: " + (((asadModel.getOverallGrowth() - 1) * 100) / asadModel.getCyclesRun()) + '%'  + '\n');
     }
 
     private static double calculatePopulationGrowth(double intrinsicGrowthRate, int currentPopulation, double carryingCapacity) {
