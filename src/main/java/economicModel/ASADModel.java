@@ -8,7 +8,7 @@ public class ASADModel {
     private double longRunAggregateSupply;
     private double shortRunAggregateSupplyCurve;
     private double taxes;
-    private  double mpc;
+    private double mpc;
     private double mpi;
     private double mps;
     private double reserveRequirement;
@@ -120,24 +120,23 @@ public class ASADModel {
     }
 
     /**
-     * Find the interest rate multiplier based on how fast your economy is growing, how large your debt is, and how large your economy is. \frac{\sqrt{x^{2}+4}-x}{\left(2\cdot a+a\cdot b\right)}
+     * Find the interest rate multiplier based on how fast your economy is growing, how large your debt is, and how large your economy is. \frac{-x}{a+a\cdot b}
      *
-     * @param totalAssets
      * @param currentBalance
      * @return
      */
-    private double baseDebtInterestEquation(double totalAssets, double currentBalance) {
-        return 1 / (2 * totalAssets + totalAssets * overallGrowth) * (Math.sqrt(Math.pow(currentBalance, 2) + 4) - currentBalance); // may not work in cases of negative assets or very negative growth
+    private double calculateDebtInterestModifier(double currentBalance) {
+        return currentBalance / (longRunAggregateSupply + longRunAggregateSupply * overallGrowth);
     }
 
     void runCycle() {
         moneySupply = getMoneySupply(); // find money supply based on bonds and reserve requirement
 
         double interestRate = getInterestRate(); // find interest rate based on current money supply
-        govtBalance = taxes - GConstant;
+        govtBalance = taxes - GConstant; // find the government balance for this cycle
 
-        overallGovtBalance = calculateBalance(govtBalance, interestRate, overallGovtBalance);
-        GConstant = calculateSpending(govtBalance, interestRate, GConstant);
+        overallGovtBalance = calculateBalance(govtBalance, interestRate, overallGovtBalance); // add the current government balance to our overall government balance
+        GConstant = calculateSpendingAfterDebt(govtBalance, interestRate, GConstant); // subtract any debt servicing from our government spending if we have to
 
         G = getGovernmentSpending(); // overall government spending
 
@@ -151,12 +150,12 @@ public class ASADModel {
 
         outputGap = calculateOutputGap(); // find the output gap so that our price will be one
 
-        publicBalance = IConstant - I;
+        publicBalance = IConstant - I; // find the public balance for this cycle
 
-        overallPublicBalance = calculateBalance(publicBalance, interestRate, overallPublicBalance);
-        I = calculateSpending(publicBalance, interestRate, I);
+        overallPublicBalance = calculateBalance(publicBalance, interestRate, overallPublicBalance); // add the current public balance to our overall public balance
+        I = calculateSpendingAfterDebt(publicBalance, interestRate, I); // subtract any debt servicing from our public investing if we have to
 
-        calculateGrowthAndInflation();
+        calculateGrowthAndInflation(); // calculate our growth and inflation for this cycle and for the overall session
         previousOutput = equilibriumOutput;
         previousPriceLevel = priceLevel;
 
@@ -164,14 +163,14 @@ public class ASADModel {
     }
 
     public void calculateGrowthAndInflation() {
-        if (cyclesRun == 0) {
+        if (cyclesRun == 0) { // if this is the first cycle, set the variables
             originalOutput = equilibriumOutput;
             originalPriceLevel = priceLevel;
         } else {
-            growth = equilibriumOutput / previousOutput;
-            overallGrowth = equilibriumOutput / originalOutput;
-            inflation = priceLevel / previousPriceLevel;
-            overallInflation = priceLevel / originalPriceLevel;
+            growth = equilibriumOutput / previousOutput; // equilibrium output growth over previous cycle
+            overallGrowth = equilibriumOutput / originalOutput; // average equilibrium output growth over all cycles
+            inflation = priceLevel / previousPriceLevel; // inflation for this cycle
+            overallInflation = priceLevel / originalPriceLevel; // average inflation for all previous cycles
         }
     }
 
@@ -192,20 +191,23 @@ public class ASADModel {
     }
 
     private double calculateBalance(double balance, double interestRate, double overallBalance) {
-        if (balance < 0) {
-            double debtInterest = (baseDebtInterestEquation(longRunAggregateSupply, balance) + interestRate) / 2;
-            overallBalance += (balance + balance * debtInterest) * priceLevel;
-            overallBalance += ((debtRepaymentAmount + debtRepaymentAmount * debtInterest) * priceLevel);
-        } else if (balance > 0) {
-            overallBalance += (balance * priceLevel);
+        if (balance < 0) { // if we have a deficit
+            double debtInterestModifier = calculateDebtInterestModifier(balance); // calculate the debt interest modifier based on current output and size of current balance
+            double debtInterest = (debtInterestModifier + interestRate) / 2; // calculate the debt interest based on the overall interest rate added to modifier, divided by 2 (or the average if you will)
+            overallBalance += (balance + balance * debtInterest) * priceLevel; // add our current balance to the overall balance, taking into account debt interest and price level
+
+            overallBalance += ((debtRepaymentAmount + debtRepaymentAmount * debtInterest) * priceLevel); // add the debt repayment to the overall balance
+        } else if (balance > 0) { // if we have a surplus
+            overallBalance += (balance * priceLevel); // add balance to overall balance to the overall balance, taking into account price level
         }
         return overallBalance;
     }
 
-    private double calculateSpending(double balance, double interestRate, double spending) {
-        if (balance < 0) {
-            double debtInterest = (baseDebtInterestEquation(longRunAggregateSupply, balance) + interestRate) / 2;
-            spending -= (debtRepaymentAmount + debtRepaymentAmount * debtInterest);
+    private double calculateSpendingAfterDebt(double balance, double interestRate, double spending) {
+        if (balance < 0) { // if we have a deficit, else do nothing
+            double debtInterestModifier = calculateDebtInterestModifier(balance);// calculate the debt interest modifier based on current output and size of current balance
+            double debtInterest = (debtInterestModifier + interestRate) / 2; // calculate the debt interest based on the overall interest rate added to modifier, divided by 2 (or the average if you will)
+            spending -= (debtRepaymentAmount + debtRepaymentAmount * debtInterest); // remove the debt repayment amount from the spending
         }
         return spending;
     }
@@ -436,11 +438,11 @@ public class ASADModel {
         return ownedBonds;
     }
 
-    public double getOutputGap(){
+    public double getOutputGap() {
         return outputGap;
     }
 
-    public double getEquilibriumOutput(){
+    public double getEquilibriumOutput() {
         return equilibriumOutput;
     }
 }
