@@ -125,46 +125,44 @@ public class Main {
             } else if (mode.equals("a")) {
                 System.out.println("Enter number of cycles for AI to run");
                 int cyclesToRun = Integer.parseInt(scanner.nextLine());
-                while(cyclesToRun > 0){
-                    cyclesToRun--;
-                    runAICycle(ai, asadModel, solowSwanGrowthModel, savingsGrowth, technology, deprecation);
-                }
+                runAICycles(ai, asadModel, solowSwanGrowthModel, savingsGrowth, technology, deprecation, cyclesToRun);
             }
         }
     }
 
-    private static void runAICycle(AI ai, ASADModel asadModel, SolowSwanGrowthModel solowSwanGrowthModel, double savingsGrowth, double technology, double deprecation) throws Exception {
-        System.out.println("Cycle number " + (asadModel.getCyclesRun() + 1));
-        //System.out.println("Press enter to run Solow Model cycle");
-        //scanner.nextLine();
-        double populationGrowth = 0;
+    private static void runAICycles(AI ai, ASADModel asadModel, SolowSwanGrowthModel solowSwanGrowthModel, double savingsGrowth, double technology, double deprecation, int cyclesToRun) throws Exception {
+        while(cyclesToRun > solowSwanGrowthModel.getCyclesRun()) {
+            System.out.println("Cycle number " + (solowSwanGrowthModel.getCyclesRun() + 1));
+            //System.out.println("Press enter to run Solow Model cycle");
+            //scanner.nextLine();
+            double populationGrowth = 0;
 
-        if (asadModel.getCyclesRun() != 0) {
-            double intrinsicGrowth = 1 / (solowSwanGrowthModel.outputPerPerson * 1000);
-            double carryingCapacity = (int) solowSwanGrowthModel.outputPerPerson * 1000;
-            populationGrowth = calculatePopulationGrowth(intrinsicGrowth, solowSwanGrowthModel.labour, carryingCapacity);
-        }
+            if (asadModel.getCyclesRun() != 0) {
+                double intrinsicGrowth = 1 / (solowSwanGrowthModel.outputPerPerson * 1000);
+                double carryingCapacity = (int) solowSwanGrowthModel.outputPerPerson * 1000;
+                populationGrowth = calculatePopulationGrowth(intrinsicGrowth, solowSwanGrowthModel.labour, carryingCapacity);
+            }
 
-        solowSwanGrowthModel.runCycle(savingsGrowth, populationGrowth, technology, deprecation);
+            solowSwanGrowthModel.runCycle(savingsGrowth, populationGrowth, technology, deprecation);
 
-        //System.out.println("-*Solow Model Information*-");
-        //System.out.println("Population Growth rate: " + populationGrowth);
-        //System.out.println("Total Output: " + solowSwanGrowthModel.output);
+            //System.out.println("-*Solow Model Information*-");
+            //System.out.println("Population Growth rate: " + populationGrowth);
+            //System.out.println("Total Output: " + solowSwanGrowthModel.output);
 
-        asadModel.setLongRunAggregateSupply(solowSwanGrowthModel.getOutput());
+            asadModel.setLongRunAggregateSupply(solowSwanGrowthModel.getOutput());
 
-        asadModel.setC(asadModel.getLongRunAggregateSupply() * asadModel.getmpc());
-        asadModel.setIConstant(asadModel.getLongRunAggregateSupply() * asadModel.getmpi());
-        //inflation = quantity * velocity;
-        //money supply * velocity of money = price level * real gdp
-        //price level * real gdp = nominal gdp
-        //System.out.println('\n' + "Press enter to run ASAD Model cycle");
-        //scanner.nextLine();
-        asadModel.runCycle();
-        System.out.println("-*ASAD Model Information pre-adjustment*-");
-        printData(asadModel);
-       // System.out.println("Long Run Aggregate Supply: " + asadModel.longRunAggregateSupply);
-       // System.out.println("Average growth Rate: " + (((asadModel.overallGrowth - 1) * 100) / asadModel.cyclesRun) + '%');
+            asadModel.setC(asadModel.getLongRunAggregateSupply() * asadModel.getmpc());
+            asadModel.setIConstant(asadModel.getLongRunAggregateSupply() * asadModel.getmpi());
+            //inflation = quantity * velocity;
+            //money supply * velocity of money = price level * real gdp
+            //price level * real gdp = nominal gdp
+            //System.out.println('\n' + "Press enter to run ASAD Model cycle");
+            //scanner.nextLine();
+            asadModel.runCycle();
+            System.out.println("-*ASAD Model Information pre-adjustment*-");
+            printData(asadModel);
+            // System.out.println("Long Run Aggregate Supply: " + asadModel.longRunAggregateSupply);
+            // System.out.println("Average growth Rate: " + (((asadModel.overallGrowth - 1) * 100) / asadModel.cyclesRun) + '%');
 
        /* System.out.println('\n' + "Select option for ai testing:" +
                 '\n' + "r for rule based decisions" +
@@ -173,46 +171,51 @@ public class Main {
                 '\n' + "m for machine learning");
         String option = scanner.nextLine();*/
 
-        ArffLoader arffLoader = new ArffLoader();
-        File file = new File(ai.arffFilePath);
-        arffLoader.setFile(file);
-        Instances instances = arffLoader.getDataSet();
-        int bound;
-        if(instances.size() == 0){
-            bound = 3;
-        } else {
-            bound = 4;
-        }
-        Random random = new Random();
-        int option = random.nextInt(bound);
-        switch (option) {
-            case 0:
-                asadModel = ai.ruleBasedDecisions(asadModel);
-                break;
-            case 1:
-                asadModel = ai.fuzzyLogic(asadModel);
-                break;
-            case 2:
-                asadModel = ai.goalOrientedBehavior(asadModel);
-                break;
-            case 3:
-                asadModel = ai.machineLearningRegression(asadModel);
-                break;
-            default:
-                System.out.println("invalid option");
-                throw new Exception();
-        }
-        System.out.println('\n' + "-*ASAD Model Information Post-adjustment*-");
-        printData(asadModel);
-        //System.out.println("Long Run Aggregate Supply: " + asadModel.longRunAggregateSupply);
-        //System.out.println("Average growth Rate: " + (((asadModel.overallGrowth - 1) * 100) / asadModel.cyclesRun) + '%' + '\n');
+            ArffLoader arffLoader = new ArffLoader();
+            File file = new File(ai.arffFilePath);
+            arffLoader.setFile(file);
+            Instances instances = arffLoader.getDataSet();
+            int bound;
+            if (instances.size() == 0) {
+                bound = 3;
+            } else {
+                bound = 4;
+            }
+            Random random = new Random();
+            int option = random.nextInt(bound);
+            switch (option) {
+                case 0:
+                    System.out.println("Rule Based Decisions Selected");
+                    asadModel = ai.ruleBasedDecisions(asadModel);
+                    break;
+                case 1:
+                    System.out.println("Fuzzy Logic Selected");
+                    asadModel = ai.fuzzyLogic(asadModel);
+                    break;
+                case 2:
+                    System.out.println("Goal Oriented Behavior Selected");
+                    asadModel = ai.goalOrientedBehavior(asadModel);
+                    break;
+                case 3:
+                    System.out.println("Machine Learning Selected");
+                    asadModel = ai.machineLearningRegression(asadModel);
+                    break;
+                default:
+                    System.out.println("invalid option");
+                    throw new Exception();
+            }
+            System.out.println('\n' + "-*ASAD Model Information Post-adjustment*-");
+            printData(asadModel);
+            //System.out.println("Long Run Aggregate Supply: " + asadModel.longRunAggregateSupply);
+            //System.out.println("Average growth Rate: " + (((asadModel.overallGrowth - 1) * 100) / asadModel.cyclesRun) + '%' + '\n');
 
-        technology += (asadModel.getI() / 1000);
-        System.out.println("Technology Level: " + technology);
-        //System.out.println('\n' + "Press enter to continue to next cycle, or type e and press enter to end program");
+            technology += (asadModel.getI() / 1000);
+            System.out.println("Technology Level: " + technology + '\n');
+            //System.out.println('\n' + "Press enter to continue to next cycle, or type e and press enter to end program");
         /*if (scanner.nextLine().equals("e")) {
             isPlaying = false;
         }*/
+        }
     }
 
     private static void printData(ASADModel asadModel) {
@@ -238,12 +241,12 @@ public class Main {
         System.out.println('\n' + "-*Debt and deficit Data*-");
         System.out.println("Government Balance: " + asadModel.getGovtBalance());
         System.out.println("Public Balance: " + asadModel.getPublicBalance());
-        System.out.println("Total Government Debt: " + asadModel.getOverallGovtBalance());
-        System.out.println("Total Public Debt: " + asadModel.getOverallPublicBalance());
+        System.out.println("Total Government Balance: " + asadModel.getOverallGovtBalance());
+        System.out.println("Total Public Balance: " + asadModel.getOverallPublicBalance());
 
         System.out.println('\n' + "-*Economic growth information*-");
         System.out.println("Growth Rate for last cycle: " + ((asadModel.getGrowth() - 1) * 100) + '%');
-        System.out.println("Average growth Rate: " + (((asadModel.getOverallGrowth() - 1) * 100) / asadModel.getCyclesRun()) + '%'  + '\n');
+        System.out.println("Average growth Rate: " + (((asadModel.getOverallGrowth() - 1) * 100) / asadModel.getCyclesRun()) + '%' +'\n');
     }
 
     private static double calculatePopulationGrowth(double intrinsicGrowthRate, int currentPopulation, double carryingCapacity) {
