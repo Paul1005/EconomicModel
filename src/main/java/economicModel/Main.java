@@ -48,18 +48,18 @@ public class Main {
                 double populationGrowth = 0;
 
                 if (asadModel.getCyclesRun() != 0) {
-                    double intrinsicGrowth = 1 / (solowSwanGrowthModel.outputPerPerson * 1000);
-                    double carryingCapacity = (int) solowSwanGrowthModel.outputPerPerson * 1000;
-                    populationGrowth = calculatePopulationGrowth(intrinsicGrowth, solowSwanGrowthModel.labour, carryingCapacity);
+                    double intrinsicGrowth = 1 / (solowSwanGrowthModel.getOutputPerPerson() * 1000);
+                    double carryingCapacity = (int) solowSwanGrowthModel.getOutputPerPerson() * 1000;
+                    populationGrowth = calculatePopulationGrowth(intrinsicGrowth, solowSwanGrowthModel.getLabour(), carryingCapacity);
                 }
 
                 solowSwanGrowthModel.runCycle(savingsGrowth, populationGrowth, technology, deprecation);
 
                 System.out.println("-*Solow Model Information*-");
                 System.out.println("Population Growth rate: " + populationGrowth);
-                System.out.println("Total Output: " + solowSwanGrowthModel.output);
+                System.out.println("Total Output: " + solowSwanGrowthModel.getOutput());
 
-                asadModel.setLongRunAggregateSupply(solowSwanGrowthModel.output);
+                asadModel.setLongRunAggregateSupply(solowSwanGrowthModel.getOutput());
 
                 // TODO: not sure if these are ideal
                 asadModel.setC(asadModel.getLongRunAggregateSupply() * asadModel.getmpc());
@@ -140,9 +140,9 @@ public class Main {
             double populationGrowth = 0;
 
             if (asadModel.getCyclesRun() != 0) {
-                double intrinsicGrowth = 1 / (solowSwanGrowthModel.outputPerPerson * 1000);
-                double carryingCapacity = (int) solowSwanGrowthModel.outputPerPerson * 1000;
-                populationGrowth = calculatePopulationGrowth(intrinsicGrowth, solowSwanGrowthModel.labour, carryingCapacity);
+                double intrinsicGrowth = 1 / (solowSwanGrowthModel.getOutputPerPerson() * 1000);
+                double carryingCapacity = (int) solowSwanGrowthModel.getOutputPerPerson() * 1000;
+                populationGrowth = calculatePopulationGrowth(intrinsicGrowth, solowSwanGrowthModel.getLabour(), carryingCapacity);
             }
 
             solowSwanGrowthModel.runCycle(savingsGrowth, populationGrowth, technology, deprecation);

@@ -224,16 +224,8 @@ public class ASADModel {
         return (Math.sqrt(4 * C * longRunAggregateSupply + Math.pow(G, 2) + 2 * G * taxes * taxMultiplier + 4 * longRunAggregateSupply * I + Math.pow(taxes, 2) * Math.pow(taxMultiplier, 2)) + G + taxes * taxMultiplier) / (2 * longRunAggregateSupply);
     }
 
-    public double getPriceLevel(){
-        return priceLevel;
-    }
-
     private double calculateMoneySupply() {
         return ownedBonds / reserveRequirement;
-    }
-
-    public double getMoneySupply(){
-        return moneySupply;
     }
 
     double calculateReserveMultiplier(double investmentRequired) {
@@ -453,5 +445,13 @@ public class ASADModel {
 
     public double getEquilibriumOutput() {
         return equilibriumOutput;
+    }
+
+    public double getPriceLevel(){
+        return priceLevel;
+    }
+
+    public double getMoneySupply(){
+        return moneySupply;
     }
 }

@@ -11,12 +11,9 @@ import net.sourceforge.jFuzzyLogic.FIS;
 import java.io.File;
 import java.io.IOException;
 import java.util.Random;
+
 //TODO: need to test to see which of these techniques works best, and if they perform better than a human
 public class AI {
-    private double bondChange;
-    private double reserveMultiplier;
-    private double spendingChange;
-    private double taxChange;
     private Random random;
     public String arffFilePath;
     private double oldLRAS;
@@ -27,27 +24,25 @@ public class AI {
         oldLRAS = -1;
     }
 
-    private void calculateRequiredChanges(ASADModel asadModel) {
-        double investmentRequired = asadModel.calculateInvestmentRequired(); // find how much investment we need
-        bondChange = asadModel.calculateBondChange(investmentRequired);
-        reserveMultiplier = asadModel.calculateReserveMultiplier(investmentRequired);
-        spendingChange = asadModel.calculateSpendingChange();
-        taxChange = asadModel.calculateTaxChange();
-    }
-
     // rule based AI
     public ASADModel ruleBasedDecisions(ASADModel asadModel) throws Exception {
-        calculateRequiredChanges(asadModel);
+        double spendingChange = asadModel.calculateSpendingChange();
+        double taxChange = asadModel.calculateTaxChange();
+
+        double investmentRequired = asadModel.calculateInvestmentRequired();
+        double bondChange = asadModel.calculateBondChange(investmentRequired);
+        double reserveMultiplier = asadModel.calculateReserveMultiplier(investmentRequired);
+
         if (asadModel.getOverallPublicBalance() < asadModel.getOverallGovtBalance()) { // if our govt finances are better than public finances
-            govtIsRich(asadModel);
+            govtIsRich(asadModel, spendingChange, taxChange, bondChange, reserveMultiplier);
         } else if (asadModel.getOverallPublicBalance() > asadModel.getOverallGovtBalance()) { // if our public finances are better than govt finances
-            publicIsRich(asadModel);
+            publicIsRich(asadModel, spendingChange, taxChange, bondChange, reserveMultiplier);
         } else if (asadModel.getOverallPublicBalance() == asadModel.getOverallGovtBalance()) { // if they are identical
             int choice = random.nextInt(2);
             if (choice == 0) {
-                govtIsRich(asadModel);
+                govtIsRich(asadModel, spendingChange, taxChange, bondChange, reserveMultiplier);
             } else if (choice == 1) {
-                publicIsRich(asadModel);
+                publicIsRich(asadModel, spendingChange, taxChange, bondChange, reserveMultiplier);
             }
         }
 
@@ -55,7 +50,7 @@ public class AI {
         return asadModel;
     }
 
-    private void publicIsRich(ASADModel asadModel) {
+    private void publicIsRich(ASADModel asadModel, double spendingChange, double taxChange, double bondChange, double reserveMultiplier) {
         int choice = random.nextInt(2);
         if (asadModel.getOutputGap() > 0) {  // if equilibrium output is above lras
             if (choice == 0) {
@@ -72,7 +67,7 @@ public class AI {
         }
     }
 
-    private void govtIsRich(ASADModel asadModel) {
+    private void govtIsRich(ASADModel asadModel, double spendingChange, double taxChange, double bondChange, double reserveMultiplier) {
         int choice = random.nextInt(2);
         if (asadModel.getOutputGap() > 0) { // if equilibrium output is above lras
             if (choice == 0) {
@@ -82,7 +77,6 @@ public class AI {
             }
         } else if (asadModel.getOutputGap() < 0) { // if equilibrium output is below lras
             if (choice == 0) {
-
                 asadModel.changeSpending(spendingChange);
             } else if (choice == 1) {
                 asadModel.changeTaxes(taxChange);
@@ -243,13 +237,13 @@ public class AI {
             } else if (i == 3) {
                 denseInstance[i] = asadModel.getReserveRequirement() * positiveReserveMultiplier;
             } else if (i == 4) {
-                denseInstance[i- 4] = asadModel.getTaxes() - taxChange;
+                denseInstance[i - 4] = asadModel.getTaxes() - taxChange;
             } else if (i == 5) {
-                denseInstance[i- 4] = asadModel.getG() - spendingChange;
+                denseInstance[i - 4] = asadModel.getG() - spendingChange;
             } else if (i == 6) {
-                denseInstance[i- 4] = asadModel.getOwnedBonds() - bondChange;
+                denseInstance[i - 4] = asadModel.getOwnedBonds() - bondChange;
             } else if (i == 7) {
-                denseInstance[i- 4] = asadModel.getReserveRequirement() * negativeReserveMultiplier;
+                denseInstance[i - 4] = asadModel.getReserveRequirement() * negativeReserveMultiplier;
             } else {
                 // leave things the same
             }
@@ -286,7 +280,7 @@ public class AI {
         } else {
             LRASGrowth = asadModel.getLongRunAggregateSupply() / oldLRAS;
         }
-        if(asadModel.getCyclesRun() > 3){ // only run it if we have run enough cycles to see lras growth
+        if (asadModel.getCyclesRun() > 3) { // only run it if we have run enough cycles to see lras growth
             ArffLoader arffLoader = new ArffLoader();
             File file = new File(arffFilePath);
             arffLoader.setFile(file);
