@@ -20,7 +20,7 @@ public class SolowSwanGrowthModel {
 
     public void runCycle(double savingsGrowth, double populationGrowth, double technology, double depreciation) {
         a = 1.0 / 3.0;
-        productivityPerWorker = 1.0;
+        productivityPerWorker = 1.0; // maybe modify this with the ASAD model
         eL = productivityPerWorker * labour;
 
         capitalPerPerson = capital / labour;

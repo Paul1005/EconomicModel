@@ -21,7 +21,7 @@ public class ASADModel {
     private double C; // Should maybe be affected by inflation
     private double aggregateDemandOutputCurve;
     private double equilibriumOutput;
-    private double I;
+    private double I; // Should we have public and government investment?
 
     private double taxMultiplier;
     private double spendingMultiplier;
@@ -130,23 +130,23 @@ public class ASADModel {
     }
 
     void runCycle() {
-        moneySupply = getMoneySupply(); // find money supply based on bonds and reserve requirement
+        moneySupply = calculateMoneySupply(); // find money supply based on bonds and reserve requirement
 
-        double interestRate = getInterestRate(); // find interest rate based on current money supply
+        double interestRate = calculateInterestRate(); // find interest rate based on current money supply
         govtBalance = taxes - GConstant; // find the government balance for this cycle
 
         overallGovtBalance = calculateBalance(govtBalance, interestRate, overallGovtBalance); // add the current government balance to our overall government balance
         GConstant = calculateSpendingAfterDebt(govtBalance, interestRate, GConstant); // subtract any debt servicing from our government spending if we have to
 
-        G = getGovernmentSpending(); // overall government spending
+        G = calculateGovernmentSpending(); // overall government spending
 
         I = investmentEquation(interestRate); // overall investment
 
         equilibriumOutput = calculateEquilibriumOutput(); // should equal LRAS when price is set to one
 
-        priceLevel = getPriceLevel(); // find our equilibrium price level
-        aggregateDemandOutputCurve = getAggregateDemandOutput(); // this is the aggregate demand curve
-        shortRunAggregateSupplyCurve = getShortRunAggregateSupply(); // this is the short run aggregate supply curve
+        priceLevel = calculatePriceLevel(); // find our equilibrium price level
+        aggregateDemandOutputCurve = calculateAggregateDemandOutput(); // this is the aggregate demand curve
+        shortRunAggregateSupplyCurve = calculateShortRunAggregateSupply(); // this is the short run aggregate supply curve
 
         outputGap = calculateOutputGap(); // find the output gap so that our price will be one
 
@@ -162,7 +162,7 @@ public class ASADModel {
         cyclesRun++;
     }
 
-    public void calculateGrowthAndInflation() {
+    private void calculateGrowthAndInflation() {
         if (cyclesRun == 0) { // if this is the first cycle, set the variables
             originalOutput = equilibriumOutput;
             originalPriceLevel = priceLevel;
@@ -174,27 +174,27 @@ public class ASADModel {
         }
     }
 
-    public double getShortRunAggregateSupply() {
+    private double calculateShortRunAggregateSupply() {
         return longRunAggregateSupply * priceLevel;
     }
 
-    public double getAggregateDemandOutput() {
-        return (C + I) / priceLevel + G + taxes * taxMultiplier;
+    private double calculateAggregateDemandOutput() {
+        return (C + I) / priceLevel + G + taxes * taxMultiplier; // not sure what should be affected by inflation
     }
 
-    public double calculateOutputGap() {
+    private double calculateOutputGap() {
         return equilibriumOutput - longRunAggregateSupply;
     }
 
-    public double getInterestRate() {
+    private double calculateInterestRate() {
         return (longRunAggregateSupply - moneySupply) / longRunAggregateSupply;
     }
 
     private double calculateBalance(double balance, double interestRate, double overallBalance) {
         if (balance < 0) { // if we have a deficit
             double debtInterestModifier = calculateDebtInterestModifier(balance); // calculate the debt interest modifier based on current output and size of current balance
-            double debtInterest = (debtInterestModifier + interestRate) / 2; // calculate the debt interest based on the overall interest rate added to modifier, divided by 2 (or the average if you will)
-            overallBalance += (balance + balance * debtInterest) * priceLevel; // add our current balance to the overall balance, taking into account debt interest and price level
+            double debtInterest = (debtInterestModifier + (interestRate / 100)) / 2; // calculate the debt interest based on the overall interest rate added to modifier, divided by 2 (or the average if you will)
+            overallBalance += ((balance + balance * debtInterest) * priceLevel); // add our current balance to the overall balance, taking into account debt interest and price level
 
             overallBalance += ((debtRepaymentAmount + debtRepaymentAmount * debtInterest) * priceLevel); // add the debt repayment to the overall balance
         } else if (balance > 0) { // if we have a surplus
@@ -206,28 +206,35 @@ public class ASADModel {
     private double calculateSpendingAfterDebt(double balance, double interestRate, double spending) {
         if (balance < 0) { // if we have a deficit, else do nothing
             double debtInterestModifier = calculateDebtInterestModifier(balance);// calculate the debt interest modifier based on current output and size of current balance
-            double debtInterest = (debtInterestModifier + interestRate) / 2; // calculate the debt interest based on the overall interest rate added to modifier, divided by 2 (or the average if you will)
+            double debtInterest = (debtInterestModifier + (interestRate / 100)) / 2; // calculate the debt interest based on the overall interest rate added to modifier, divided by 2 (or the average if you will)
             spending -= (debtRepaymentAmount + debtRepaymentAmount * debtInterest); // remove the debt repayment amount from the spending
         }
         return spending;
     }
 
-    public double getGovernmentSpending() {
+    private double calculateGovernmentSpending() {
         return GConstant * spendingMultiplier;
     }
 
-    public double calculateEquilibriumOutput() {
+    private double calculateEquilibriumOutput() {
         return C + taxes * taxMultiplier + G + I;
     }
 
-    public double getPriceLevel() {
+    private double calculatePriceLevel() {
         return (Math.sqrt(4 * C * longRunAggregateSupply + Math.pow(G, 2) + 2 * G * taxes * taxMultiplier + 4 * longRunAggregateSupply * I + Math.pow(taxes, 2) * Math.pow(taxMultiplier, 2)) + G + taxes * taxMultiplier) / (2 * longRunAggregateSupply);
     }
 
-    public double getMoneySupply() {
+    public double getPriceLevel(){
+        return priceLevel;
+    }
+
+    private double calculateMoneySupply() {
         return ownedBonds / reserveRequirement;
     }
 
+    public double getMoneySupply(){
+        return moneySupply;
+    }
 
     double calculateReserveMultiplier(double investmentRequired) {
         double interestRate = interestRateEquation(investmentRequired); // find the new interest rate based on the investment we need.
@@ -247,7 +254,7 @@ public class ASADModel {
         return gap * reserveRequirement; // determine how many more bonds we need to buy or sell
     }
 
-    public double getInvestmentRequired() {
+    public double calculateInvestmentRequired() {
         return longRunAggregateSupply - C - G - taxes * taxMultiplier;
     }
 
@@ -290,8 +297,14 @@ public class ASADModel {
         overallGrowth = i;
     }
 
+    public void setGrowth(double i) { growth = i; }
+
     public void setOverallInflation(double i) {
         overallInflation = i;
+    }
+
+    public void setInflation(double i) {
+        inflation = i;
     }
 
     public void setOwnedBonds(double i) {

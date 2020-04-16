@@ -11,7 +11,7 @@ import net.sourceforge.jFuzzyLogic.FIS;
 import java.io.File;
 import java.io.IOException;
 import java.util.Random;
-
+//TODO: need to test to see which of these techniques works best, and if they perform better than a human
 public class AI {
     private double bondChange;
     private double reserveMultiplier;
@@ -27,8 +27,8 @@ public class AI {
         oldLRAS = -1;
     }
 
-    public void calculateRequiredChanges(ASADModel asadModel) {
-        double investmentRequired = asadModel.getInvestmentRequired(); // find how much investment we need
+    private void calculateRequiredChanges(ASADModel asadModel) {
+        double investmentRequired = asadModel.calculateInvestmentRequired(); // find how much investment we need
         bondChange = asadModel.calculateBondChange(investmentRequired);
         reserveMultiplier = asadModel.calculateReserveMultiplier(investmentRequired);
         spendingChange = asadModel.calculateSpendingChange();
@@ -274,7 +274,7 @@ public class AI {
     }
 
     // regression
-    public void runCycleAndRecordInfo(ASADModel asadModel) throws Exception {
+    private void runCycleAndRecordInfo(ASADModel asadModel) throws Exception {
         asadModel.runCycle();
         recordInfo(asadModel);
     }
