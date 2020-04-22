@@ -110,13 +110,22 @@ public class ASADModel {
     }
 
     /**
-     * Find money supply based on interest rate and long run aggregate supply.
+     * Find money supply based on interest rate and long run aggregate supply. a\cdot e^{-x}
      *
      * @param interestRate
      * @return
      */
     private double calculateMoneySupply(double interestRate) {
-        return -interestRate * longRunAggregateSupply + longRunAggregateSupply; // might need to upgrade this
+        return longRunAggregateSupply * Math.pow(Math.E, -interestRate); // might need to upgrade this
+    }
+
+    /**
+     * Find interest rate based on money supply and long run aggregate supply (is the inverse of the above). -\log x+\log a
+     *
+     * @return
+     */
+    private double calculateInterestRate() {
+        return Math.log(longRunAggregateSupply) - Math.log(moneySupply); // might need to upgrade this
     }
 
     /**
@@ -127,10 +136,6 @@ public class ASADModel {
      */
     private double calculateInterestRateModifier(double currentBalance) {
         return -currentBalance / (longRunAggregateSupply + longRunAggregateSupply * overallGrowth);
-    }
-
-    private double calculateInterestRate() {
-        return (longRunAggregateSupply - moneySupply) / longRunAggregateSupply; // might need to upgrade this
     }
 
     void runCycle() {
@@ -193,7 +198,7 @@ public class ASADModel {
     private double calculateBalance(double balance, double interestRate, double overallBalance) {
         if (balance < 0) { // if we have a deficit
             double debtInterestModifier = calculateInterestRateModifier(balance); // calculate the debt interest modifier based on current output and size of current balance
-            double debtInterest = (debtInterestModifier + (interestRate / 100)) / 2; // calculate the debt interest based on the overall interest rate added to modifier, divided by 2 (or the average if you will)
+            double debtInterest = getFinalDebtInterest(interestRate, debtInterestModifier); // calculate the debt interest based on the overall interest rate added to modifier, divided by 2 (or the average if you will)
             overallBalance += ((balance + balance * debtInterest) * priceLevel); // add our current balance to the overall balance, taking into account debt interest and price level
 
             overallBalance += ((debtRepaymentAmount + debtRepaymentAmount * debtInterest) * priceLevel); // add the debt repayment to the overall balance
@@ -203,10 +208,14 @@ public class ASADModel {
         return overallBalance;
     }
 
+    private double getFinalDebtInterest(double interestRate, double debtInterestModifier) {
+        return (debtInterestModifier + interestRate) / 2;
+    }
+
     private double calculateSpendingAfterDebt(double balance, double interestRate, double spending) {
         if (balance < 0) { // if we have a deficit, else do nothing
             double debtInterestModifier = calculateInterestRateModifier(balance);// calculate the debt interest modifier based on current output and size of current balance
-            double debtInterest = (debtInterestModifier + (interestRate / 100)) / 2; // calculate the debt interest based on the overall interest rate added to modifier, divided by 2 (or the average if you will)
+            double debtInterest = getFinalDebtInterest(interestRate, debtInterestModifier); // calculate the debt interest based on the overall interest rate added to modifier, divided by 2 (or the average if you will)
             spending -= (debtRepaymentAmount + debtRepaymentAmount * debtInterest); // remove the debt repayment amount from the spending
         }
         return spending;
@@ -289,7 +298,9 @@ public class ASADModel {
         overallGrowth = i;
     }
 
-    public void setGrowth(double i) { growth = i; }
+    public void setGrowth(double i) {
+        growth = i;
+    }
 
     public void setOverallInflation(double i) {
         overallInflation = i;
@@ -447,11 +458,11 @@ public class ASADModel {
         return equilibriumOutput;
     }
 
-    public double getPriceLevel(){
+    public double getPriceLevel() {
         return priceLevel;
     }
 
-    public double getMoneySupply(){
+    public double getMoneySupply() {
         return moneySupply;
     }
 }
