@@ -50,6 +50,8 @@ public class ASADModel {
     //default constructor
     public ASADModel() {
         cyclesRun = 0;
+        averageInflation = inflation = overallInflation = 1;
+        growth = overallGrowth = 1;
     }
 
     //copy constructor
@@ -177,8 +179,6 @@ public class ASADModel {
         if (cyclesRun == 0) { // if this is the first cycle, set the variables
             originalOutput = equilibriumOutput;
             originalPriceLevel = priceLevel;
-            averageInflation = inflation = overallInflation = 1;
-            growth = overallGrowth = 1;
         } else {
             growth = equilibriumOutput / previousOutput; // equilibrium output growth over previous cycle
             overallGrowth = equilibriumOutput / originalOutput; // average equilibrium output growth over all cycles
