@@ -16,11 +16,6 @@ public class Main {
         SolowSwanGrowthModel solowSwanGrowthModel = new SolowSwanGrowthModel();
         //starting variables
         asadModel.setDebtRepaymentAmount(1);
-        asadModel.setCyclesRun(0);
-        asadModel.setGrowth(1);
-        asadModel.setInflation(1);
-        asadModel.setOverallGrowth(1);
-        asadModel.setOverallInflation(1);
         double technology = 1;
         double deprecation = 0.005;
         solowSwanGrowthModel.setCapital(18000);

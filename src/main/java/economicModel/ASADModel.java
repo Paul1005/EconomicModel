@@ -44,11 +44,12 @@ public class ASADModel {
     private double previousPriceLevel;
     private double originalPriceLevel;
     private double overallInflation;
+    private double averageInflation;
     private double inflation;
 
     //default constructor
     public ASADModel() {
-
+        cyclesRun = 0;
     }
 
     //copy constructor
@@ -87,26 +88,27 @@ public class ASADModel {
         this.originalPriceLevel = asadModel.originalPriceLevel;
         this.overallInflation = asadModel.overallInflation;
         this.inflation = asadModel.inflation;
+        this.averageInflation = asadModel.averageInflation;
     }
 
     /**
-     * Find investment based on interest rate, IConstant, and mpi. Is the inverse(swap x and y) of the equation below. \frac{a\sqrt{\sqrt{x^{2}+4}-x}}{\sqrt{2}\cdot b}
+     * Find investment based on interest rate, IConstant, and average inflation. Is the inverse(swap x and y) of the equation below. \frac{a\sqrt{\sqrt{x^{2}+4}-x}}{\sqrt{2}\cdot b}
      *
      * @param interestRate
      * @return
      */
     private double calculateInvestmentGivenInterestRate(double interestRate) {
-        return IConstant * Math.sqrt(Math.sqrt(Math.pow(interestRate, 2) + 4) - interestRate) / (Math.sqrt(2) * overallInflation);
+        return IConstant * Math.sqrt(Math.sqrt(Math.pow(interestRate, 2) + 4) - interestRate) / (Math.sqrt(2) * averageInflation);
     }
 
     /**
-     * Find interest rate based on investment, IConstant, and mpi. Is the inverse(swap x and y) of the equation above. \frac{a^{4}-b^{4}\cdot x^{4}}{a^{2}\cdot b^{2}\cdot x^{2}}
+     * Find interest rate based on investment, IConstant, and average inflation. Is the inverse(swap x and y) of the equation above. \frac{a^{4}-b^{4}\cdot x^{4}}{a^{2}\cdot b^{2}\cdot x^{2}}
      *
      * @param investmentRequired
      * @return
      */
     private double calculateInterestRateGivenInvestment(double investmentRequired) {
-        return (Math.pow(IConstant, 4) - Math.pow(overallInflation, 4) * Math.pow(investmentRequired, 4)) / (Math.pow(IConstant, 2) * Math.pow(overallInflation, 2) * Math.pow(investmentRequired, 2));
+        return (Math.pow(IConstant, 4) - Math.pow(averageInflation, 4) * Math.pow(investmentRequired, 4)) / (Math.pow(IConstant, 2) * Math.pow(averageInflation, 2) * Math.pow(investmentRequired, 2));
     }
 
     /**
@@ -175,11 +177,14 @@ public class ASADModel {
         if (cyclesRun == 0) { // if this is the first cycle, set the variables
             originalOutput = equilibriumOutput;
             originalPriceLevel = priceLevel;
+            averageInflation = inflation = overallInflation = 1;
+            growth = overallGrowth = 1;
         } else {
             growth = equilibriumOutput / previousOutput; // equilibrium output growth over previous cycle
             overallGrowth = equilibriumOutput / originalOutput; // average equilibrium output growth over all cycles
             inflation = priceLevel / previousPriceLevel; // inflation for this cycle
             overallInflation = priceLevel / originalPriceLevel; // average inflation for all previous cycles
+            averageInflation = overallInflation / cyclesRun;
         }
     }
 
