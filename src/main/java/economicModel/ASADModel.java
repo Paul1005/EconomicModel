@@ -95,7 +95,7 @@ public class ASADModel {
      * @param interestRate
      * @return
      */
-    private double investmentEquation(double interestRate) {
+    private double calculateInvestmentGivenInterestRate(double interestRate) {
         return IConstant * Math.sqrt(Math.sqrt(Math.pow(interestRate, 2) + 4) - interestRate) / (Math.sqrt(2) * overallInflation);
     }
 
@@ -105,7 +105,7 @@ public class ASADModel {
      * @param investmentRequired
      * @return
      */
-    private double interestRateEquation(double investmentRequired) {
+    private double calculateInterestRateGivenInvestment(double investmentRequired) {
         return (Math.pow(IConstant, 4) - Math.pow(overallInflation, 4) * Math.pow(investmentRequired, 4)) / (Math.pow(IConstant, 2) * Math.pow(overallInflation, 2) * Math.pow(investmentRequired, 2));
     }
 
@@ -115,8 +115,8 @@ public class ASADModel {
      * @param interestRate
      * @return
      */
-    private double moneySupplyEquation(double interestRate) {
-        return -interestRate * longRunAggregateSupply + longRunAggregateSupply;
+    private double calculateMoneySupply(double interestRate) {
+        return -interestRate * longRunAggregateSupply + longRunAggregateSupply; // might need to upgrade this
     }
 
     /**
@@ -125,8 +125,12 @@ public class ASADModel {
      * @param currentBalance
      * @return
      */
-    private double calculateDebtInterestModifier(double currentBalance) {
-        return currentBalance / (longRunAggregateSupply + longRunAggregateSupply * overallGrowth);
+    private double calculateInterestRateModifier(double currentBalance) {
+        return -currentBalance / (longRunAggregateSupply + longRunAggregateSupply * overallGrowth);
+    }
+
+    private double calculateInterestRate() {
+        return (longRunAggregateSupply - moneySupply) / longRunAggregateSupply; // might need to upgrade this
     }
 
     void runCycle() {
@@ -140,7 +144,7 @@ public class ASADModel {
 
         G = calculateGovernmentSpending(); // overall government spending
 
-        I = investmentEquation(interestRate); // overall investment
+        I = calculateInvestmentGivenInterestRate(interestRate); // overall investment
 
         equilibriumOutput = calculateEquilibriumOutput(); // should equal LRAS when price is set to one
 
@@ -186,13 +190,9 @@ public class ASADModel {
         return equilibriumOutput - longRunAggregateSupply;
     }
 
-    private double calculateInterestRate() {
-        return (longRunAggregateSupply - moneySupply) / longRunAggregateSupply;
-    }
-
     private double calculateBalance(double balance, double interestRate, double overallBalance) {
         if (balance < 0) { // if we have a deficit
-            double debtInterestModifier = calculateDebtInterestModifier(balance); // calculate the debt interest modifier based on current output and size of current balance
+            double debtInterestModifier = calculateInterestRateModifier(balance); // calculate the debt interest modifier based on current output and size of current balance
             double debtInterest = (debtInterestModifier + (interestRate / 100)) / 2; // calculate the debt interest based on the overall interest rate added to modifier, divided by 2 (or the average if you will)
             overallBalance += ((balance + balance * debtInterest) * priceLevel); // add our current balance to the overall balance, taking into account debt interest and price level
 
@@ -205,7 +205,7 @@ public class ASADModel {
 
     private double calculateSpendingAfterDebt(double balance, double interestRate, double spending) {
         if (balance < 0) { // if we have a deficit, else do nothing
-            double debtInterestModifier = calculateDebtInterestModifier(balance);// calculate the debt interest modifier based on current output and size of current balance
+            double debtInterestModifier = calculateInterestRateModifier(balance);// calculate the debt interest modifier based on current output and size of current balance
             double debtInterest = (debtInterestModifier + (interestRate / 100)) / 2; // calculate the debt interest based on the overall interest rate added to modifier, divided by 2 (or the average if you will)
             spending -= (debtRepaymentAmount + debtRepaymentAmount * debtInterest); // remove the debt repayment amount from the spending
         }
@@ -229,8 +229,8 @@ public class ASADModel {
     }
 
     double calculateReserveMultiplier(double investmentRequired) {
-        double interestRate = interestRateEquation(investmentRequired); // find the new interest rate based on the investment we need.
-        double newMoneySupply = moneySupplyEquation(interestRate); // find the money supply we need based on the new interest rate
+        double interestRate = calculateInterestRateGivenInvestment(investmentRequired); // find the new interest rate based on the investment we need.
+        double newMoneySupply = calculateMoneySupply(interestRate); // find the money supply we need based on the new interest rate
         return moneySupply / newMoneySupply;
     }
 
@@ -240,8 +240,8 @@ public class ASADModel {
     }
 
     double calculateBondChange(double investmentRequired) {
-        double interestRate = interestRateEquation(investmentRequired); // find the new interest rate based on the investment we need.
-        double newMoneySupply = moneySupplyEquation(interestRate); // find the money supply we need based on the new interest rate
+        double interestRate = calculateInterestRateGivenInvestment(investmentRequired); // find the new interest rate based on the investment we need.
+        double newMoneySupply = calculateMoneySupply(interestRate); // find the money supply we need based on the new interest rate
         double gap = newMoneySupply - moneySupply; // determine how much more money we need
         return gap * reserveRequirement; // determine how many more bonds we need to buy or sell
     }

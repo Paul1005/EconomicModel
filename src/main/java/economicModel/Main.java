@@ -43,8 +43,6 @@ public class Main {
             String mode = scanner.nextLine();
             if (mode.equals("m")) {
                 System.out.println("Cycle number " + (solowSwanGrowthModel.getCyclesRun() + 1) + '\n');
-                System.out.println("Press enter to run Solow Model cycle");
-                scanner.nextLine();
                 double populationGrowth = 0;
 
                 if (asadModel.getCyclesRun() != 0) {
@@ -57,7 +55,7 @@ public class Main {
 
                 System.out.println("-*Solow Model Information*-");
                 System.out.println("Population Growth rate: " + populationGrowth);
-                System.out.println("Total Output: " + solowSwanGrowthModel.getOutput());
+                System.out.println("Total Output: " + solowSwanGrowthModel.getOutput() + '\n');
 
                 asadModel.setLongRunAggregateSupply(solowSwanGrowthModel.getOutput());
 
@@ -67,14 +65,13 @@ public class Main {
                 //inflation = quantity * velocity;
                 //money supply * velocity of money = price level * real gdp
                 //price level * real gdp = nominal gdp
-                System.out.println('\n' + "Press enter to run ASAD Model cycle");
-                scanner.nextLine();
                 asadModel.runCycle();
 
                 System.out.println("-*ASAD Model Information pre-adjustment*-");
                 printData(asadModel);
+                System.out.println("Technology Level: " + technology + '\n');
 
-                System.out.println('\n' + "Select option for policy adjustment:" +
+                System.out.println("Select option for policy adjustment:" +
                         '\n' + "t for taxes" +
                         '\n' + "g for government spending" +
                         '\n' + "m for money supply" +
@@ -163,6 +160,7 @@ public class Main {
             asadModel.runCycle();
             System.out.println("-*ASAD Model Information pre-adjustment*-");
             printData(asadModel);
+            System.out.println("Technology Level: " + technology + '\n');
             // System.out.println("Long Run Aggregate Supply: " + asadModel.longRunAggregateSupply);
             // System.out.println("Average growth Rate: " + (((asadModel.overallGrowth - 1) * 100) / asadModel.cyclesRun) + '%');
 
