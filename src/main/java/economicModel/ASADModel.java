@@ -115,7 +115,7 @@ public class ASADModel {
      * @param interestRate
      * @return
      */
-    private double calculateMoneySupply(double interestRate) {
+    private double calculateMoneySupplyGivenInterestRate(double interestRate) {
         return longRunAggregateSupply * Math.pow(Math.E, 100 * -interestRate);
     }
 
@@ -124,7 +124,7 @@ public class ASADModel {
      *
      * @return
      */
-    private double calculateInterestRate() {
+    private double calculateInterestRateGivenMoneySupply() {
         return (Math.log(longRunAggregateSupply) - Math.log(moneySupply)) / 100;
     }
 
@@ -141,7 +141,7 @@ public class ASADModel {
     void runCycle() {
         moneySupply = calculateMoneySupply(); // find money supply based on bonds and reserve requirement
 
-        double interestRate = calculateInterestRate(); // find interest rate based on current money supply
+        double interestRate = calculateInterestRateGivenMoneySupply(); // find interest rate based on current money supply
         govtBalance = taxes - GConstant; // find the government balance for this cycle
 
         overallGovtBalance = calculateBalance(govtBalance, interestRate, overallGovtBalance); // add the current government balance to our overall government balance
@@ -188,7 +188,8 @@ public class ASADModel {
     }
 
     private double calculateAggregateDemandOutput() {
-        return (C + I) / priceLevel + G + taxes * taxMultiplier; // not sure what should be affected by inflation
+        //return (C + I) / priceLevel + G + taxes * taxMultiplier; // not sure what should be affected by inflation
+        return (C + I + G + taxes * taxMultiplier) / priceLevel;
     }
 
     private double calculateOutputGap() {
@@ -230,7 +231,8 @@ public class ASADModel {
     }
 
     private double calculatePriceLevel() {
-        return (Math.sqrt(4 * C * longRunAggregateSupply + Math.pow(G, 2) + 2 * G * taxes * taxMultiplier + 4 * longRunAggregateSupply * I + Math.pow(taxes, 2) * Math.pow(taxMultiplier, 2)) + G + taxes * taxMultiplier) / (2 * longRunAggregateSupply);
+        //return (Math.sqrt(4 * C * longRunAggregateSupply + Math.pow(G, 2) + 2 * G * taxes * taxMultiplier + 4 * longRunAggregateSupply * I + Math.pow(taxes, 2) * Math.pow(taxMultiplier, 2)) + G + taxes * taxMultiplier) / (2 * longRunAggregateSupply);
+        return Math.sqrt(C + G + taxes * taxMultiplier + I) / Math.sqrt(longRunAggregateSupply);
     }
 
     private double calculateMoneySupply() {
@@ -239,7 +241,7 @@ public class ASADModel {
 
     double calculateReserveMultiplier(double investmentRequired) {
         double interestRate = calculateInterestRateGivenInvestment(investmentRequired); // find the new interest rate based on the investment we need.
-        double newMoneySupply = calculateMoneySupply(interestRate); // find the money supply we need based on the new interest rate
+        double newMoneySupply = calculateMoneySupplyGivenInterestRate(interestRate); // find the money supply we need based on the new interest rate
         return moneySupply / newMoneySupply;
     }
 
@@ -250,7 +252,7 @@ public class ASADModel {
 
     double calculateBondChange(double investmentRequired) {
         double interestRate = calculateInterestRateGivenInvestment(investmentRequired); // find the new interest rate based on the investment we need.
-        double newMoneySupply = calculateMoneySupply(interestRate); // find the money supply we need based on the new interest rate
+        double newMoneySupply = calculateMoneySupplyGivenInterestRate(interestRate); // find the money supply we need based on the new interest rate
         double gap = newMoneySupply - moneySupply; // determine how much more money we need
         return gap * reserveRequirement; // determine how many more bonds we need to buy or sell
     }
