@@ -116,7 +116,7 @@ public class ASADModel {
      * @return
      */
     private double calculateMoneySupply(double interestRate) {
-        return longRunAggregateSupply * Math.pow(Math.E, -interestRate); // might need to upgrade this
+        return longRunAggregateSupply * Math.pow(Math.E, 100 * -interestRate);
     }
 
     /**
@@ -125,7 +125,7 @@ public class ASADModel {
      * @return
      */
     private double calculateInterestRate() {
-        return Math.log(longRunAggregateSupply) - Math.log(moneySupply); // might need to upgrade this
+        return (Math.log(longRunAggregateSupply) - Math.log(moneySupply)) / 100;
     }
 
     /**
