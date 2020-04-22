@@ -111,6 +111,7 @@ public class Main {
                 printData(asadModel);
 
                 technology += (asadModel.getI() / 1000);
+                technology += (asadModel.getG() * asadModel.getmpi() / 1000);
                 System.out.println("Technology Level: " + technology);
                 System.out.println('\n' + "Press enter to continue to next cycle, or type e and press enter to end program");
                 if (scanner.nextLine().equals("e")) {
