@@ -259,8 +259,12 @@ public class ASADModel {
     }
 
     void changeReserveRequirements(double reserveMultiplier) {
-        System.out.println("Reserve Requirement changed by " + reserveMultiplier + '\n');
-        reserveRequirement *= reserveMultiplier; // determine the new reserve requirement based on the new and old money supply
+        if(reserveMultiplier == 0){
+            System.out.println("reserve multiplier can't be zero");
+        } else{
+            System.out.println("Reserve Requirement changed by " + reserveMultiplier + '\n');
+            reserveRequirement *= reserveMultiplier; // determine the new reserve requirement based on the new and old money supply
+        }
     }
 
     double calculateBondChange(double investmentRequired) {
@@ -275,8 +279,12 @@ public class ASADModel {
     }
 
     void changeMoneySupply(double bondChange) {
-        System.out.println("Bonds owned changed by " + bondChange + '\n');
-        ownedBonds += bondChange; // add the change in bonds
+        if (ownedBonds + bondChange <= 0) {
+            System.out.println("can't sell enough bonds");
+        } else {
+            System.out.println("Bonds owned changed by " + bondChange + '\n');
+            ownedBonds += bondChange; // add the change in bonds
+        }
     }
 
     double calculateSpendingChange() {
@@ -284,8 +292,12 @@ public class ASADModel {
     }
 
     void changeSpending(double spendingChange) {
-        System.out.println("Spending changed by " + spendingChange + '\n');
-        GConstant += spendingChange; // add spending change to government spending
+        if (GConstant + spendingChange <= 0) {
+            System.out.println("can't cut spending enough");
+        } else {
+            System.out.println("Spending changed by " + spendingChange + '\n');
+            GConstant += spendingChange; // add spending change to government spending
+        }
     }
 
     double calculateTaxChange() {
