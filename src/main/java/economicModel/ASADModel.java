@@ -156,7 +156,7 @@ public class ASADModel {
         C = calculateConsumption();
         I = calculateInvestmentGivenInterestRate(interestRate); // overall investment
 
-        publicBalance = longRunAggregateSupply - I - C - taxes; // find the public balance for this cycle
+        publicBalance = longRunAggregateSupply - I - C - taxes; // find the public balance for this cycle, might still need some adjusting
 
         overallPublicBalance = calculateBalance(publicBalance, interestRate, overallPublicBalance); // add the current public balance to our overall public balance
         I = calculateSpendingAfterDebt(publicBalance, interestRate, I, mpi); // subtract any debt servicing from our public investing if we have to
@@ -387,8 +387,8 @@ public class ASADModel {
         return I;
     }
 
-    public double getCConstant() {
-        return CConstant;
+    public double getC() {
+        return C;
     }
 
     public double getAggregateDemandOutputCurve() {

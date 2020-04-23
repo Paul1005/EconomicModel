@@ -122,13 +122,12 @@ public class Main {
     }
 
     private static double updateTechnology(ASADModel asadModel, double technology) {
-        // might need something better than this
-        technology += (Math.sqrt(asadModel.getI() + asadModel.getG() * asadModel.getmpi()) / 100);
+        technology += (Math.sqrt(asadModel.getI() + asadModel.getG() * asadModel.getmpi()) / 200);
         return technology;
     }
 
     private static void runAICycles(AI ai, ASADModel asadModel, SolowSwanGrowthModel solowSwanGrowthModel, double savingsGrowth, double technology, double deprecation, int cyclesToRun) throws Exception {
-        while(cyclesToRun > solowSwanGrowthModel.getCyclesRun()) {
+        while (cyclesToRun > solowSwanGrowthModel.getCyclesRun()) {
             System.out.println("Cycle number " + (solowSwanGrowthModel.getCyclesRun() + 1));
             //System.out.println("Press enter to run Solow Model cycle");
             //scanner.nextLine();
@@ -207,7 +206,7 @@ public class Main {
             //System.out.println("Long Run Aggregate Supply: " + asadModel.longRunAggregateSupply);
             //System.out.println("Average growth Rate: " + (((asadModel.overallGrowth - 1) * 100) / asadModel.cyclesRun) + '%' + '\n');
 
-            technology += (asadModel.getI() / 1000);
+            technology = updateTechnology(asadModel, technology);
             System.out.println("Technology Level: " + technology + '\n');
             //System.out.println('\n' + "Press enter to continue to next cycle, or type e and press enter to end program");
         /*if (scanner.nextLine().equals("e")) {
@@ -227,7 +226,7 @@ public class Main {
         System.out.println('\n' + "-*Financial Data*-");
         System.out.println("Taxes: " + asadModel.getTaxes());
         System.out.println("Government Spending: " + asadModel.getG());
-        System.out.println("Consumption: " + asadModel.getCConstant());
+        System.out.println("Consumption: " + asadModel.getC());
         System.out.println("Investment: " + asadModel.getI());
         System.out.println("Reserve Requirement: " + asadModel.getReserveRequirement());
 
@@ -244,7 +243,7 @@ public class Main {
 
         System.out.println('\n' + "-*Economic growth information*-");
         System.out.println("Growth Rate for last cycle: " + ((asadModel.getGrowth() - 1) * 100) + '%');
-        System.out.println("Average growth Rate: " + (((asadModel.getOverallGrowth() - 1) * 100) / asadModel.getCyclesRun()) + '%' +'\n');
+        System.out.println("Average growth Rate: " + (((asadModel.getOverallGrowth() - 1) * 100) / asadModel.getCyclesRun()) + '%' + '\n');
     }
 
     private static double calculatePopulationGrowth(double intrinsicGrowthRate, int currentPopulation, double carryingCapacity) {
