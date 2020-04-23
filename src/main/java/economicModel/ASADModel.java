@@ -252,19 +252,18 @@ public class ASADModel {
         return ownedBonds / reserveRequirement;
     }
 
+    double calculateSpendingChange() {
+        return outputGap / -spendingMultiplier; // find the change in spending required
+    }
+
+    double calculateTaxChange() {
+        return outputGap / -taxMultiplier; // find the change in taxes required
+    }
+
     double calculateReserveMultiplier(double investmentRequired) {
         double interestRate = calculateInterestRateGivenInvestment(investmentRequired); // find the new interest rate based on the investment we need.
         double newMoneySupply = calculateMoneySupplyGivenInterestRate(interestRate); // find the money supply we need based on the new interest rate
         return moneySupply / newMoneySupply;
-    }
-
-    void changeReserveRequirements(double reserveMultiplier) {
-        if(reserveMultiplier == 0){
-            System.out.println("reserve multiplier can't be zero");
-        } else{
-            System.out.println("Reserve Requirement changed by " + reserveMultiplier + '\n');
-            reserveRequirement *= reserveMultiplier; // determine the new reserve requirement based on the new and old money supply
-        }
     }
 
     double calculateBondChange(double investmentRequired) {
@@ -278,6 +277,15 @@ public class ASADModel {
         return longRunAggregateSupply - C - G;
     }
 
+    void changeReserveRequirements(double reserveMultiplier) {
+        if(reserveMultiplier == 0){
+            System.out.println("reserve multiplier can't be zero");
+        } else{
+            System.out.println("Reserve Requirement changed by " + reserveMultiplier + '\n');
+            reserveRequirement *= reserveMultiplier; // determine the new reserve requirement based on the new and old money supply
+        }
+    }
+
     void changeMoneySupply(double bondChange) {
         if (ownedBonds + bondChange <= 0) {
             System.out.println("can't sell enough bonds");
@@ -287,10 +295,6 @@ public class ASADModel {
         }
     }
 
-    double calculateSpendingChange() {
-        return outputGap / -spendingMultiplier; // find the change in spending required
-    }
-
     void changeSpending(double spendingChange) {
         if (GConstant + spendingChange <= 0) {
             System.out.println("can't cut spending enough");
@@ -298,10 +302,6 @@ public class ASADModel {
             System.out.println("Spending changed by " + spendingChange + '\n');
             GConstant += spendingChange; // add spending change to government spending
         }
-    }
-
-    double calculateTaxChange() {
-        return outputGap / -taxMultiplier; // find the change in taxes required
     }
 
     void changeTaxes(double taxChange) {
@@ -353,12 +353,12 @@ public class ASADModel {
         spendingMultiplier = v;
     }
 
-    public int getCyclesRun() {
-        return cyclesRun;
-    }
-
     public void setLongRunAggregateSupply(double output) {
         longRunAggregateSupply = output;
+    }
+
+    public int getCyclesRun() {
+        return cyclesRun;
     }
 
     public double getmpc() {
