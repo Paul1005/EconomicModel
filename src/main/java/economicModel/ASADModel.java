@@ -101,7 +101,7 @@ public class ASADModel {
      * @return
      */
     private double calculateInvestmentGivenInterestRate(double interestRate) {
-        return IConstant * Math.sqrt(Math.sqrt(Math.pow(interestRate, 2) + 4) - interestRate) / (Math.sqrt(2) * averageInflation);
+        return IConstant * Math.sqrt(Math.sqrt(Math.pow(interestRate, 2) + 4) - interestRate) / (Math.sqrt(2) * averageInflation); // might need to modify this
     }
 
     /**
@@ -115,22 +115,22 @@ public class ASADModel {
     }
 
     /**
-     * Find money supply based on interest rate and long run aggregate supply. a\cdot e^{-x}
+     * Find money supply based on interest rate and long run aggregate supply. \frac{1}{2}a\left(\sqrt{x^{2}+4}-x\right)
      *
      * @param interestRate
      * @return
      */
     private double calculateMoneySupplyGivenInterestRate(double interestRate) {
-        return longRunAggregateSupply * Math.pow(Math.E, -interestRate);
+        return 0.5 * longRunAggregateSupply * (Math.sqrt(Math.pow(interestRate, 2) + 4) - interestRate);
     }
 
     /**
-     * Find interest rate based on money supply and long run aggregate supply (is the inverse of the above). -\log x+\log a
+     * Find interest rate based on money supply and long run aggregate supply (is the inverse of the above). \frac{a}{x}-\frac{x}{a}
      *
      * @return
      */
     private double calculateInterestRateGivenMoneySupply() {
-        return Math.log(longRunAggregateSupply) - Math.log(moneySupply);
+        return longRunAggregateSupply / moneySupply - moneySupply / longRunAggregateSupply;
     }
 
     /**
@@ -459,7 +459,7 @@ public class ASADModel {
         return moneySupply;
     }
 
-    public double getAverageInflation(){
+    public double getAverageInflation() {
         return averageInflation;
     }
 }
