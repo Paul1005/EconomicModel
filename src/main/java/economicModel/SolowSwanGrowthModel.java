@@ -7,6 +7,12 @@ public class SolowSwanGrowthModel {
     private int cyclesRun;
     private double outputPerPerson;
 
+    public SolowSwanGrowthModel(double capital, int labour, int cyclesRun){
+        this.capital = capital;
+        this.labour = labour;
+        this.cyclesRun = cyclesRun;
+    }
+
     public void runCycle(double savingsGrowth, double populationGrowth, double technology, double depreciation) {
         double a = 1.0 / 3.0;
         double productivityPerWorker = 1.0;

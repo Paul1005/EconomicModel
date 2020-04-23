@@ -13,14 +13,11 @@ public class Main {
         Scanner scanner = new Scanner(System.in);  // Create a Scanner object
 
         ASADModel asadModel = new ASADModel();
-        SolowSwanGrowthModel solowSwanGrowthModel = new SolowSwanGrowthModel();
+        SolowSwanGrowthModel solowSwanGrowthModel = new SolowSwanGrowthModel(18000, 100, 0);
         //starting variables
         asadModel.setDebtRepaymentAmount(1);
         double technology = 1;
         double deprecation = 0.005;
-        solowSwanGrowthModel.setCapital(18000);
-        solowSwanGrowthModel.setLabour(100);
-        solowSwanGrowthModel.setCyclesRun(0);
         asadModel.setOwnedBonds(10);
         asadModel.setReserveRequirement(0.125);
         asadModel.setTaxes(100);
@@ -109,9 +106,8 @@ public class Main {
                 ai.recordInfo(asadModel);
                 System.out.println('\n' + "-*ASAD Model Information Post-adjustment*-");
                 printData(asadModel);
+                technology = updateTechnology(asadModel, technology);
 
-                technology += (asadModel.getI() / 1000);
-                technology += (asadModel.getG() * asadModel.getmpi() / 1000);
                 System.out.println("Technology Level: " + technology);
                 System.out.println('\n' + "Press enter to continue to next cycle, or type e and press enter to end program");
                 if (scanner.nextLine().equals("e")) {
@@ -123,6 +119,12 @@ public class Main {
                 runAICycles(ai, asadModel, solowSwanGrowthModel, savingsGrowth, technology, deprecation, cyclesToRun);
             }
         }
+    }
+
+    private static double updateTechnology(ASADModel asadModel, double technology) {
+        // might need something better than this
+        technology += (Math.sqrt(asadModel.getI() + asadModel.getG() * asadModel.getmpi()) / 100);
+        return technology;
     }
 
     private static void runAICycles(AI ai, ASADModel asadModel, SolowSwanGrowthModel solowSwanGrowthModel, double savingsGrowth, double technology, double deprecation, int cyclesToRun) throws Exception {
