@@ -67,7 +67,8 @@ public class Main {
                         '\n' + "t for taxes" +
                         '\n' + "g for government spending" +
                         '\n' + "m for money supply" +
-                        '\n' + "r for reserve requirement"); // should maybe be able to select more than one?
+                        '\n' + "r for reserve requirement" +
+                        '\n' + "n for no change"); // should maybe be able to select more than one?
                 String option = scanner.nextLine();
                 switch (option) {
                     case "t":
@@ -97,6 +98,10 @@ public class Main {
                         System.out.println("Size of reserve requirement change needed to close the gap: " + asadModel.calculateReserveMultiplier(asadModel.calculateInvestmentRequired()));
                         double reserveMultiplier = scanner.nextDouble();
                         asadModel.changeReserveRequirements(reserveMultiplier);
+                        break;
+                    case "n":
+                        // if we want to change reserve requirement
+                        System.out.println("No option selected");
                         break;
                     default:
                         System.out.println("invalid option");
