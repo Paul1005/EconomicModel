@@ -53,6 +53,7 @@ public class ASADModel {
         cyclesRun = 0;
         averageInflation = inflation = 1;
         growth = overallGrowth = 1;
+        priceLevel = 1;
     }
 
     //copy constructor
@@ -156,7 +157,8 @@ public class ASADModel {
         C = calculateConsumption();
         I = calculateInvestmentGivenInterestRate(interestRate); // overall investment
 
-        publicBalance = longRunAggregateSupply - I - C - taxes; // find the public balance for this cycle, might still need some adjusting
+        //publicBalance = longRunAggregateSupply - I - C - taxes; // find the public balance for this cycle, might still need some adjusting
+        publicBalance = IConstant - I; // find the public balance for this cycle, might still need some adjusting
 
         overallPublicBalance = calculateBalance(publicBalance, interestRate, overallPublicBalance); // add the current public balance to our overall public balance
         I = calculateSpendingAfterDebt(publicBalance, interestRate, I, mpi); // subtract any debt servicing from our public investing if we have to
