@@ -3,7 +3,7 @@ package economicModel;
 //Note: right now incentive is to keep price level at 1
 //TODO: have some kind of unemployment indicator (phillips curve?), right now labour and population are synonymous
 //TODO: incorporate crowding out
-//TODO: go over how C and I are calculated
+//TODO: go over how CConstant and I are calculated
 public class ASADModel {
     private double longRunAggregateSupply;
     private double shortRunAggregateSupplyCurve;
@@ -18,7 +18,8 @@ public class ASADModel {
     private double IConstant;
     private double G;
     private double outputGap;
-    private double C; // Should maybe be affected by inflation
+    private double CConstant;
+    private double C;
     private double aggregateDemandOutputCurve;
     private double equilibriumOutput;
     private double I; // Should we have public and government investment?
@@ -50,7 +51,7 @@ public class ASADModel {
     //default constructor
     public ASADModel() {
         cyclesRun = 0;
-        averageInflation = inflation = overallInflation = 1;
+        averageInflation = inflation = 1;
         growth = overallGrowth = 1;
     }
 
@@ -69,7 +70,7 @@ public class ASADModel {
         this.IConstant = asadModel.IConstant;
         this.G = asadModel.G;
         this.outputGap = asadModel.outputGap;
-        this.C = asadModel.C;
+        this.CConstant = asadModel.CConstant;
         this.aggregateDemandOutputCurve = asadModel.aggregateDemandOutputCurve;
         this.equilibriumOutput = asadModel.equilibriumOutput;
         this.I = asadModel.I;
@@ -120,7 +121,7 @@ public class ASADModel {
      * @return
      */
     private double calculateMoneySupplyGivenInterestRate(double interestRate) {
-        return longRunAggregateSupply * Math.pow(Math.E, 100 * -interestRate);
+        return longRunAggregateSupply * Math.pow(Math.E, -interestRate);
     }
 
     /**
@@ -129,7 +130,7 @@ public class ASADModel {
      * @return
      */
     private double calculateInterestRateGivenMoneySupply() {
-        return (Math.log(longRunAggregateSupply) - Math.log(moneySupply)) / 100;
+        return Math.log(longRunAggregateSupply) - Math.log(moneySupply);
     }
 
     /**
@@ -150,9 +151,9 @@ public class ASADModel {
 
         overallGovtBalance = calculateBalance(govtBalance, interestRate, overallGovtBalance); // add the current government balance to our overall government balance
         GConstant = calculateSpendingAfterDebt(govtBalance, interestRate, GConstant, 1); // subtract any debt servicing from our government spending if we have to
-
         G = calculateGovernmentSpending(); // overall government spending
 
+        C = calculateConsumption();
         I = calculateInvestmentGivenInterestRate(interestRate); // overall investment
 
         publicBalance = longRunAggregateSupply - I - C - taxes; // find the public balance for this cycle
@@ -169,12 +170,15 @@ public class ASADModel {
 
         outputGap = calculateOutputGap(); // find the output gap so that our price will be one
 
-
         calculateGrowthAndInflation(); // calculate our growth and inflation for this cycle and for the overall session
         previousOutput = equilibriumOutput;
         previousPriceLevel = priceLevel;
 
         cyclesRun++;
+    }
+
+    private double calculateConsumption() {
+        return CConstant + taxes * taxMultiplier;
     }
 
     private void calculateGrowthAndInflation() {
@@ -185,7 +189,7 @@ public class ASADModel {
             growth = equilibriumOutput / previousOutput; // equilibrium output growth over previous cycle
             overallGrowth = equilibriumOutput / originalOutput; // average equilibrium output growth over all cycles
             inflation = priceLevel / previousPriceLevel; // inflation for this cycle
-            overallInflation = priceLevel / originalPriceLevel; // average inflation for all previous cycles
+            overallInflation += inflation; // average inflation for all previous cycles
             averageInflation = overallInflation / cyclesRun;
         }
     }
@@ -195,8 +199,8 @@ public class ASADModel {
     }
 
     private double calculateAggregateDemandOutput() {
-        //return (C + I) / priceLevel + G + taxes * taxMultiplier; // not sure what should be affected by inflation
-        return (C + I + G + taxes * taxMultiplier) / priceLevel;
+        //return (CConstant + I) / priceLevel + G + taxes * taxMultiplier; // not sure what should be affected by inflation
+        return (C + I + G) / priceLevel;
     }
 
     private double calculateOutputGap() {
@@ -206,7 +210,7 @@ public class ASADModel {
     private double calculateBalance(double balance, double interestRate, double overallBalance) {
         if (balance < 0) { // if we have a deficit
             double debtInterestModifier = calculateInterestRateModifier(balance); // calculate the debt interest modifier based on current output and size of current balance
-            double debtInterest = getFinalDebtInterest(interestRate, debtInterestModifier); // calculate the debt interest based on the overall interest rate added to modifier, divided by 2 (or the average if you will)
+            double debtInterest = getFinalDebtInterest(interestRate / 100, debtInterestModifier); // calculate the debt interest based on the overall interest rate added to modifier, divided by 2 (or the average if you will)
             overallBalance += ((balance + balance * debtInterest) * priceLevel); // add our current balance to the overall balance, taking into account debt interest and price level
 
             overallBalance += ((debtRepaymentAmount + debtRepaymentAmount * debtInterest) * priceLevel); // add the debt repayment to the overall balance
@@ -223,7 +227,7 @@ public class ASADModel {
     private double calculateSpendingAfterDebt(double balance, double interestRate, double spending, double modifier) {
         if (balance < 0) { // if we have a deficit, else do nothing
             double debtInterestModifier = calculateInterestRateModifier(balance);// calculate the debt interest modifier based on current output and size of current balance
-            double debtInterest = getFinalDebtInterest(interestRate, debtInterestModifier); // calculate the debt interest based on the overall interest rate added to modifier, divided by 2 (or the average if you will)
+            double debtInterest = getFinalDebtInterest(interestRate / 100, debtInterestModifier); // calculate the debt interest based on the overall interest rate added to modifier, divided by 2 (or the average if you will)
             spending -= ((debtRepaymentAmount + debtRepaymentAmount * debtInterest) * modifier); // remove the debt repayment amount from the spending
         }
         return spending;
@@ -234,12 +238,12 @@ public class ASADModel {
     }
 
     private double calculateEquilibriumOutput() {
-        return C + taxes * taxMultiplier + G + I;
+        return C + G + I;
     }
 
     private double calculatePriceLevel() {
-        //return (Math.sqrt(4 * C * longRunAggregateSupply + Math.pow(G, 2) + 2 * G * taxes * taxMultiplier + 4 * longRunAggregateSupply * I + Math.pow(taxes, 2) * Math.pow(taxMultiplier, 2)) + G + taxes * taxMultiplier) / (2 * longRunAggregateSupply);
-        return Math.sqrt(C + G + taxes * taxMultiplier + I) / Math.sqrt(longRunAggregateSupply);
+        //return (Math.sqrt(4 * CConstant * longRunAggregateSupply + Math.pow(G, 2) + 2 * G * taxes * taxMultiplier + 4 * longRunAggregateSupply * I + Math.pow(taxes, 2) * Math.pow(taxMultiplier, 2)) + G + taxes * taxMultiplier) / (2 * longRunAggregateSupply);
+        return Math.sqrt(C + G + I) / Math.sqrt(longRunAggregateSupply);
     }
 
     private double calculateMoneySupply() {
@@ -265,7 +269,7 @@ public class ASADModel {
     }
 
     public double calculateInvestmentRequired() {
-        return longRunAggregateSupply - C - G - taxes * taxMultiplier;
+        return longRunAggregateSupply - C - G;
     }
 
     void changeMoneySupply(double bondChange) {
@@ -297,26 +301,6 @@ public class ASADModel {
 
     public void setDebtRepaymentAmount(double i) {
         debtRepaymentAmount = i;
-    }
-
-    public void setCyclesRun(int i) {
-        cyclesRun = i;
-    }
-
-    public void setOverallGrowth(double i) {
-        overallGrowth = i;
-    }
-
-    public void setGrowth(double i) {
-        growth = i;
-    }
-
-    public void setOverallInflation(double i) {
-        overallInflation = i;
-    }
-
-    public void setInflation(double i) {
-        inflation = i;
     }
 
     public void setOwnedBonds(double i) {
@@ -379,8 +363,8 @@ public class ASADModel {
         return longRunAggregateSupply;
     }
 
-    public void setC(double v) {
-        C = v;
+    public void setCConstant(double v) {
+        CConstant = v;
     }
 
     public void setIConstant(double v) {
@@ -403,8 +387,8 @@ public class ASADModel {
         return I;
     }
 
-    public double getC() {
-        return C;
+    public double getCConstant() {
+        return CConstant;
     }
 
     public double getAggregateDemandOutputCurve() {
@@ -473,5 +457,9 @@ public class ASADModel {
 
     public double getMoneySupply() {
         return moneySupply;
+    }
+
+    public double getAverageInflation(){
+        return averageInflation;
     }
 }

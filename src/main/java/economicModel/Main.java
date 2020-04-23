@@ -30,7 +30,7 @@ public class Main {
         asadModel.setmps(1 - asadModel.getmpc() - asadModel.getmpi());
         asadModel.setTaxMultiplier(-asadModel.getmpc() / asadModel.getmps());
         asadModel.setSpendingMultiplier(1 / asadModel.getmps());
-        double savingsGrowth = asadModel.getmps() + asadModel.getmpi(); // should we include mpi in this?
+        double savingsGrowth = asadModel.getmps() + asadModel.getmpi(); // should we include mpi or mps in this?
         AI ai = new AI();
         boolean isPlaying = true;
         while (isPlaying) {
@@ -55,7 +55,7 @@ public class Main {
                 asadModel.setLongRunAggregateSupply(solowSwanGrowthModel.getOutput());
 
                 // TODO: not sure if these are ideal
-                asadModel.setC(asadModel.getLongRunAggregateSupply() * asadModel.getmpc());
+                asadModel.setCConstant(asadModel.getLongRunAggregateSupply() * asadModel.getmpc());
                 asadModel.setIConstant(asadModel.getLongRunAggregateSupply() * asadModel.getmpi());
                 //inflation = quantity * velocity;
                 //money supply * velocity of money = price level * real gdp
@@ -146,7 +146,7 @@ public class Main {
 
             asadModel.setLongRunAggregateSupply(solowSwanGrowthModel.getOutput());
 
-            asadModel.setC(asadModel.getLongRunAggregateSupply() * asadModel.getmpc());
+            asadModel.setCConstant(asadModel.getLongRunAggregateSupply() * asadModel.getmpc());
             asadModel.setIConstant(asadModel.getLongRunAggregateSupply() * asadModel.getmpi());
             //inflation = quantity * velocity;
             //money supply * velocity of money = price level * real gdp
@@ -225,14 +225,14 @@ public class Main {
         System.out.println('\n' + "-*Financial Data*-");
         System.out.println("Taxes: " + asadModel.getTaxes());
         System.out.println("Government Spending: " + asadModel.getG());
-        System.out.println("Consumption: " + asadModel.getC());
+        System.out.println("Consumption: " + asadModel.getCConstant());
         System.out.println("Investment: " + asadModel.getI());
         System.out.println("Reserve Requirement: " + asadModel.getReserveRequirement());
 
         System.out.println('\n' + "-*Inflation Data*-");
         System.out.println("Price Level: " + asadModel.getPriceLevel());
         System.out.println("Inflation Rate for last cycle: " + ((asadModel.getInflation() - 1) * 100) + '%');
-        System.out.println("Average Inflation Rate: " + (((asadModel.getOverallInflation() - 1) * 100) / asadModel.getCyclesRun()) + '%');
+        System.out.println("Average Inflation Rate: " + ((asadModel.getAverageInflation() - 1) * 100) + '%');
 
         System.out.println('\n' + "-*Debt and deficit Data*-");
         System.out.println("Government Balance: " + asadModel.getGovtBalance());
