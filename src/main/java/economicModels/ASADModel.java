@@ -132,7 +132,6 @@ public class ASADModel {
 
     /**
      * Find investment based on interest rate, IConstant, and average inflation. Is the inverse(swap x and y) of the equation below. \frac{a\sqrt{\sqrt{x^{2}+4}-x}}{\sqrt{2}\cdot b}
-     *
      * @param interestRate
      * @return
      */
@@ -142,7 +141,6 @@ public class ASADModel {
 
     /**
      * Find interest rate based on investment, IConstant, and average inflation. Is the inverse(swap x and y) of the equation above. \frac{a^{4}-b^{4}\cdot x^{4}}{a^{2}\cdot b^{2}\cdot x^{2}}
-     *
      * @param investmentRequired
      * @return
      */
@@ -152,7 +150,6 @@ public class ASADModel {
 
     /**
      * Find money supply based on interest rate and long run aggregate supply. \frac{1}{2}a\left(\sqrt{x^{2}+4}-x\right)
-     *
      * @param interestRate
      * @return
      */
@@ -162,7 +159,6 @@ public class ASADModel {
 
     /**
      * Find interest rate based on money supply and long run aggregate supply (is the inverse of the above). \frac{a}{x}-\frac{x}{a}
-     *
      * @return
      */
     private double calculateInterestRateGivenMoneySupply() {
@@ -171,18 +167,24 @@ public class ASADModel {
 
     /**
      * Find the interest rate multiplier based on how fast your economy is growing, how large your debt is, and how large your economy is. \frac{-x}{a+a\cdot b}
-     *
      * @param currentBalance
      * @return
      */
     private double calculateInterestRateModifier(double currentBalance) {
         return -currentBalance / (longRunAggregateSupply + longRunAggregateSupply * overallGrowth);
     }
-    
+
+    /**
+     * Calculate C based on the CConstant taxes and taxMultiplier.
+     * @return
+     */
     private double calculateConsumption() {
         return CConstant + taxes * taxMultiplier;
     }
 
+    /**
+     * Calculate various growth and inflation variables for this cycle.
+     */
     private void calculateGrowthAndInflation() {
         if (cyclesRun == 0) { // if this is the first cycle, set the variables
             originalOutput = equilibriumOutput;
@@ -196,25 +198,43 @@ public class ASADModel {
         }
     }
 
+    /**
+     * Calculate sras based on lras and price level
+     * @return
+     */
     private double calculateShortRunAggregateSupply() {
         return longRunAggregateSupply * priceLevel;
     }
 
+    /**
+     * Calculate aggregate demand based on C, I, G, and price level
+     * @return
+     */
     private double calculateAggregateDemandOutput() {
         //return (CConstant + I) / priceLevel + G + taxes * taxMultiplier; // not sure what should be affected by inflation
         return (C + I + G) / priceLevel;
     }
 
+    /**
+     * Calculate the output gap base on equilibrium output and lras.
+     * @return
+     */
     private double calculateOutputGap() {
         return equilibriumOutput - longRunAggregateSupply;
     }
 
+    /**
+     * calculate the overall balance based on current balance and interest rate.
+     * @param balance
+     * @param interestRate
+     * @param overallBalance
+     * @return
+     */
     private double calculateBalance(double balance, double interestRate, double overallBalance) {
         if (balance < 0) { // if we have a deficit
             double debtInterestModifier = calculateInterestRateModifier(balance); // calculate the debt interest modifier based on current output and size of current balance
             double debtInterest = getFinalDebtInterest(interestRate / 100, debtInterestModifier); // calculate the debt interest based on the overall interest rate added to modifier, divided by 2 (or the average if you will)
             overallBalance += ((balance + balance * debtInterest) * priceLevel); // add our current balance to the overall balance, taking into account debt interest and price level
-
             overallBalance += ((debtRepaymentAmount + debtRepaymentAmount * debtInterest) * priceLevel); // add the debt repayment to the overall balance
         } else if (balance > 0) { // if we have a surplus
             overallBalance += (balance * priceLevel); // add balance to overall balance to the overall balance, taking into account price level
@@ -222,10 +242,24 @@ public class ASADModel {
         return overallBalance;
     }
 
+    /**
+     * Find the final interest rate based on the overall interest rate and the interest rate of this organization.
+     * @param interestRate
+     * @param debtInterestModifier
+     * @return
+     */
     private double getFinalDebtInterest(double interestRate, double debtInterestModifier) {
         return (debtInterestModifier + interestRate) / 2;
     }
 
+    /**
+     * Calculate the spending by subtracting debt if necessary.
+     * @param balance
+     * @param interestRate
+     * @param spending
+     * @param modifier
+     * @return
+     */
     private double calculateSpendingAfterDebt(double balance, double interestRate, double spending, double modifier) {
         if (balance < 0) { // if we have a deficit, else do nothing
             double debtInterestModifier = calculateInterestRateModifier(balance);// calculate the debt interest modifier based on current output and size of current balance
@@ -235,37 +269,71 @@ public class ASADModel {
         return spending;
     }
 
+    /**
+     * Calculate G from GConstant and spendingMultiplier.
+     * @return
+     */
     private double calculateGovernmentSpending() {
         return GConstant * spendingMultiplier;
     }
 
+    /**
+     * Calculate output by adding C, G, and I.
+     * @return
+     */
     private double calculateEquilibriumOutput() {
         return C + G + I;
     }
 
+    /**
+     * Calculate Price level based on C, G, I, and lras.
+     * @return
+     */
     private double calculatePriceLevel() {
         //return (Math.sqrt(4 * CConstant * longRunAggregateSupply + Math.pow(G, 2) + 2 * G * taxes * taxMultiplier + 4 * longRunAggregateSupply * I + Math.pow(taxes, 2) * Math.pow(taxMultiplier, 2)) + G + taxes * taxMultiplier) / (2 * longRunAggregateSupply);
         return Math.sqrt(C + G + I) / Math.sqrt(longRunAggregateSupply);
     }
 
+    /**
+     * Calculate the current money supply based on bonds and reserveRequirements.
+     * @return
+     */
     private double calculateMoneySupply() {
         return ownedBonds / reserveRequirement;
     }
 
+    /**
+     * Calculate the spending change required to close the output gap.
+     * @return
+     */
     public double calculateSpendingChange() {
         return outputGap / -spendingMultiplier; // find the change in spending required
     }
 
+    /**
+     * Calculate the tax change required to close the output gap.
+     * @return
+     */
     public double calculateTaxChange() {
         return outputGap / -taxMultiplier; // find the change in taxes required
     }
 
+    /**
+     * Calculate the reserve multiplier required based on investment required.
+     * @param investmentRequired
+     * @return
+     */
     public double calculateReserveMultiplier(double investmentRequired) {
         double interestRate = calculateInterestRateGivenInvestment(investmentRequired); // find the new interest rate based on the investment we need.
         double newMoneySupply = calculateMoneySupplyGivenInterestRate(interestRate); // find the money supply we need based on the new interest rate
         return moneySupply / newMoneySupply;
     }
 
+    /**
+     * Calculate the bond change required based on investment required.
+     * @param investmentRequired
+     * @return
+     */
     public double calculateBondChange(double investmentRequired) {
         double interestRate = calculateInterestRateGivenInvestment(investmentRequired); // find the new interest rate based on the investment we need.
         double newMoneySupply = calculateMoneySupplyGivenInterestRate(interestRate); // find the money supply we need based on the new interest rate
@@ -273,10 +341,18 @@ public class ASADModel {
         return gap * reserveRequirement; // determine how many more bonds we need to buy or sell
     }
 
+    /**
+     * Find the investment required by subtracting C and G from lras.
+     * @return
+     */
     public double calculateInvestmentRequired() {
         return longRunAggregateSupply - C - G;
     }
 
+    /**
+     * Multiply current reserve requirement by the reserve multiplier.
+     * @param reserveMultiplier
+     */
     public void changeReserveRequirements(double reserveMultiplier) {
         if (reserveMultiplier == 0) {
             System.out.println("reserve multiplier can't be zero");
@@ -286,6 +362,10 @@ public class ASADModel {
         }
     }
 
+    /**
+     * Add the bond change to the current owned bonds.
+     * @param bondChange
+     */
     public void changeMoneySupply(double bondChange) {
         if (ownedBonds + bondChange <= 0) {
             System.out.println("can't sell enough bonds");
@@ -295,6 +375,10 @@ public class ASADModel {
         }
     }
 
+    /**
+     * Add the spending change to the current spending.
+     * @param spendingChange
+     */
     public void changeSpending(double spendingChange) {
         if (GConstant + spendingChange <= 0) {
             System.out.println("can't cut spending enough");
@@ -304,6 +388,10 @@ public class ASADModel {
         }
     }
 
+    /**
+     * Add the tax change to the current taxes.
+     * @param taxChange
+     */
     public void changeTaxes(double taxChange) {
         if (taxes + taxChange <= 0) {
             System.out.println("can't cut taxes enough");
@@ -357,6 +445,14 @@ public class ASADModel {
         longRunAggregateSupply = output;
     }
 
+    public void setCConstant(double v) {
+        CConstant = v;
+    }
+
+    public void setIConstant(double v) {
+        IConstant = v;
+    }
+
     public int getCyclesRun() {
         return cyclesRun;
     }
@@ -375,14 +471,6 @@ public class ASADModel {
 
     public double getLongRunAggregateSupply() {
         return longRunAggregateSupply;
-    }
-
-    public void setCConstant(double v) {
-        CConstant = v;
-    }
-
-    public void setIConstant(double v) {
-        IConstant = v;
     }
 
     public double getTaxes() {
