@@ -1,5 +1,6 @@
-package economicModel;
+package ai;
 
+import economicModel.ASADModel;
 import weka.classifiers.functions.*;
 import weka.core.DenseInstance;
 import weka.core.Instance;

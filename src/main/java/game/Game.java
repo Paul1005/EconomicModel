@@ -1,5 +1,8 @@
-package economicModel;
+package game;
 
+import ai.AI;
+import economicModel.ASADModel;
+import economicModel.SolowSwanGrowthModel;
 import weka.core.Instances;
 import weka.core.converters.ArffLoader;
 
@@ -7,9 +10,9 @@ import java.io.File;
 import java.util.Random;
 import java.util.Scanner;
 
-//TODO: should allow user to pick more than one option, also refactor ai cycles so you don't need to copy-paste so much code
-public class Main {
-    public static void main(String args[]) throws Exception {
+public class Game {
+
+    public void run() throws Exception {
         Scanner scanner = new Scanner(System.in);  // Create a Scanner object
 
         ASADModel asadModel = new ASADModel();
@@ -35,10 +38,10 @@ public class Main {
         String mode = "";
         boolean isPlaying = true;
         while (isPlaying) {
-            if(cyclesToRun == 0){
+            if (cyclesToRun == 0) {
                 System.out.println("Press m for manual play, press a for ai play");
                 mode = scanner.nextLine();
-                if(mode.equals("a")){
+                if (mode.equals("a")) {
                     System.out.println("Enter number of cycles for AI to run");
                     cyclesToRun = Integer.parseInt(scanner.nextLine());
                 }
@@ -69,7 +72,7 @@ public class Main {
             printData(asadModel);
             System.out.println("Technology Level: " + technology + '\n');
 
-            if(mode.equals("m")) {
+            if (mode.equals("m")) {
                 System.out.println("Select option for policy adjustment:" +
                         '\n' + "t for taxes" +
                         '\n' + "g for government spending" +
@@ -114,7 +117,7 @@ public class Main {
                         System.out.println("invalid option");
                         throw new Exception();
                 }
-            } else if(mode.equals("a")){
+            } else if (mode.equals("a")) {
                 ArffLoader arffLoader = new ArffLoader();
                 File file = new File(ai.arffFilePath);
                 arffLoader.setFile(file);
@@ -156,23 +159,23 @@ public class Main {
             technology = updateTechnology(asadModel, technology);
 
             System.out.println("Technology Level: " + technology);
-            if(mode.equals("m")){
+            if (mode.equals("m")) {
                 System.out.println('\n' + "Press enter to continue to next cycle, or type e and press enter to end program");
                 if (scanner.nextLine().equals("e")) {
                     isPlaying = false;
                 }
-            } else if(mode.equals("a")){
+            } else if (mode.equals("a")) {
                 cyclesToRun--;
             }
         }
     }
 
-    private static double updateTechnology(ASADModel asadModel, double technology) {
+    private double updateTechnology(ASADModel asadModel, double technology) {
         technology += (Math.sqrt(asadModel.getI() + asadModel.getG() * asadModel.getmpi()) / 200);
         return technology;
     }
 
-    private static void printData(ASADModel asadModel) {
+    private void printData(ASADModel asadModel) {
         System.out.println("-*Output Gap Data*-");
         System.out.println("Long Run Aggregate Supply: " + asadModel.getLongRunAggregateSupply());
         System.out.println("Aggregate Demand: " + asadModel.getAggregateDemandOutputCurve());
@@ -203,7 +206,7 @@ public class Main {
         System.out.println("Average growth Rate: " + (((asadModel.getOverallGrowth() - 1) * 100) / asadModel.getCyclesRun()) + '%' + '\n');
     }
 
-    private static double calculatePopulationGrowth(double intrinsicGrowthRate, int currentPopulation, double carryingCapacity) {
+    private double calculatePopulationGrowth(double intrinsicGrowthRate, int currentPopulation, double carryingCapacity) {
         return intrinsicGrowthRate * currentPopulation * (1 - (double) currentPopulation / carryingCapacity);
     }
 }
