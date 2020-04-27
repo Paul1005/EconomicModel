@@ -26,43 +26,50 @@ public class Main {
         asadModel.setSpendingMultiplier(1 / asadModel.getmps());
 
         AI ai = new AI();
+        int cyclesToRun = 0;
 
         double technology = 1;
         double deprecation = 0.005;
         double savingsGrowth = asadModel.getmps() + asadModel.getmpi(); // should we include mpi or mps in this?
         SolowSwanGrowthModel solowSwanGrowthModel = new SolowSwanGrowthModel(18000, 100, 0);
-
+        String mode = "";
         boolean isPlaying = true;
         while (isPlaying) {
-            System.out.println("Press m for manual play, press a for ai play");
-            String mode = scanner.nextLine();
-
-            if (mode.equals("m")) {
-                System.out.println("Cycle number " + (solowSwanGrowthModel.getCyclesRun() + 1) + '\n');
-                double populationGrowth = 0;
-
-                if (solowSwanGrowthModel.getCyclesRun() > 0) {
-                    double intrinsicGrowth = 1 / (solowSwanGrowthModel.getOutputPerPerson() * 1000);
-                    double carryingCapacity = (int) solowSwanGrowthModel.getOutputPerPerson() * 1000;
-                    populationGrowth = calculatePopulationGrowth(intrinsicGrowth, solowSwanGrowthModel.getLabour(), carryingCapacity);
+            if(cyclesToRun == 0){
+                System.out.println("Press m for manual play, press a for ai play");
+                mode = scanner.nextLine();
+                if(mode.equals("a")){
+                    System.out.println("Enter number of cycles for AI to run");
+                    cyclesToRun = Integer.parseInt(scanner.nextLine());
                 }
+            }
 
-                solowSwanGrowthModel.runCycle(savingsGrowth, populationGrowth, technology, deprecation);
+            System.out.println("Cycle number " + (solowSwanGrowthModel.getCyclesRun() + 1) + '\n');
+            double populationGrowth = 0;
 
-                System.out.println("-*Solow Model Information*-");
-                System.out.println("Population Growth rate: " + populationGrowth);
-                System.out.println("Total Output: " + solowSwanGrowthModel.getOutput() + '\n');
+            if (solowSwanGrowthModel.getCyclesRun() > 0) {
+                double intrinsicGrowth = 1 / (solowSwanGrowthModel.getOutputPerPerson() * 1000);
+                double carryingCapacity = (int) solowSwanGrowthModel.getOutputPerPerson() * 1000;
+                populationGrowth = calculatePopulationGrowth(intrinsicGrowth, solowSwanGrowthModel.getLabour(), carryingCapacity);
+            }
 
-                asadModel.setLongRunAggregateSupply(solowSwanGrowthModel.getOutput());
-                // TODO: not sure if these are ideal
-                asadModel.setCConstant(asadModel.getLongRunAggregateSupply() * asadModel.getmpc());
-                asadModel.setIConstant(asadModel.getLongRunAggregateSupply() * asadModel.getmpi());
-                asadModel.runCycle();
+            solowSwanGrowthModel.runCycle(savingsGrowth, populationGrowth, technology, deprecation);
 
-                System.out.println("-*ASAD Model Information pre-adjustment*-");
-                printData(asadModel);
-                System.out.println("Technology Level: " + technology + '\n');
+            System.out.println("-*Solow Model Information*-");
+            System.out.println("Population Growth rate: " + populationGrowth);
+            System.out.println("Total Output: " + solowSwanGrowthModel.getOutput() + '\n');
 
+            asadModel.setLongRunAggregateSupply(solowSwanGrowthModel.getOutput());
+            // TODO: not sure if these are ideal
+            asadModel.setCConstant(asadModel.getLongRunAggregateSupply() * asadModel.getmpc());
+            asadModel.setIConstant(asadModel.getLongRunAggregateSupply() * asadModel.getmpi());
+            asadModel.runCycle();
+
+            System.out.println("-*ASAD Model Information pre-adjustment*-");
+            printData(asadModel);
+            System.out.println("Technology Level: " + technology + '\n');
+
+            if(mode.equals("m")) {
                 System.out.println("Select option for policy adjustment:" +
                         '\n' + "t for taxes" +
                         '\n' + "g for government spending" +
@@ -107,21 +114,55 @@ public class Main {
                         System.out.println("invalid option");
                         throw new Exception();
                 }
-                asadModel.runCycle();
-                ai.recordInfo(asadModel);
-                System.out.println('\n' + "-*ASAD Model Information Post-adjustment*-");
-                printData(asadModel);
-                technology = updateTechnology(asadModel, technology);
+            } else if(mode.equals("a")){
+                ArffLoader arffLoader = new ArffLoader();
+                File file = new File(ai.arffFilePath);
+                arffLoader.setFile(file);
+                Instances instances = arffLoader.getDataSet();
+                int bound;
+                if (instances.size() == 0) {
+                    bound = 3;
+                } else {
+                    bound = 4;
+                }
+                Random random = new Random();
+                int option = random.nextInt(bound);
+                switch (option) {
+                    case 0:
+                        System.out.println("Rule Based Decisions Selected");
+                        asadModel = ai.ruleBasedDecisions(asadModel);
+                        break;
+                    case 1:
+                        System.out.println("Fuzzy Logic Selected");
+                        asadModel = ai.fuzzyLogic(asadModel);
+                        break;
+                    case 2:
+                        System.out.println("Goal Oriented Behavior Selected");
+                        asadModel = ai.goalOrientedBehavior(asadModel);
+                        break;
+                    case 3:
+                        System.out.println("Machine Learning Selected");
+                        asadModel = ai.machineLearningRegression(asadModel);
+                        break;
+                    default:
+                        System.out.println("invalid option");
+                        throw new Exception();
+                }
+            }
+            asadModel.runCycle();
+            ai.recordInfo(asadModel);
+            System.out.println('\n' + "-*ASAD Model Information Post-adjustment*-");
+            printData(asadModel);
+            technology = updateTechnology(asadModel, technology);
 
-                System.out.println("Technology Level: " + technology);
+            System.out.println("Technology Level: " + technology);
+            if(mode.equals("m")){
                 System.out.println('\n' + "Press enter to continue to next cycle, or type e and press enter to end program");
                 if (scanner.nextLine().equals("e")) {
                     isPlaying = false;
                 }
-            } else if (mode.equals("a")) {
-                System.out.println("Enter number of cycles for AI to run");
-                int cyclesToRun = Integer.parseInt(scanner.nextLine());
-                runAICycles(ai, asadModel, solowSwanGrowthModel, savingsGrowth, technology, deprecation, cyclesToRun);
+            } else if(mode.equals("a")){
+                cyclesToRun--;
             }
         }
     }
@@ -129,72 +170,6 @@ public class Main {
     private static double updateTechnology(ASADModel asadModel, double technology) {
         technology += (Math.sqrt(asadModel.getI() + asadModel.getG() * asadModel.getmpi()) / 200);
         return technology;
-    }
-
-    private static void runAICycles(AI ai, ASADModel asadModel, SolowSwanGrowthModel solowSwanGrowthModel, double savingsGrowth, double technology, double deprecation, int cyclesToRun) throws Exception {
-        while (cyclesToRun > solowSwanGrowthModel.getCyclesRun()) {
-            System.out.println("Cycle number " + (solowSwanGrowthModel.getCyclesRun() + 1));
-            //System.out.println("Press enter to run Solow Model cycle");
-            //scanner.nextLine();
-            double populationGrowth = 0;
-
-            if (asadModel.getCyclesRun() != 0) {
-                double intrinsicGrowth = 1 / (solowSwanGrowthModel.getOutputPerPerson() * 1000);
-                double carryingCapacity = (int) solowSwanGrowthModel.getOutputPerPerson() * 1000;
-                populationGrowth = calculatePopulationGrowth(intrinsicGrowth, solowSwanGrowthModel.getLabour(), carryingCapacity);
-            }
-
-            solowSwanGrowthModel.runCycle(savingsGrowth, populationGrowth, technology, deprecation);
-
-            asadModel.setLongRunAggregateSupply(solowSwanGrowthModel.getOutput());
-
-            asadModel.setCConstant(asadModel.getLongRunAggregateSupply() * asadModel.getmpc());
-            asadModel.setIConstant(asadModel.getLongRunAggregateSupply() * asadModel.getmpi());
-
-            asadModel.runCycle();
-            System.out.println("-*ASAD Model Information pre-adjustment*-");
-            printData(asadModel);
-            System.out.println("Technology Level: " + technology + '\n');
-
-            ArffLoader arffLoader = new ArffLoader();
-            File file = new File(ai.arffFilePath);
-            arffLoader.setFile(file);
-            Instances instances = arffLoader.getDataSet();
-            int bound;
-            if (instances.size() == 0) {
-                bound = 3;
-            } else {
-                bound = 4;
-            }
-            Random random = new Random();
-            int option = random.nextInt(bound);
-            switch (option) {
-                case 0:
-                    System.out.println("Rule Based Decisions Selected");
-                    asadModel = ai.ruleBasedDecisions(asadModel);
-                    break;
-                case 1:
-                    System.out.println("Fuzzy Logic Selected");
-                    asadModel = ai.fuzzyLogic(asadModel);
-                    break;
-                case 2:
-                    System.out.println("Goal Oriented Behavior Selected");
-                    asadModel = ai.goalOrientedBehavior(asadModel);
-                    break;
-                case 3:
-                    System.out.println("Machine Learning Selected");
-                    asadModel = ai.machineLearningRegression(asadModel);
-                    break;
-                default:
-                    System.out.println("invalid option");
-                    throw new Exception();
-            }
-            System.out.println('\n' + "-*ASAD Model Information Post-adjustment*-");
-            printData(asadModel);
-
-            technology = updateTechnology(asadModel, technology);
-            System.out.println("Technology Level: " + technology + '\n');
-        }
     }
 
     private static void printData(ASADModel asadModel) {
