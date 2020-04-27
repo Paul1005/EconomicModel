@@ -1,8 +1,8 @@
 package game;
 
 import ai.AI;
-import economicModel.ASADModel;
-import economicModel.SolowSwanGrowthModel;
+import economicModels.ASADModel;
+import economicModels.SolowSwanGrowthModel;
 import weka.core.Instances;
 import weka.core.converters.ArffLoader;
 
@@ -73,49 +73,37 @@ public class Game {
             System.out.println("Technology Level: " + technology + '\n');
 
             if (mode.equals("m")) {
-                System.out.println("Select option for policy adjustment:" +
-                        '\n' + "t for taxes" +
-                        '\n' + "g for government spending" +
-                        '\n' + "m for money supply" +
-                        '\n' + "r for reserve requirement" +
-                        '\n' + "n for no change"); // should maybe be able to select more than one?
-                String option = scanner.nextLine();
-                switch (option) {
-                    case "t":
-                        // if we want to change taxes
-                        System.out.println("How much do you wish to change taxes by?");
-                        System.out.println("Size of tax change needed to close the gap: " + asadModel.calculateTaxChange());
-                        double taxChange = scanner.nextDouble();
-                        asadModel.changeTaxes(taxChange);
-                        break;
-                    case "g":
-                        // if we want to change spending
-                        System.out.println("How much do you wish to change spending by?");
-                        System.out.println("Size of spending change needed to close the gap: " + asadModel.calculateSpendingChange());
-                        double spendingChange = scanner.nextDouble();
-                        asadModel.changeSpending(spendingChange);
-                        break;
-                    case "m":
-                        // if we want to change money supply
-                        System.out.println("How much do you wish to change bonds owned by?");
-                        System.out.println("Size of bond change needed to close the gap: " + asadModel.calculateBondChange(asadModel.calculateInvestmentRequired()));
-                        double bondChange = scanner.nextDouble();
-                        asadModel.changeMoneySupply(bondChange);
-                        break;
-                    case "r":
-                        // if we want to change reserve requirement
-                        System.out.println("How much do you wish to change reserve requirement by?");
-                        System.out.println("Size of reserve requirement change needed to close the gap: " + asadModel.calculateReserveMultiplier(asadModel.calculateInvestmentRequired()));
-                        double reserveMultiplier = scanner.nextDouble();
-                        asadModel.changeReserveRequirements(reserveMultiplier);
-                        break;
-                    case "n":
-                        // if we want to change reserve requirement
-                        System.out.println("No option selected");
-                        break;
-                    default:
-                        System.out.println("invalid option");
-                        throw new Exception();
+                // if we want to change taxes
+                System.out.println("How much do you wish to change taxes by? Type 0 for no change");
+                System.out.println("Size of tax change needed to close the gap: " + asadModel.calculateTaxChange());
+                double taxChange = scanner.nextDouble();
+                if (taxChange != 0) {
+                    asadModel.changeTaxes(taxChange);
+                }
+
+                // if we want to change spending
+                System.out.println("How much do you wish to change spending by? Type 0 for no change");
+                System.out.println("Size of spending change needed to close the gap: " + asadModel.calculateSpendingChange());
+                double spendingChange = scanner.nextDouble();
+                if (spendingChange != 0) {
+                    asadModel.changeSpending(spendingChange);
+                }
+
+                double investmentRequired = asadModel.calculateInvestmentRequired();
+                // if we want to change money supply
+                System.out.println("How much do you wish to change bonds owned by? Type 0 for no change");
+                System.out.println("Size of bond change needed to close the gap: " + asadModel.calculateBondChange(investmentRequired));
+                double bondChange = scanner.nextDouble();
+                if (bondChange != 0) {
+                    asadModel.changeMoneySupply(bondChange);
+                }
+
+                // if we want to change reserve requirement
+                System.out.println("How much do you wish to change reserve requirement by? Type 1 for no change");
+                System.out.println("Size of reserve requirement change needed to close the gap: " + asadModel.calculateReserveMultiplier(investmentRequired));
+                double reserveMultiplier = scanner.nextDouble();
+                if (reserveMultiplier != 0) {
+                    asadModel.changeReserveRequirements(reserveMultiplier);
                 }
             } else if (mode.equals("a")) {
                 ArffLoader arffLoader = new ArffLoader();
@@ -168,6 +156,11 @@ public class Game {
                 cyclesToRun--;
             }
         }
+
+    }
+
+    private double calculatePopulationGrowth(double intrinsicGrowthRate, int currentPopulation, double carryingCapacity) {
+        return intrinsicGrowthRate * currentPopulation * (1 - (double) currentPopulation / carryingCapacity);
     }
 
     private double updateTechnology(ASADModel asadModel, double technology) {
@@ -204,9 +197,5 @@ public class Game {
         System.out.println('\n' + "-*Economic growth information*-");
         System.out.println("Growth Rate for last cycle: " + ((asadModel.getGrowth() - 1) * 100) + '%');
         System.out.println("Average growth Rate: " + (((asadModel.getOverallGrowth() - 1) * 100) / asadModel.getCyclesRun()) + '%' + '\n');
-    }
-
-    private double calculatePopulationGrowth(double intrinsicGrowthRate, int currentPopulation, double carryingCapacity) {
-        return intrinsicGrowthRate * currentPopulation * (1 - (double) currentPopulation / carryingCapacity);
     }
 }

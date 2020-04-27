@@ -1,9 +1,8 @@
-package economicModel;
+package economicModels;
 
 //Note: right now incentive is to keep price level at 1
 //TODO: have some kind of unemployment indicator (phillips curve?), right now labour and population are synonymous
 //TODO: incorporate crowding out
-//TODO: go over how CConstant and I are calculated
 public class ASADModel {
     private double longRunAggregateSupply;
     private double shortRunAggregateSupplyCurve;
@@ -96,6 +95,41 @@ public class ASADModel {
         this.averageInflation = asadModel.averageInflation;
     }
 
+    public void runCycle() {
+        moneySupply = calculateMoneySupply(); // find money supply based on bonds and reserve requirement
+
+        double interestRate = calculateInterestRateGivenMoneySupply(); // find interest rate based on current money supply
+        govtBalance = taxes - GConstant; // find the government balance for this cycle
+
+        overallGovtBalance = calculateBalance(govtBalance, interestRate, overallGovtBalance); // add the current government balance to our overall government balance
+        GConstant = calculateSpendingAfterDebt(govtBalance, interestRate, GConstant, 1); // subtract any debt servicing from our government spending if we have to
+        G = calculateGovernmentSpending(); // overall government spending
+
+        C = calculateConsumption();
+        I = calculateInvestmentGivenInterestRate(interestRate); // overall investment
+
+        //publicBalance = longRunAggregateSupply - I - C - taxes; // find the public balance for this cycle, might still need some adjusting
+        publicBalance = IConstant - I; // find the public balance for this cycle, might still need some adjusting
+
+        overallPublicBalance = calculateBalance(publicBalance, interestRate, overallPublicBalance); // add the current public balance to our overall public balance
+        I = calculateSpendingAfterDebt(publicBalance, interestRate, I, mpi); // subtract any debt servicing from our public investing if we have to
+        C = calculateSpendingAfterDebt(publicBalance, interestRate, C, mpc); // subtract any debt servicing from our public consumption if we have to
+
+        equilibriumOutput = calculateEquilibriumOutput(); // should equal LRAS when price is set to one
+
+        priceLevel = calculatePriceLevel(); // find our equilibrium price level
+        aggregateDemandOutputCurve = calculateAggregateDemandOutput(); // this is the aggregate demand curve
+        shortRunAggregateSupplyCurve = calculateShortRunAggregateSupply(); // this is the short run aggregate supply curve
+
+        outputGap = calculateOutputGap(); // find the output gap so that our price will be one
+
+        calculateGrowthAndInflation(); // calculate our growth and inflation for this cycle and for the overall session
+        previousOutput = equilibriumOutput;
+        previousPriceLevel = priceLevel;
+
+        cyclesRun++;
+    }
+
     /**
      * Find investment based on interest rate, IConstant, and average inflation. Is the inverse(swap x and y) of the equation below. \frac{a\sqrt{\sqrt{x^{2}+4}-x}}{\sqrt{2}\cdot b}
      *
@@ -144,42 +178,7 @@ public class ASADModel {
     private double calculateInterestRateModifier(double currentBalance) {
         return -currentBalance / (longRunAggregateSupply + longRunAggregateSupply * overallGrowth);
     }
-
-    public void runCycle() {
-        moneySupply = calculateMoneySupply(); // find money supply based on bonds and reserve requirement
-
-        double interestRate = calculateInterestRateGivenMoneySupply(); // find interest rate based on current money supply
-        govtBalance = taxes - GConstant; // find the government balance for this cycle
-
-        overallGovtBalance = calculateBalance(govtBalance, interestRate, overallGovtBalance); // add the current government balance to our overall government balance
-        GConstant = calculateSpendingAfterDebt(govtBalance, interestRate, GConstant, 1); // subtract any debt servicing from our government spending if we have to
-        G = calculateGovernmentSpending(); // overall government spending
-
-        C = calculateConsumption();
-        I = calculateInvestmentGivenInterestRate(interestRate); // overall investment
-
-        //publicBalance = longRunAggregateSupply - I - C - taxes; // find the public balance for this cycle, might still need some adjusting
-        publicBalance = IConstant - I; // find the public balance for this cycle, might still need some adjusting
-
-        overallPublicBalance = calculateBalance(publicBalance, interestRate, overallPublicBalance); // add the current public balance to our overall public balance
-        I = calculateSpendingAfterDebt(publicBalance, interestRate, I, mpi); // subtract any debt servicing from our public investing if we have to
-        C = calculateSpendingAfterDebt(publicBalance, interestRate, C, mpc); // subtract any debt servicing from our public consumption if we have to
-
-        equilibriumOutput = calculateEquilibriumOutput(); // should equal LRAS when price is set to one
-
-        priceLevel = calculatePriceLevel(); // find our equilibrium price level
-        aggregateDemandOutputCurve = calculateAggregateDemandOutput(); // this is the aggregate demand curve
-        shortRunAggregateSupplyCurve = calculateShortRunAggregateSupply(); // this is the short run aggregate supply curve
-
-        outputGap = calculateOutputGap(); // find the output gap so that our price will be one
-
-        calculateGrowthAndInflation(); // calculate our growth and inflation for this cycle and for the overall session
-        previousOutput = equilibriumOutput;
-        previousPriceLevel = priceLevel;
-
-        cyclesRun++;
-    }
-
+    
     private double calculateConsumption() {
         return CConstant + taxes * taxMultiplier;
     }

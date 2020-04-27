@@ -1,4 +1,4 @@
-package economicModel;
+package economicModels;
 
 public class SolowSwanGrowthModel {
     private double capital; // might want inflation to affect this
