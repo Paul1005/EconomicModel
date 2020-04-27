@@ -5,7 +5,7 @@ plugins {
     id 'application'
 }
 
-mainClassName = 'economicModel.Main'
+mainClassName = 'economicModels.Main'
 
 sourceCompatibility = 1.8
 
