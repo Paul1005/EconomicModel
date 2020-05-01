@@ -190,8 +190,8 @@ public class Game {
 
         System.out.println('\n' + "-*Debt and deficit Data*-");
         System.out.println("Government Balance: " + asadModel.getGovtBalance());
-        System.out.println("Public Balance: " + asadModel.getPublicBalance());
         System.out.println("Total Government Balance: " + asadModel.getOverallGovtBalance());
+        System.out.println("Public Balance: " + asadModel.getPublicBalance());
         System.out.println("Total Public Balance: " + asadModel.getOverallPublicBalance());
 
         System.out.println('\n' + "-*Economic growth information*-");

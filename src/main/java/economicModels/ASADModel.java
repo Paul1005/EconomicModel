@@ -102,7 +102,7 @@ public class ASADModel {
         govtBalance = taxes - GConstant; // find the government balance for this cycle
 
         overallGovtBalance = calculateBalance(govtBalance, interestRate, overallGovtBalance); // add the current government balance to our overall government balance
-        GConstant = calculateSpendingAfterDebt(govtBalance, interestRate, GConstant, 1); // subtract any debt servicing from our government spending if we have to
+        GConstant = calculateSpendingAfterDebt(govtBalance, overallGovtBalance, interestRate, GConstant, 1); // subtract any debt servicing from our government spending if we have to
         G = calculateGovernmentSpending(); // overall government spending
 
         C = calculateConsumption();
@@ -112,8 +112,8 @@ public class ASADModel {
         publicBalance = IConstant - I; // find the public balance for this cycle, might still need some adjusting
 
         overallPublicBalance = calculateBalance(publicBalance, interestRate, overallPublicBalance); // add the current public balance to our overall public balance
-        I = calculateSpendingAfterDebt(publicBalance, interestRate, I, mpi); // subtract any debt servicing from our public investing if we have to
-        C = calculateSpendingAfterDebt(publicBalance, interestRate, C, mpc); // subtract any debt servicing from our public consumption if we have to
+        I = calculateSpendingAfterDebt(publicBalance, overallPublicBalance, interestRate, I, mpi); // subtract any debt servicing from our public investing if we have to
+        C = calculateSpendingAfterDebt(publicBalance, overallPublicBalance,interestRate, C, mpc); // subtract any debt servicing from our public consumption if we have to
 
         equilibriumOutput = calculateEquilibriumOutput(); // should equal LRAS when price is set to one
 
@@ -231,8 +231,8 @@ public class ASADModel {
      * @return
      */
     private double calculateBalance(double balance, double interestRate, double overallBalance) {
-        if (balance < 0) { // if we have a deficit
-            double debtInterestModifier = calculateInterestRateModifier(balance); // calculate the debt interest modifier based on current output and size of current balance
+        if (balance < 0 && overallBalance + balance < 0) { // if we have a deficit and have to take on debt
+            double debtInterestModifier = calculateInterestRateModifier(overallBalance + balance); // calculate the debt interest modifier based on current output and size of current balance
             double debtInterest = getFinalDebtInterest(interestRate / 100, debtInterestModifier); // calculate the debt interest based on the overall interest rate added to modifier, divided by 2 (or the average if you will)
             overallBalance += ((balance + balance * debtInterest) * priceLevel); // add our current balance to the overall balance, taking into account debt interest and price level
             overallBalance += ((debtRepaymentAmount + debtRepaymentAmount * debtInterest) * priceLevel); // add the debt repayment to the overall balance
@@ -260,11 +260,13 @@ public class ASADModel {
      * @param modifier
      * @return
      */
-    private double calculateSpendingAfterDebt(double balance, double interestRate, double spending, double modifier) {
-        if (balance < 0) { // if we have a deficit, else do nothing
-            double debtInterestModifier = calculateInterestRateModifier(balance);// calculate the debt interest modifier based on current output and size of current balance
+    private double calculateSpendingAfterDebt(double balance, double overallBalance, double interestRate, double spending, double modifier) {
+        if (balance < 0 && overallBalance + balance < 0) { // if we have a deficit and have to take on debt, else do nothing
+            double debtInterestModifier = calculateInterestRateModifier(balance + overallBalance);// calculate the debt interest modifier based on current output and size of current balance
             double debtInterest = getFinalDebtInterest(interestRate / 100, debtInterestModifier); // calculate the debt interest based on the overall interest rate added to modifier, divided by 2 (or the average if you will)
-            spending -= ((debtRepaymentAmount + debtRepaymentAmount * debtInterest) * modifier); // remove the debt repayment amount from the spending
+            double debtRepayment = ((debtRepaymentAmount + debtRepaymentAmount * debtInterest) * modifier);
+            System.out.println("Debt Repayment: " + debtRepayment);
+            spending -= debtRepayment; // remove the debt repayment amount from the spending
         }
         return spending;
     }
