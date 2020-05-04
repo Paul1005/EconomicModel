@@ -166,12 +166,12 @@ public class ASADModel {
     }
 
     /**
-     * Find the interest rate multiplier based on how fast your economy is growing, how large your debt is, and how large your economy is. \frac{-x}{a+a\cdot b}
+     * Find the interest rate multiplier based on how fast your economy is growing, how large your debt is, and how large your economy is. \frac{x^{2}}{a+a\cdot b}
      * @param currentBalance
      * @return
      */
     private double calculateInterestRateModifier(double currentBalance) {
-        return -currentBalance / (longRunAggregateSupply + longRunAggregateSupply * overallGrowth);
+        return Math.pow(currentBalance, 2) / (longRunAggregateSupply + longRunAggregateSupply * overallGrowth);
     }
 
     /**
