@@ -171,7 +171,7 @@ public class ASADModel {
      * @return
      */
     private double calculateInterestRateModifier(double currentBalance) {
-        return Math.pow(currentBalance, 2) / (longRunAggregateSupply + longRunAggregateSupply * overallGrowth);
+        return Math.pow(currentBalance, 2) / (Math.pow(longRunAggregateSupply, 2) + Math.pow(longRunAggregateSupply, 2) * overallGrowth);
     }
 
     /**
