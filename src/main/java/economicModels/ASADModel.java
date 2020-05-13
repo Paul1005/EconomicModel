@@ -166,7 +166,7 @@ public class ASADModel {
     }
 
     /**
-     * Find the interest rate multiplier based on how fast your economy is growing, how large your debt is, and how large your economy is. \frac{x^{2}}{a+a\cdot b}
+     * Find the interest rate multiplier based on how fast your economy is growing, how large your debt is, and how large your economy is. \frac{x^{2}}{a^{2}+a^{2}\cdot b}
      * @param currentBalance
      * @return
      */
@@ -236,7 +236,7 @@ public class ASADModel {
             double debtInterest = getFinalDebtInterest(interestRate / 100, debtInterestModifier); // calculate the debt interest based on the overall interest rate added to modifier, divided by 2 (or the average if you will)
             overallBalance += ((balance + balance * debtInterest) * priceLevel); // add our current balance to the overall balance, taking into account debt interest and price level
             overallBalance += ((debtRepaymentAmount + debtRepaymentAmount * debtInterest) * priceLevel); // add the debt repayment to the overall balance
-        } else if (balance > 0) { // if we have a surplus
+        } else { // if we have a surplus or reserves
             overallBalance += (balance * priceLevel); // add balance to overall balance to the overall balance, taking into account price level
         }
         return overallBalance;
