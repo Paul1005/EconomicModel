@@ -3,6 +3,7 @@ package economicModels;
 //Note: right now incentive is to keep price level at 1
 //TODO: have some kind of unemployment indicator (phillips curve?), right now labour and population are synonymous
 //TODO: incorporate crowding out
+//TODO: improve debt system to deal with situation where equilibrium output is negative
 public class ASADModel {
     private double longRunAggregateSupply;
     private double shortRunAggregateSupplyCurve;
@@ -103,17 +104,16 @@ public class ASADModel {
 
         overallGovtBalance = calculateBalance(govtBalance, interestRate, overallGovtBalance); // add the current government balance to our overall government balance
         GConstant = calculateSpendingAfterDebt(govtBalance, overallGovtBalance, interestRate, GConstant, 1); // subtract any debt servicing from our government spending if we have to
-        G = calculateGovernmentSpending(); // overall government spending
+        G = calculateGovernmentSpendingEffect(); // overall government spending
 
-        C = calculateConsumption();
+        C = calculateConsumptionEffect();
         I = calculateInvestmentGivenInterestRate(interestRate); // overall investment
 
-        //publicBalance = longRunAggregateSupply - I - C - taxes; // find the public balance for this cycle, might still need some adjusting
         publicBalance = IConstant - I; // find the public balance for this cycle, might still need some adjusting
 
         overallPublicBalance = calculateBalance(publicBalance, interestRate, overallPublicBalance); // add the current public balance to our overall public balance
         I = calculateSpendingAfterDebt(publicBalance, overallPublicBalance, interestRate, I, mpi); // subtract any debt servicing from our public investing if we have to
-        C = calculateSpendingAfterDebt(publicBalance, overallPublicBalance,interestRate, C, mpc); // subtract any debt servicing from our public consumption if we have to
+        C = calculateSpendingAfterDebt(publicBalance, overallPublicBalance, interestRate, C, mpc); // subtract any debt servicing from our public consumption if we have to
 
         equilibriumOutput = calculateEquilibriumOutput(); // should equal LRAS when price is set to one
 
@@ -132,6 +132,7 @@ public class ASADModel {
 
     /**
      * Find investment based on interest rate, IConstant, and average inflation. Is the inverse(swap x and y) of the equation below. \frac{a\sqrt{\sqrt{x^{2}+4}-x}}{\sqrt{2}\cdot b}
+     *
      * @param interestRate
      * @return
      */
@@ -141,6 +142,7 @@ public class ASADModel {
 
     /**
      * Find interest rate based on investment, IConstant, and average inflation. Is the inverse(swap x and y) of the equation above. \frac{a^{4}-b^{4}\cdot x^{4}}{a^{2}\cdot b^{2}\cdot x^{2}}
+     *
      * @param investmentRequired
      * @return
      */
@@ -150,6 +152,7 @@ public class ASADModel {
 
     /**
      * Find money supply based on interest rate and long run aggregate supply. \frac{1}{2}a\left(\sqrt{x^{2}+4}-x\right)
+     *
      * @param interestRate
      * @return
      */
@@ -159,6 +162,7 @@ public class ASADModel {
 
     /**
      * Find interest rate based on money supply and long run aggregate supply (is the inverse of the above). \frac{a}{x}-\frac{x}{a}
+     *
      * @return
      */
     private double calculateInterestRateGivenMoneySupply() {
@@ -167,6 +171,7 @@ public class ASADModel {
 
     /**
      * Find the interest rate multiplier based on how fast your economy is growing, how large your debt is, and how large your economy is. \frac{x^{2}}{a^{2}+a^{2}\cdot b}
+     *
      * @param currentBalance
      * @return
      */
@@ -176,9 +181,10 @@ public class ASADModel {
 
     /**
      * Calculate C based on the CConstant taxes and taxMultiplier.
+     *
      * @return
      */
-    private double calculateConsumption() {
+    private double calculateConsumptionEffect() {
         return CConstant + taxes * taxMultiplier;
     }
 
@@ -200,6 +206,7 @@ public class ASADModel {
 
     /**
      * Calculate sras based on lras and price level
+     *
      * @return
      */
     private double calculateShortRunAggregateSupply() {
@@ -208,15 +215,16 @@ public class ASADModel {
 
     /**
      * Calculate aggregate demand based on C, I, G, and price level
+     *
      * @return
      */
     private double calculateAggregateDemandOutput() {
-        //return (CConstant + I) / priceLevel + G + taxes * taxMultiplier; // not sure what should be affected by inflation
         return (C + I + G) / priceLevel;
     }
 
     /**
      * Calculate the output gap base on equilibrium output and lras.
+     *
      * @return
      */
     private double calculateOutputGap() {
@@ -225,6 +233,7 @@ public class ASADModel {
 
     /**
      * calculate the overall balance based on current balance and interest rate.
+     *
      * @param balance
      * @param interestRate
      * @param overallBalance
@@ -244,6 +253,7 @@ public class ASADModel {
 
     /**
      * Find the final interest rate based on the overall interest rate and the interest rate of this organization.
+     *
      * @param interestRate
      * @param debtInterestModifier
      * @return
@@ -254,6 +264,7 @@ public class ASADModel {
 
     /**
      * Calculate the spending by subtracting debt if necessary.
+     *
      * @param balance
      * @param interestRate
      * @param spending
@@ -265,7 +276,7 @@ public class ASADModel {
             double debtInterestModifier = calculateInterestRateModifier(balance + overallBalance);// calculate the debt interest modifier based on current output and size of current balance
             double debtInterest = getFinalDebtInterest(interestRate / 100, debtInterestModifier); // calculate the debt interest based on the overall interest rate added to modifier, divided by 2 (or the average if you will)
             double debtRepayment = ((debtRepaymentAmount + debtRepaymentAmount * debtInterest) * modifier);
-            System.out.println("Debt Repayment: " + debtRepayment);
+            //System.out.println("Debt Repayment: " + debtRepayment);
             spending -= debtRepayment; // remove the debt repayment amount from the spending
         }
         return spending;
@@ -273,14 +284,16 @@ public class ASADModel {
 
     /**
      * Calculate G from GConstant and spendingMultiplier.
+     *
      * @return
      */
-    private double calculateGovernmentSpending() {
+    private double calculateGovernmentSpendingEffect() {
         return GConstant * spendingMultiplier;
     }
 
     /**
      * Calculate output by adding C, G, and I.
+     *
      * @return
      */
     private double calculateEquilibriumOutput() {
@@ -289,15 +302,24 @@ public class ASADModel {
 
     /**
      * Calculate Price level based on C, G, I, and lras.
+     *
      * @return
      */
     private double calculatePriceLevel() {
-        //return (Math.sqrt(4 * CConstant * longRunAggregateSupply + Math.pow(G, 2) + 2 * G * taxes * taxMultiplier + 4 * longRunAggregateSupply * I + Math.pow(taxes, 2) * Math.pow(taxMultiplier, 2)) + G + taxes * taxMultiplier) / (2 * longRunAggregateSupply);
+        if (C + G + I < 0) {
+            System.out.println("Debt overload!");
+            try {
+                throw new Exception();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         return Math.sqrt(C + G + I) / Math.sqrt(longRunAggregateSupply);
     }
 
     /**
      * Calculate the current money supply based on bonds and reserveRequirements.
+     *
      * @return
      */
     private double calculateMoneySupply() {
@@ -306,6 +328,7 @@ public class ASADModel {
 
     /**
      * Calculate the spending change required to close the output gap.
+     *
      * @return
      */
     public double calculateSpendingChange() {
@@ -314,6 +337,7 @@ public class ASADModel {
 
     /**
      * Calculate the tax change required to close the output gap.
+     *
      * @return
      */
     public double calculateTaxChange() {
@@ -322,6 +346,7 @@ public class ASADModel {
 
     /**
      * Calculate the reserve multiplier required based on investment required.
+     *
      * @param investmentRequired
      * @return
      */
@@ -333,6 +358,7 @@ public class ASADModel {
 
     /**
      * Calculate the bond change required based on investment required.
+     *
      * @param investmentRequired
      * @return
      */
@@ -345,6 +371,7 @@ public class ASADModel {
 
     /**
      * Find the investment required by subtracting C and G from lras.
+     *
      * @return
      */
     public double calculateInvestmentRequired() {
@@ -353,9 +380,11 @@ public class ASADModel {
 
     /**
      * Multiply current reserve requirement by the reserve multiplier.
+     *
      * @param reserveMultiplier
      */
     public void changeReserveRequirements(double reserveMultiplier) {
+        //TODO: need to check if loan will be too large
         if (reserveMultiplier == 0) {
             System.out.println("reserve multiplier can't be zero");
         } else {
@@ -366,9 +395,11 @@ public class ASADModel {
 
     /**
      * Add the bond change to the current owned bonds.
+     *
      * @param bondChange
      */
-    public void changeMoneySupply(double bondChange) {
+    public void changeOwnedBonds(double bondChange) {
+        //TODO: need to check if loan will be too large
         if (ownedBonds + bondChange <= 0) {
             System.out.println("can't sell enough bonds");
         } else {
@@ -379,9 +410,11 @@ public class ASADModel {
 
     /**
      * Add the spending change to the current spending.
+     *
      * @param spendingChange
      */
     public void changeSpending(double spendingChange) {
+        //TODO: need to check if loan will be too large
         if (GConstant + spendingChange <= 0) {
             System.out.println("can't cut spending enough");
         } else {
@@ -392,9 +425,11 @@ public class ASADModel {
 
     /**
      * Add the tax change to the current taxes.
+     *
      * @param taxChange
      */
     public void changeTaxes(double taxChange) {
+        //TODO: need to check if loan will be too large
         if (taxes + taxChange <= 0) {
             System.out.println("can't cut taxes enough");
         } else {

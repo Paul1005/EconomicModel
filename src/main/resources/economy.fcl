@@ -1,5 +1,4 @@
 // Block definition (there may be more than one block per file)
-// these numbers are placeholders, may way to use functions of some kind
 FUNCTION_BLOCK economy
 
 // Define input variables

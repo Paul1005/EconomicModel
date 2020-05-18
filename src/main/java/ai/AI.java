@@ -1,7 +1,11 @@
 package ai;
 
 import economicModels.ASADModel;
+import weka.classifiers.Classifier;
+import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.functions.*;
+import weka.classifiers.meta.Stacking;
+import weka.classifiers.meta.Vote;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -29,7 +33,6 @@ public class AI {
     public ASADModel ruleBasedDecisions(ASADModel asadModel) throws Exception {
         double spendingChange = asadModel.calculateSpendingChange();
         double taxChange = asadModel.calculateTaxChange();
-
         double investmentRequired = asadModel.calculateInvestmentRequired();
         double bondChange = asadModel.calculateBondChange(investmentRequired);
         double reserveMultiplier = asadModel.calculateReserveMultiplier(investmentRequired);
@@ -61,7 +64,7 @@ public class AI {
             }
         } else if (asadModel.getOutputGap() < 0) { // if equilibrium output is below lras
             if (choice == 0) {
-                asadModel.changeMoneySupply(bondChange);
+                asadModel.changeOwnedBonds(bondChange);
             } else if (choice == 1) {
                 asadModel.changeReserveRequirements(reserveMultiplier);
             }
@@ -72,7 +75,7 @@ public class AI {
         int choice = random.nextInt(2);
         if (asadModel.getOutputGap() > 0) { // if equilibrium output is above lras
             if (choice == 0) {
-                asadModel.changeMoneySupply(bondChange);
+                asadModel.changeOwnedBonds(bondChange);
             } else if (choice == 1) {
                 asadModel.changeReserveRequirements(reserveMultiplier);
             }
@@ -117,22 +120,22 @@ public class AI {
         // Evaluate
         fis.evaluate();
 
-        double govtSpending = fis.getVariable("govtSpending").getLatestDefuzzifiedValue();
-        double publicSpending = fis.getVariable("publicSpending").getLatestDefuzzifiedValue();
+        double govtSpendingChange = fis.getVariable("govtSpending").getLatestDefuzzifiedValue();
+        double publicSpendingChange = fis.getVariable("publicSpending").getLatestDefuzzifiedValue();
 
-        if (asadModel.getG() + govtSpending <= 0) {
-            asadModel.changeTaxes(govtSpending / asadModel.getTaxMultiplier());
+        if (asadModel.getG() + govtSpendingChange <= 0) {
+            asadModel.changeTaxes(govtSpendingChange / asadModel.getTaxMultiplier());
         } else {
-            asadModel.changeSpending(govtSpending / asadModel.getSpendingMultiplier());
+            asadModel.changeSpending(govtSpendingChange / asadModel.getSpendingMultiplier());
         }
 
         int choice = random.nextInt(2);
 
         if (choice == 0) {
-            double bonds = asadModel.calculateBondChange(publicSpending + asadModel.getI());
-            asadModel.changeMoneySupply(bonds);
+            double bonds = asadModel.calculateBondChange(publicSpendingChange + asadModel.getI());
+            asadModel.changeOwnedBonds(bonds);
         } else if (choice == 1) {
-            double reserveRequirement = asadModel.calculateReserveMultiplier(publicSpending + asadModel.getI());
+            double reserveRequirement = asadModel.calculateReserveMultiplier(publicSpendingChange + asadModel.getI());
             asadModel.changeReserveRequirements(reserveRequirement);
         }
 
@@ -154,6 +157,7 @@ public class AI {
             ASADModel testModel = new ASADModel(asadModel);
             tryOption(testModel, bondChange, positiveReserveMultiplier, negativeReserveMultiplier, spendingChange, taxChange, i);
             testModel.runCycle();
+            // goals
             double inflation = testModel.getOverallInflation();
             double publicBalance = testModel.getOverallPublicBalance();
             double govtBalance = testModel.getOverallGovtBalance();
@@ -175,28 +179,26 @@ public class AI {
     }
 
     private double getEconomicHealth(double inflation, double publicBalance, double govtBalance, double growth, double gdp) {
-        return gdp * growth - ((publicBalance + govtBalance) / inflation);
+        return gdp * growth + ((publicBalance + govtBalance) / inflation) / 500;
     }
 
     private void tryOption(ASADModel asadModel, double bondChange, double positiveReserveMultiplier, double negativeReserveMultiplier, double spendingChange, double taxChange, int option) {
         if (option == 0) {
-            asadModel.changeMoneySupply(bondChange);
+            asadModel.changeTaxes(taxChange);
         } else if (option == 1) {
-            asadModel.changeMoneySupply(-bondChange);
-        } else if (option == 2) {
-            asadModel.changeReserveRequirements(positiveReserveMultiplier);
-        } else if (option == 3) {
-            asadModel.changeReserveRequirements(negativeReserveMultiplier);
-        } else if (option == 4) {
             asadModel.changeSpending(spendingChange);
+        } else if (option == 2) {
+            asadModel.changeOwnedBonds(bondChange);
+        } else if (option == 3) {
+            asadModel.changeReserveRequirements(positiveReserveMultiplier);
+        } else if (option == 4) {
+            asadModel.changeTaxes(-taxChange);
         } else if (option == 5) {
             asadModel.changeSpending(-spendingChange);
         } else if (option == 6) {
-            if (taxChange > asadModel.getTaxes()) {
-                asadModel.changeTaxes(-taxChange);
-            }
+            asadModel.changeOwnedBonds(-bondChange);
         } else if (option == 7) {
-            asadModel.changeTaxes(taxChange);
+            asadModel.changeReserveRequirements(negativeReserveMultiplier);
         } else {
             // do nothing
         }
@@ -206,23 +208,24 @@ public class AI {
         ArffLoader arffLoader = new ArffLoader();
         File file = new File(arffFilePath);
         arffLoader.setFile(file);
+
         Instances instances = arffLoader.getDataSet();
         instances.setClassIndex(instances.numAttributes() - 1);
-        LinearRegression linearRegression = new LinearRegression();
-        GaussianProcesses gaussianProcess = new GaussianProcesses(); // may need to use different regression method
-        SMOreg smoReg = new SMOreg();
 
-        linearRegression.buildClassifier(instances);
-        smoReg.buildClassifier(instances);
-        gaussianProcess.buildClassifier(instances);
+        Classifier[] classifiers = {new LinearRegression(), new GaussianProcesses(), new SMOreg()};
+
+        Vote voter = new Vote();
+        voter.setClassifiers(classifiers);
+        voter.buildClassifier(instances);
+
         double bondChange = asadModel.getMoneySupply() / 128;
         double positiveReserveMultiplier = 2;
         double negativeReserveMultiplier = 0.5f;
         double spendingChange = asadModel.getLongRunAggregateSupply() / 128;
         double taxChange = asadModel.getLongRunAggregateSupply() / 96;
         double LRASGrowth = 0;
-        int option = 0;
 
+        int option = 0;
         for (int i = 0; i < 9; i++) {
             double[] denseInstance = new double[instances.numAttributes()];
             denseInstance[0] = asadModel.getTaxes();
@@ -251,7 +254,8 @@ public class AI {
             Instance predicationDataSet = new DenseInstance(1.0, denseInstance);
             predicationDataSet.setValue(predicationDataSet.numAttributes() - 1, '?');
             predicationDataSet.setDataset(instances);
-            double newGrowth = (linearRegression.classifyInstance(predicationDataSet) + smoReg.classifyInstance(predicationDataSet) + gaussianProcess.classifyInstance(predicationDataSet)) / 3; // maybe do a better implementation for this
+
+            double newGrowth = voter.classifyInstance(predicationDataSet);
 
             if (i != 0) {
                 if (newGrowth > LRASGrowth) {

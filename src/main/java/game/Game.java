@@ -9,12 +9,10 @@ import weka.core.converters.ArffLoader;
 import java.io.File;
 import java.util.Random;
 import java.util.Scanner;
-
+//TODO: debt should more directly affect lras
 public class Game {
 
     public void run() throws Exception {
-        Scanner scanner = new Scanner(System.in);  // Create a Scanner object
-
         ASADModel asadModel = new ASADModel();
         //starting variables
         asadModel.setDebtRepaymentAmount(1);
@@ -28,7 +26,6 @@ public class Game {
         asadModel.setTaxMultiplier(-asadModel.getmpc() / asadModel.getmps());
         asadModel.setSpendingMultiplier(1 / asadModel.getmps());
 
-        AI ai = new AI();
         int cyclesToRun = 0;
 
         double technology = 1;
@@ -37,6 +34,9 @@ public class Game {
         SolowSwanGrowthModel solowSwanGrowthModel = new SolowSwanGrowthModel(18000, 100, 0);
         String mode = "";
         boolean isPlaying = true;
+
+        AI ai = new AI();
+        Scanner scanner = new Scanner(System.in);  // Create a Scanner object
         while (isPlaying) {
             if (cyclesToRun == 0) {
                 System.out.println("Press m for manual play, press a for ai play");
@@ -68,7 +68,7 @@ public class Game {
             asadModel.setIConstant(asadModel.getLongRunAggregateSupply() * asadModel.getmpi());
             asadModel.runCycle();
 
-            System.out.println("-*ASAD Model Information pre-adjustment*-");
+            System.out.println("-*AS-AD Model Information pre-adjustment*-");
             printData(asadModel);
             System.out.println("Technology Level: " + technology + '\n');
 
@@ -95,7 +95,7 @@ public class Game {
                 System.out.println("Size of bond change needed to close the gap: " + asadModel.calculateBondChange(investmentRequired));
                 double bondChange = scanner.nextDouble();
                 if (bondChange != 0) {
-                    asadModel.changeMoneySupply(bondChange);
+                    asadModel.changeOwnedBonds(bondChange);
                 }
 
                 // if we want to change reserve requirement
@@ -142,11 +142,11 @@ public class Game {
             }
             asadModel.runCycle();
             ai.recordInfo(asadModel);
-            System.out.println('\n' + "-*ASAD Model Information Post-adjustment*-");
+            System.out.println('\n' + "-*AS-AD Model Information Post-adjustment*-");
             printData(asadModel);
             technology = updateTechnology(asadModel, technology);
-
             System.out.println("Technology Level: " + technology);
+
             if (mode.equals("m")) {
                 System.out.println('\n' + "Press enter to continue to next cycle, or type e and press enter to end program");
                 if (scanner.nextLine().equals("e")) {

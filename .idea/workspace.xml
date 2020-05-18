@@ -3,7 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="38dd646a-555f-4125-b061-a12f2763d137" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ai/AI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ai/AI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/economicModels/ASADModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/economicModels/ASADModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/economicModels/SolowSwanGrowthModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/economicModels/SolowSwanGrowthModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/game/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/Game.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/economy.fcl" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/economy.fcl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/growth-info.arff" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/growth-info.arff" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -16,12 +20,12 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/EconomicModelPrototype$Main.ic" NAME="Main Coverage Results" MODIFIED="1587679744880" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
-      <FILTER>economicModel.*</FILTER>
+    <SUITE FILE_PATH="coverage/EconomicModelPrototype$Main.ic" NAME="Main Coverage Results" MODIFIED="1589419762265" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>game.*</FILTER>
     </SUITE>
   </component>
   <component name="CoverageViewManager">
-    <option name="myElementSize" value="241" />
+    <option name="myElementSize" value="271" />
   </component>
   <component name="DatabaseView">
     <option name="SHOW_INTERMEDIATE" value="true" />
@@ -130,38 +134,46 @@
     <session id="-772241034">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="8" />
+          <entry key="project.closed" value="22" />
           <entry key="project.open.time.12" value="1" />
+          <entry key="project.open.time.22" value="1" />
           <entry key="project.open.time.4" value="1" />
           <entry key="project.open.time.5" value="1" />
-          <entry key="project.open.time.7" value="2" />
+          <entry key="project.open.time.6" value="6" />
+          <entry key="project.open.time.7" value="10" />
           <entry key="project.open.time.8" value="3" />
           <entry key="project.open.time.9" value="1" />
-          <entry key="project.opened" value="9" />
+          <entry key="project.opened" value="24" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="dummy" value="21" />
-          <entry key="java" value="4648" />
+          <entry key="java" value="5905" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JAVA" value="4648" />
+          <entry key="JAVA" value="5905" />
           <entry key="PLAIN_TEXT" value="21" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
+          <entry key="JAVA/" value="2" />
+          <entry key="JavaScript-modules-diagram/D:/Documents/EconomicModel/src" value="1" />
+          <entry key="MODULES/mdl-EconomicModelPrototype_main" value="1" />
           <entry key="fcl" value="2" />
-          <entry key="java" value="1" />
+          <entry key="gradle" value="1" />
+          <entry key="java" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="JAVA" value="1" />
+          <entry key="Groovy" value="1" />
+          <entry key="JAVA" value="3" />
           <entry key="PLAIN_TEXT" value="2" />
+          <entry key="UML" value="4" />
         </counts>
       </usages-collector>
     </session>
@@ -169,34 +181,14 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/game/Main.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="34">
-              <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/game/Game.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1173">
-              <caret line="77" column="94" selection-start-line="77" selection-start-column="94" selection-end-line="77" selection-end-column="94" />
+            <state relative-caret-position="271">
+              <caret line="125" column="30" selection-start-line="125" selection-start-column="30" selection-end-line="125" selection-end-column="30" />
               <folding>
                 <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/economicModels/ASADModel.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1409">
-              <caret line="245" column="114" selection-start-line="245" selection-start-column="114" selection-end-line="245" selection-end-column="114" />
-              <folding>
-                <element signature="e#18793#18794#0" expanded="true" />
-                <element signature="e#18821#18822#0" expanded="true" />
+                <element signature="method#calculatePopulationGrowth#0;class#Game#0" />
+                <element signature="method#updateTechnology#0;class#Game#0" />
               </folding>
             </state>
           </provider>
@@ -205,19 +197,26 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/economicModels/SolowSwanGrowthModel.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="153">
-              <caret line="9" column="63" selection-start-line="9" selection-start-column="63" selection-end-line="9" selection-end-column="63" />
+            <state relative-caret-position="474">
+              <caret line="32" column="22" selection-start-line="32" selection-start-column="22" selection-end-line="32" selection-end-column="22" />
+              <folding>
+                <element signature="method#SolowSwanGrowthModel#0;class#SolowSwanGrowthModel#0" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ai/AI.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="16" column="13" selection-start-line="16" selection-start-column="13" selection-end-line="16" selection-end-column="13" />
+            <state relative-caret-position="373">
+              <caret line="234" column="25" lean-forward="true" selection-start-line="234" selection-start-column="25" selection-end-line="234" selection-end-column="25" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="method#ruleBasedDecisions#0;class#AI#0" />
+                <element signature="method#publicIsRich#0;class#AI#0" />
+                <element signature="method#govtIsRich#0;class#AI#0" />
+                <element signature="method#fuzzyLogic#0;class#AI#0" />
               </folding>
             </state>
           </provider>
@@ -226,8 +225,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/resources/economy.fcl">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1037">
-              <caret line="61" column="53" selection-start-line="61" selection-start-column="53" selection-end-line="61" selection-end-column="53" />
+            <state relative-caret-position="841">
+              <caret line="99" column="18" selection-start-line="99" selection-start-column="18" selection-end-line="99" selection-end-column="18" />
             </state>
           </provider>
         </entry>
@@ -235,8 +234,21 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/resources/growth-info.arff">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="102">
-              <caret line="6" column="11" selection-start-line="6" selection-start-column="11" selection-end-line="6" selection-end-column="11" />
+            <state relative-caret-position="34">
+              <caret line="2" column="11" selection-start-line="2" selection-start-column="11" selection-end-line="5" selection-end-column="30" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/economicModels/ASADModel.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="239">
+              <caret line="286" column="6" selection-start-line="286" selection-start-column="6" selection-end-line="286" selection-end-column="6" />
+              <folding>
+                <element signature="e#19083#19084#0" expanded="true" />
+                <element signature="e#19115#19116#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -272,6 +284,15 @@
       <find>asadmodel</find>
       <find>calculatec</find>
       <find>getccon</find>
+      <find>intere</find>
+      <find>Debt Repayment</find>
+      <find>sqrt</find>
+      <find>nan</find>
+      <find>calculate pri</find>
+      <find>public balance</find>
+      <find>Debt Repayment:</find>
+      <find>cycle n</find>
+      <find>spendingMultiplier</find>
     </findStrings>
     <replaceStrings>
       <replace>asadModel</replace>
@@ -777,17 +798,19 @@
         <option value="$PROJECT_DIR$/src/main/java/economicModel/fuzzySet.java" />
         <option value="$PROJECT_DIR$/src/main/java/economicModel/FuzzySet.java" />
         <option value="$PROJECT_DIR$/src/main/resources/tipper.fcl" />
-        <option value="$PROJECT_DIR$/src/main/resources/economy.fcl" />
         <option value="$PROJECT_DIR$/build.gradle" />
         <option value="$PROJECT_DIR$/src/main/java/economicModel/AI.java" />
-        <option value="$PROJECT_DIR$/src/main/resources/growth-info.arff" />
         <option value="$PROJECT_DIR$/src/main/java/economicModel/SolowSwanGrowthModel.java" />
         <option value="$PROJECT_DIR$/src/main/java/economicModel/Main.java" />
         <option value="$PROJECT_DIR$/src/main/java/economicModel/Game.java" />
         <option value="$PROJECT_DIR$/src/main/java/game/Main.java" />
         <option value="$PROJECT_DIR$/src/main/java/economicModel/ASADModel.java" />
-        <option value="$PROJECT_DIR$/src/main/java/game/Game.java" />
+        <option value="$PROJECT_DIR$/src/main/java/economicModels/SolowSwanGrowthModel.java" />
+        <option value="$PROJECT_DIR$/src/main/resources/economy.fcl" />
+        <option value="$PROJECT_DIR$/src/main/resources/growth-info.arff" />
         <option value="$PROJECT_DIR$/src/main/java/economicModels/ASADModel.java" />
+        <option value="$PROJECT_DIR$/src/main/java/game/Game.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ai/AI.java" />
       </list>
     </option>
   </component>
@@ -803,7 +826,7 @@
       <select />
     </treeState>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="682" />
     <option name="y" value="17" />
     <option name="width" value="1192" />
@@ -907,7 +930,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -961,23 +984,22 @@
               <item name="EconomicModelPrototype" type="b2602c69:ProjectViewProjectNode" />
               <item name="EconomicModel" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="resources" type="462c0819:PsiDirectoryNode" />
+              <item name="test" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="SearchEverywhereHistoryKey" value="&#9;FILE&#9;file://D:/Documents/EconomicModelPrototype/src/main/java/economicModel/AI.java" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1587964738573" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1589775492945" />
     <property name="extract.method.default.visibility" value="private" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="I:/Documents" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="project.structure.last.edited" value="Modules" />
@@ -1148,34 +1170,48 @@
       <workItem from="1587670553757" duration="7553000" />
       <workItem from="1587681074837" duration="615000" />
       <workItem from="1587928509122" duration="8675000" />
-      <workItem from="1588016764947" duration="599000" />
+      <workItem from="1588016764947" duration="605000" />
+      <workItem from="1588307700131" duration="1478000" />
+      <workItem from="1588362395240" duration="8858000" />
+      <workItem from="1588551927657" duration="802000" />
+      <workItem from="1588643855233" duration="1259000" />
+      <workItem from="1588706797026" duration="2829000" />
+      <workItem from="1588791291985" duration="7688000" />
+      <workItem from="1588894503155" duration="1240000" />
+      <workItem from="1589244034921" duration="14118000" />
+      <workItem from="1589309153303" duration="22436000" />
+      <workItem from="1589391118909" duration="24657000" />
+      <workItem from="1589438100887" duration="1343000" />
+      <workItem from="1589478494558" duration="10550000" />
+      <workItem from="1589566831681" duration="4478000" />
+      <workItem from="1589609525967" duration="32000" />
+      <workItem from="1589742151862" duration="10672000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="361741000" />
+    <option name="totallyTimeSpent" value="474187000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="7" />
-    <editor active="true" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.29530916" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49820143" visible="true" weight="0.34701493" />
+      <window_info id="Structure" order="1" sideWeight="0.50179857" side_tool="true" weight="0.3283582" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
       <window_info id="UI Designer" order="4" />
       <window_info id="Favorites" order="5" side_tool="true" />
       <window_info id="Capture Tool" order="6" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info active="true" anchor="bottom" id="Find" order="1" visible="true" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.38222224" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49946696" visible="true" weight="0.38222224" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.34444445" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Build" order="7" />
       <window_info anchor="bottom" id="Terminal" order="8" />
-      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
+      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50053304" side_tool="true" weight="0.38222224" />
       <window_info anchor="bottom" id="Messages" order="10" />
       <window_info anchor="bottom" id="Database Changes" order="11" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="12" show_stripe_button="false" />
@@ -1299,13 +1335,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="24" column="99" selection-start-line="24" selection-start-column="99" selection-end-line="24" selection-end-column="99" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/resources/tipper.fcl" />
     <entry file="file://$PROJECT_DIR$/src/main/java/game/Main.java">
       <provider selected="true" editor-type-id="text-editor">
@@ -1314,54 +1343,462 @@
         </state>
       </provider>
     </entry>
+    <entry file="uml://JavaScript-modules-diagram/D:/Documents/EconomicModel/src">
+      <provider selected="true" editor-type-id="UmlEditorProvider">
+        <state>
+          <ID>JavaScript-modules-diagram</ID>
+          <OriginalElement>$PROJECT_DIR$/src</OriginalElement>
+          <nodes />
+          <notes />
+          <edges />
+          <settings layout="Hierarchic Group" zoom="1.0" x="240.0" y="240.0" />
+          <SelectedNodes />
+          <Categories>
+            <Category>All</Category>
+          </Categories>
+          <SCOPE>All</SCOPE>
+          <VISIBILITY>Details</VISIBILITY>
+        </state>
+      </provider>
+    </entry>
+    <entry file="uml://MODULES/mdl-EconomicModelPrototype_main">
+      <provider selected="true" editor-type-id="UmlEditorProvider">
+        <state>
+          <ID>MODULES</ID>
+          <OriginalElement>mdl-EconomicModelPrototype_main</OriginalElement>
+          <nodes>
+            <node x="9346.0" y="259.0">lib-Gradle: com.github.fommil.netlib:netlib-native_system-osx-x86_64:natives:1.1</node>
+            <node x="8864.0" y="259.0">lib-Gradle: com.github.fommil.netlib:netlib-native_ref-osx-x86_64:natives:1.1</node>
+            <node x="4305.0" y="259.0">lib-Gradle: com.github.vbmacher:java-cup-runtime:11b-20160615</node>
+            <node x="13035.0" y="259.0">lib-Gradle: com.sun.istack:istack-commons-runtime:3.0.8</node>
+            <node x="9851.0" y="259.0">lib-Gradle: com.github.fracpete:jfilechooser-bookmarks:0.1.6</node>
+            <node x="14466.0" y="259.0">lib-Gradle: com.github.fommil.netlib:all:pom:1.1.2</node>
+            <node x="2025.0" y="259.0">lib-tools.jar</node>
+            <node x="7607.5" y="0.0">mdl-EconomicModelPrototype_main</node>
+            <node x="281.0" y="259.0">lib-jFuzzyLogic.jar</node>
+            <node x="6089.0" y="259.0">lib-Gradle: com.github.fommil.netlib:netlib-native_system-linux-i686:natives:1.1</node>
+            <node x="6916.0" y="259.0">lib-Gradle: org.jvnet.staxex:stax-ex:1.8.1</node>
+            <node x="15650.0" y="259.0">lib-Gradle: org.glassfish.jaxb:jaxb-runtime:2.3.2</node>
+            <node x="5606.0" y="259.0">lib-Gradle: nz.ac.waikato.cms.weka:simpleEducationalLearningSchemes:1.0.2</node>
+            <node x="455.0" y="259.0">lib-Gradle: com.googlecode.matrix-toolkits-java:mtj:1.0.4</node>
+            <node x="7572.0" y="259.0">lib-Gradle: nz.ac.waikato.cms.weka:weka-dev:3.9.4</node>
+            <node x="7916.0" y="259.0">lib-Gradle: com.github.fommil.netlib:netlib-native_ref-win-i686:natives:1.1</node>
+            <node x="10975.0" y="259.0">lib-Gradle: nz.ac.waikato.cms.weka:isotonicRegression:1.0.2</node>
+            <node x="10251.0" y="259.0">lib-Gradle: com.github.fracpete:jclipboardhelper:0.1.0</node>
+            <node x="11367.0" y="259.0">lib-Gradle: com.jetbrains:ideaIC:2018.2.4</node>
+            <node x="5099.0" y="259.0">lib-Gradle: com.github.fommil.netlib:netlib-native_system-win-x86_64:natives:1.1</node>
+            <node x="3054.0" y="259.0">lib-Gradle: com.github.fommil.netlib:netlib-native_ref-linux-armhf:natives:1.1</node>
+            <node x="11657.0" y="259.0">lib-Gradle: com.github.fommil.netlib:netlib-native_ref-linux-x86_64:natives:1.1</node>
+            <node x="7200.0" y="259.0">lib-Gradle: com.github.fommil.netlib:native_ref-java:1.1</node>
+            <node x="4731.0" y="259.0">lib-Gradle: net.sourceforge.f2j:arpack_combined_all:0.1</node>
+            <node x="14810.0" y="259.0">lib-Gradle: jakarta.xml.bind:jakarta.xml.bind-api:2.3.2</node>
+            <node x="2675.0" y="259.0">lib-Gradle: com.github.vbmacher:java-cup:11b-20160615</node>
+            <node x="1531.0" y="259.0">lib-Gradle: com.github.fommil.netlib:netlib-native_system-win-i686:natives:1.1</node>
+            <node x="6589.0" y="259.0">lib-Gradle: com.github.fommil.netlib:core:1.1.2</node>
+            <node x="1192.0" y="259.0">lib-Gradle: org.codehaus.groovy:groovy-all:2.3.11</node>
+            <node x="13417.0" y="259.0">lib-Gradle: com.github.fommil:jniloader:1.1</node>
+            <node x="0.0" y="259.0">lib-Gradle: org.glassfish.jaxb:txw2:2.3.2</node>
+            <node x="3937.0" y="259.0">lib-Gradle: jakarta.activation:jakarta.activation-api:1.2.1</node>
+            <node x="8387.0" y="259.0">lib-Gradle: com.github.fommil.netlib:netlib-native_ref-linux-i686:natives:1.1</node>
+            <node x="836.0" y="259.0">lib-Gradle: com.sun.xml.fastinfoset:FastInfoset:1.2.16</node>
+            <node x="15166.0" y="259.0">lib-Gradle: com.github.fommil.netlib:netlib-native_ref-win-x86_64:natives:1.1</node>
+            <node x="13725.0" y="259.0">lib-Gradle: nz.ac.waikato.cms.weka:weka-stable:3.8.4</node>
+            <node x="12660.0" y="259.0">lib-Gradle: nz.ac.waikato.cms.weka:paceRegression:1.0.2</node>
+            <node x="12147.0" y="259.0">lib-Gradle: com.github.fommil.netlib:netlib-native_system-linux-x86_64:natives:1.1</node>
+            <node x="10612.0" y="259.0">lib-Gradle: com.googlecode.netlib-java:netlib-java:1.1</node>
+            <node x="2164.0" y="259.0">lib-Gradle: com.github.fommil.netlib:netlib-native_system-linux-armhf:natives:1.1</node>
+            <node x="3542.0" y="259.0">lib-Gradle: com.github.fommil.netlib:native_system-java:1.1</node>
+            <node x="14081.0" y="259.0">lib-Gradle: nz.ac.waikato.cms.weka.thirdparty:bounce:0.18</node>
+          </nodes>
+          <notes />
+          <edges>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: net.sourceforge.f2j:arpack_combined_all:0.1">
+              <point x="-43.195121951219335" y="14.5" />
+              <point x="7690.804878048781" y="179.0" />
+              <point x="4905.0" y="179.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.github.vbmacher:java-cup:11b-20160615">
+              <point x="-74.04878048780483" y="14.5" />
+              <point x="7659.951219512195" y="129.0" />
+              <point x="2854.5" y="129.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: nz.ac.waikato.cms.weka.thirdparty:bounce:0.18">
+              <point x="98.7317073170725" y="14.5" />
+              <point x="7832.7317073170725" y="89.0" />
+              <point x="14263.5" y="89.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.googlecode.netlib-java:netlib-java:1.1">
+              <point x="43.195121951219335" y="14.5" />
+              <point x="7777.195121951219" y="179.0" />
+              <point x="10783.5" y="179.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.github.fommil.netlib:netlib-native_ref-win-x86_64:natives:1.1">
+              <point x="117.24390243902417" y="14.5" />
+              <point x="7851.243902439024" y="59.0" />
+              <point x="15398.0" y="59.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: org.codehaus.groovy:groovy-all:2.3.11">
+              <point x="-98.73170731707341" y="14.5" />
+              <point x="7635.268292682927" y="89.0" />
+              <point x="1351.5" y="89.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.github.fommil.netlib:native_system-java:1.1">
+              <point x="-61.707317073171" y="14.5" />
+              <point x="7672.292682926829" y="149.0" />
+              <point x="3729.5" y="149.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.github.fommil:jniloader:1.1">
+              <point x="86.39024390243867" y="14.5" />
+              <point x="7820.390243902439" y="109.0" />
+              <point x="13561.0" y="109.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.github.vbmacher:java-cup-runtime:11b-20160615">
+              <point x="-49.36585365853716" y="14.5" />
+              <point x="7684.634146341463" y="169.0" />
+              <point x="4508.0" y="169.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: nz.ac.waikato.cms.weka:paceRegression:1.0.2">
+              <point x="74.04878048780483" y="14.5" />
+              <point x="7808.048780487805" y="129.0" />
+              <point x="12837.5" y="129.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.github.fommil.netlib:netlib-native_ref-osx-x86_64:natives:1.1">
+              <point x="18.512195121951663" y="14.5" />
+              <point x="7752.512195121952" y="219.0" />
+              <point x="9095.0" y="219.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.github.fommil.netlib:all:pom:1.1.2">
+              <point x="104.90243902439033" y="14.5" />
+              <point x="7838.90243902439" y="79.0" />
+              <point x="14628.0" y="79.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.github.fommil.netlib:netlib-native_system-osx-x86_64:natives:1.1">
+              <point x="24.68292682926767" y="14.5" />
+              <point x="7758.682926829268" y="209.0" />
+              <point x="9588.5" y="209.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: org.jvnet.staxex:stax-ex:1.8.1">
+              <point x="-12.341463414633836" y="14.5" />
+              <point x="7721.658536585366" y="229.0" />
+              <point x="7048.0" y="229.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.github.fommil.netlib:netlib-native_ref-linux-armhf:natives:1.1">
+              <point x="-67.87804878048792" y="14.5" />
+              <point x="7666.121951219512" y="139.0" />
+              <point x="3288.0" y="139.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.github.fommil.netlib:netlib-native_ref-linux-i686:natives:1.1">
+              <point x="12.341463414633836" y="14.5" />
+              <point x="7746.341463414634" y="229.0" />
+              <point x="8615.5" y="229.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.googlecode.matrix-toolkits-java:mtj:1.0.4">
+              <point x="-111.07317073170725" y="14.5" />
+              <point x="7622.926829268293" y="69.0" />
+              <point x="635.5" y="69.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: org.glassfish.jaxb:txw2:2.3.2">
+              <point x="-123.414634146342" y="14.5" />
+              <point x="7610.585365853658" y="49.0" />
+              <point x="130.5" y="49.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: jakarta.activation:jakarta.activation-api:1.2.1">
+              <point x="-55.53658536585408" y="14.5" />
+              <point x="7678.463414634146" y="159.0" />
+              <point x="4111.0" y="159.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.github.fommil.netlib:native_ref-java:1.1">
+              <point x="-6.170731707317827" y="14.5" />
+              <point x="7727.829268292682" y="239.0" />
+              <point x="7376.0" y="239.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: nz.ac.waikato.cms.weka:weka-dev:3.9.4">
+              <point x="0.0" y="14.5" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: nz.ac.waikato.cms.weka:simpleEducationalLearningSchemes:1.0.2">
+              <point x="-30.8536585365855" y="14.5" />
+              <point x="7703.1463414634145" y="199.0" />
+              <point x="5837.5" y="199.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: nz.ac.waikato.cms.weka:weka-stable:3.8.4">
+              <point x="92.5609756097565" y="14.5" />
+              <point x="7826.5609756097565" y="99.0" />
+              <point x="13893.0" y="99.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.github.fommil.netlib:core:1.1.2">
+              <point x="-18.512195121951663" y="14.5" />
+              <point x="7715.487804878048" y="219.0" />
+              <point x="6742.5" y="219.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.sun.xml.fastinfoset:FastInfoset:1.2.16">
+              <point x="-104.90243902439033" y="14.5" />
+              <point x="7629.09756097561" y="79.0" />
+              <point x="1004.0" y="79.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.sun.istack:istack-commons-runtime:3.0.8">
+              <point x="80.21951219512266" y="14.5" />
+              <point x="7814.219512195123" y="119.0" />
+              <point x="13216.0" y="119.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-tools.jar">
+              <point x="-86.39024390243958" y="14.5" />
+              <point x="7647.60975609756" y="109.0" />
+              <point x="2084.5" y="109.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.github.fommil.netlib:netlib-native_system-linux-armhf:natives:1.1">
+              <point x="-80.21951219512175" y="14.5" />
+              <point x="7653.780487804878" y="119.0" />
+              <point x="2409.5" y="119.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.github.fommil.netlib:netlib-native_system-win-i686:natives:1.1">
+              <point x="-92.5609756097565" y="14.5" />
+              <point x="7641.4390243902435" y="99.0" />
+              <point x="1768.0" y="99.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.github.fommil.netlib:netlib-native_system-linux-x86_64:natives:1.1">
+              <point x="67.878048780487" y="14.5" />
+              <point x="7801.878048780487" y="139.0" />
+              <point x="12393.5" y="139.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.github.fommil.netlib:netlib-native_ref-win-i686:natives:1.1">
+              <point x="6.170731707317827" y="14.5" />
+              <point x="7740.170731707318" y="239.0" />
+              <point x="8141.5" y="239.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.github.fracpete:jfilechooser-bookmarks:0.1.6">
+              <point x="30.8536585365855" y="14.5" />
+              <point x="7764.8536585365855" y="199.0" />
+              <point x="10041.0" y="199.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: nz.ac.waikato.cms.weka:isotonicRegression:1.0.2">
+              <point x="49.36585365853716" y="14.5" />
+              <point x="7783.365853658537" y="169.0" />
+              <point x="11161.0" y="169.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.github.fracpete:jclipboardhelper:0.1.0">
+              <point x="37.024390243903326" y="14.5" />
+              <point x="7771.024390243903" y="189.0" />
+              <point x="10421.5" y="189.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.jetbrains:ideaIC:2018.2.4">
+              <point x="55.53658536585317" y="14.5" />
+              <point x="7789.536585365853" y="159.0" />
+              <point x="11502.0" y="159.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.github.fommil.netlib:netlib-native_system-win-x86_64:natives:1.1">
+              <point x="-37.02439024390242" y="14.5" />
+              <point x="7696.975609756098" y="189.0" />
+              <point x="5342.5" y="189.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.github.fommil.netlib:netlib-native_ref-linux-x86_64:natives:1.1">
+              <point x="61.707317073171" y="14.5" />
+              <point x="7795.707317073171" y="149.0" />
+              <point x="11892.0" y="149.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-jFuzzyLogic.jar">
+              <point x="-117.24390243902508" y="14.5" />
+              <point x="7616.756097560975" y="59.0" />
+              <point x="358.0" y="59.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: com.github.fommil.netlib:netlib-native_system-linux-i686:natives:1.1">
+              <point x="-24.68292682926767" y="14.5" />
+              <point x="7709.317073170732" y="209.0" />
+              <point x="6329.0" y="209.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: jakarta.xml.bind:jakarta.xml.bind-api:2.3.2">
+              <point x="111.07317073170816" y="14.5" />
+              <point x="7845.073170731708" y="69.0" />
+              <point x="14978.0" y="69.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+            <edge source="mdl-EconomicModelPrototype_main" target="lib-Gradle: org.glassfish.jaxb:jaxb-runtime:2.3.2">
+              <point x="123.414634146342" y="14.5" />
+              <point x="7857.414634146342" y="49.0" />
+              <point x="15802.5" y="49.0" />
+              <point x="0.0" y="-14.5" />
+            </edge>
+          </edges>
+          <settings layout="Hierarchic Group" zoom="1.0" x="7456.0" y="-170.0" />
+          <SelectedNodes>
+            <node>mdl-EconomicModelPrototype_main</node>
+          </SelectedNodes>
+          <Categories>
+            <Category>Libraries</Category>
+          </Categories>
+          <SCOPE>All</SCOPE>
+        </state>
+      </provider>
+    </entry>
+    <entry file="uml://JAVA/">
+      <provider selected="true" editor-type-id="UmlEditorProvider">
+        <state>
+          <ID>JAVA</ID>
+          <OriginalElement />
+          <nodes>
+            <node x="336.0" y="1115.0">ai.AI</node>
+            <node x="0.0" y="1115.0">economicModels.SolowSwanGrowthModel</node>
+            <node x="454.0" y="1360.0">game.Game</node>
+            <node x="449.5892857142857" y="0.0">economicModels.ASADModel</node>
+            <node x="430.0" y="1461.0">game.Main</node>
+          </nodes>
+          <notes />
+          <edges>
+            <edge source="game.Main" target="game.Game">
+              <point x="-42.25" y="-25.5" />
+              <point x="472.25" y="1436.0" />
+              <point x="484.25" y="1436.0" />
+              <point x="-30.25" y="25.5" />
+            </edge>
+            <edge source="game.Game" target="economicModels.ASADModel">
+              <point x="30.25" y="-25.5" />
+              <point x="544.75" y="1330.0" />
+              <point x="703.5" y="1330.0" />
+              <point x="703.5" y="1095.0" />
+              <point x="632.0892857142858" y="1095.0" />
+              <point x="36.5" y="532.5" />
+            </edge>
+            <edge source="game.Game" target="economicModels.SolowSwanGrowthModel">
+              <point x="-50.416666666666686" y="-25.5" />
+              <point x="464.08333333333337" y="1340.0" />
+              <point x="79.0" y="1340.0" />
+              <point x="-79.0" y="92.5" />
+            </edge>
+            <edge source="game.Game" target="ai.AI">
+              <point x="10.083333333333314" y="-25.5" />
+              <point x="524.5833333333334" y="1320.0" />
+              <point x="603.75" y="1320.0" />
+              <point x="89.25" y="92.5" />
+            </edge>
+            <edge source="ai.AI" target="economicModels.ASADModel">
+              <point x="89.25" y="-92.5" />
+              <point x="603.75" y="1095.0" />
+              <point x="559.0892857142858" y="1095.0" />
+              <point x="-36.5" y="532.5" />
+            </edge>
+          </edges>
+          <settings layout="Hierarchic Group" zoom="0.6000000000000001" x="530.0" y="815.0" />
+          <SelectedNodes />
+          <Categories>
+            <Category>Fields</Category>
+            <Category>Constructors</Category>
+            <Category>Methods</Category>
+            <Category>Properties</Category>
+          </Categories>
+          <SCOPE>All</SCOPE>
+          <VISIBILITY>public</VISIBILITY>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="408">
+          <caret line="24" column="99" selection-start-line="24" selection-start-column="99" selection-end-line="24" selection-end-column="99" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/economy.fcl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="841">
+          <caret line="99" column="18" selection-start-line="99" selection-start-column="18" selection-end-line="99" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/growth-info.arff">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="11" selection-start-line="2" selection-start-column="11" selection-end-line="5" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/economicModels/ASADModel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="239">
+          <caret line="286" column="6" selection-start-line="286" selection-start-column="6" selection-end-line="286" selection-end-column="6" />
+          <folding>
+            <element signature="e#19083#19084#0" expanded="true" />
+            <element signature="e#19115#19116#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/nz.ac.waikato.cms.weka/weka-stable/3.8.4/d813e48147d5339a79a05055fd164ddcf988ba53/weka-stable-3.8.4-sources.jar!/weka/classifiers/MultipleClassifiersCombiner.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="177">
+          <caret line="149" column="14" selection-start-line="149" selection-start-column="14" selection-end-line="149" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/game/Game.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1173">
-          <caret line="77" column="94" selection-start-line="77" selection-start-column="94" selection-end-line="77" selection-end-column="94" />
+        <state relative-caret-position="271">
+          <caret line="125" column="30" selection-start-line="125" selection-start-column="30" selection-end-line="125" selection-end-column="30" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#calculatePopulationGrowth#0;class#Game#0" />
+            <element signature="method#updateTechnology#0;class#Game#0" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/economicModels/SolowSwanGrowthModel.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" column="63" selection-start-line="9" selection-start-column="63" selection-end-line="9" selection-end-column="63" />
+        <state relative-caret-position="474">
+          <caret line="32" column="22" selection-start-line="32" selection-start-column="22" selection-end-line="32" selection-end-column="22" />
+          <folding>
+            <element signature="method#SolowSwanGrowthModel#0;class#SolowSwanGrowthModel#0" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ai/AI.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="16" column="13" selection-start-line="16" selection-start-column="13" selection-end-line="16" selection-end-column="13" />
+        <state relative-caret-position="373">
+          <caret line="234" column="25" lean-forward="true" selection-start-line="234" selection-start-column="25" selection-end-line="234" selection-end-column="25" />
           <folding>
             <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/economy.fcl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1037">
-          <caret line="61" column="53" selection-start-line="61" selection-start-column="53" selection-end-line="61" selection-end-column="53" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/growth-info.arff">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="6" column="11" selection-start-line="6" selection-start-column="11" selection-end-line="6" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/economicModels/ASADModel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1409">
-          <caret line="245" column="114" selection-start-line="245" selection-start-column="114" selection-end-line="245" selection-end-column="114" />
-          <folding>
-            <element signature="e#18793#18794#0" expanded="true" />
-            <element signature="e#18821#18822#0" expanded="true" />
+            <element signature="method#ruleBasedDecisions#0;class#AI#0" />
+            <element signature="method#publicIsRich#0;class#AI#0" />
+            <element signature="method#govtIsRich#0;class#AI#0" />
+            <element signature="method#fuzzyLogic#0;class#AI#0" />
           </folding>
         </state>
       </provider>
